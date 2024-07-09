@@ -1,6 +1,24 @@
 import Actor from './actor.js';
 import { setAttribute, drawElements } from '../../lib/glu.js'
 
+const { mat4 } = glMatrix;
+
+const matrixStack = {
+  items: [],
+
+  push(matrix) {
+    const temp = mat4.create();
+    mat4.copy(temp, matrix);
+    this.items.push(temp);
+  },
+  
+  pop(matrix) {
+    if (this.items.length > 0) {
+      matrix.set(this.items.pop());
+    }
+  },  
+};
+
 export default class extends Actor {
   constructor(name, trs, nodes) {
     super(name, trs);

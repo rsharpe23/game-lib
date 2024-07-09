@@ -1,3 +1,5 @@
+const { mat4 } = glMatrix;
+
 export default class {
   _matrix = mat4.create();
   _changed = false;

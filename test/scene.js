@@ -1,48 +1,67 @@
-import { Scene } from '../src/scene.js';
+import Scene from '../src/scene.js';
+import light from '../src/light.js';
+import camera from '../src/camera.js';
+import { degToRad } from '../lib/math.js';
+
+const { quat, vec3 } = glMatrix;
+
+const cameraRot = {
+  q: quat.create(),
+
+  update(deltaTime) {
+    quat.fromEuler(this.q, 0, degToRad(deltaTime), 0);
+    vec3.transformQuat(camera.position, camera.position, this.q);
+  }
+};
+
+const applyGlobalMaterial = (gl, prog) => {
+  gl.uniform3f(prog.u_MaterialAmbientColor, 0.2, 0.2, 0.2);
+  gl.uniform3f(prog.u_MaterialSpecularColor, 0.8, 0.8, 0.8);
+};
 
 export default class extends Scene {
-  _cameraAngle = 0;
-
-  constructor(texAtlas, actors) {
-    super(actors);
+  constructor(texAtlas) {
+    super();
     this.texAtlas = texAtlas;
   }
 
-  _beforeRender({ gl, prog }) {
+  _beforeRender({ canvas, gl, prog }) {
     gl.clearColor(0.0, 0.0, 0.14, 1.0);
     gl.enable(gl.DEPTH_TEST);
-    gl.useProgram(prog);
 
-    // Если использовать текстурный атлас, 
-    // то он будет только один на всю сцену.
+    prog.setLocations(gl);
+    prog.use(gl);
+
+    // Если использовать текстурный атлас, то он будет только один на всю сцену.
     gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, 
       gl.UNSIGNED_BYTE, this.texAtlas);
     gl.generateMipmap(gl.TEXTURE_2D);
+
+    camera.position = [0, 5, 20];
+    camera.perspective.aspect = canvas.width / canvas.height;
+
+    light.position = [0, -70, -100];
   }
 
-  _render({ canvas, gl, prog, matrices }, deltaTime) {
-    const { width, height } = canvas;
+  _render(appProps, deltaTime) {
+    const canvas = appProps.canvas;
+    const gl =  appProps.gl;
+    const prog =  appProps.prog;
 
-    gl.viewport(0, 0, width, height);
+    gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    mat4.perspective(matrices.projection, 1.04, width / height, 0.1, 1000.0);
-    gl.uniformMatrix4fv(prog.u_PMatrix, false, matrices.projection);
+    // TODO: Свет и камеру можно сделать классами, задавать их как 
+    // свойства сцены и вызывать здесь, вместо импорта напрямую
 
-    this._cameraAngle += deltaTime;
-    const cameraRot = quat.create();
-    const cameraPos = vec3.create();
-    quat.fromEuler(cameraRot, 0, degToRad(this._cameraAngle), 0);
-    vec3.transformQuat(cameraPos, [0, 3, 10], cameraRot);
-    mat4.lookAt(matrices.modelView, cameraPos, [0, 0, 0], [0, 1, 0]);
+    // TODO: Подумать, нужно ли убирать матрицы из глобального доступа в app
 
-    // mat4.lookAt(matrices.modelView, [0, 0, 5], [0, 0, 0], [0, 1, 0]);
+    cameraRot.update(deltaTime);
+    camera.apply(appProps);
 
-    const lightingPos = vec3.create();
-    vec3.transformMat4(lightingPos, [0, -7, -10], matrices.modelView);
-    prog.setLightUniforms(lightingPos);
+    light.apply(appProps);
 
-    prog.setMaterialUniforms();
+    applyGlobalMaterial(gl, prog);
   }
 }

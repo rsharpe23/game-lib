@@ -12,8 +12,8 @@ export const loadShader = async url => {
 };
 
 export const loadShaders = async dir => {
-  const requests = files.map(({ name, shaderType }) => {
-    const fn = loadShader(`${dir}/${name}.glsl`);
+  const requests = files.map(async ({ name, shaderType }) => {
+    const fn = await loadShader(`${dir}/${name}.glsl`);
     return gl => fn(gl, shaderType);
   });
 

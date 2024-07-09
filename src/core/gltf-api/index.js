@@ -5,8 +5,11 @@ import MeshParser from './mesh-parser.js';
 import { loadJSON, loadBuffer } from '../../../lib/load-api.js';
 import { getURL } from './util.js';
 
-export const parseGLTF = ({ scene, scenes, nodes, ...rest }) => 
-  new Geometry(scenes[scene], new NodeTree(nodes), new MeshParser(rest));
+export const parseGLTF = ({ scene, scenes, nodes, ...rest }) => {
+  const nodeTree = new NodeTree(nodes);
+  const meshParser = new MeshParser(rest);
+  return new Geometry(scenes[scene], nodeTree, meshParser);
+};
 
 export const loadGLTF = async dir => {
   const gltf = await loadJSON(getURL(dir));
@@ -15,4 +18,7 @@ export const loadGLTF = async dir => {
   return gltf;
 };
 
-export const loadGeometry = async dir => parseGLTF(await loadGLTF(dir));
+export const loadGeometry = async dir => {
+  const gltf = await loadGLTF(dir);
+  return parseGLTF(gltf);
+};

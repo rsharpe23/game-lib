@@ -7,7 +7,7 @@ uniform mat4 u_MVMatrix;
 uniform mat4 u_NMatrix;
 
 uniform vec3 u_AmbientColor;
-uniform vec3 u_DirectionalColor;
+uniform vec3 u_DiffuseColor;
 uniform vec3 u_SpecularColor;
 uniform vec3 u_LightingPos;
 
@@ -37,7 +37,7 @@ void main(void) {
   }
 
   v_Color = u_AmbientColor * u_MaterialAmbientColor 
-    + u_DirectionalColor * lambertTerm 
+    + u_DiffuseColor * lambertTerm 
     + u_SpecularColor * u_MaterialSpecularColor * specular;
 
   v_Texcoord = a_Texcoord;

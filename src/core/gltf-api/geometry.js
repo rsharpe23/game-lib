@@ -1,13 +1,17 @@
 import TRS from '../trs.js';
 
-export default class {
-  static _accessor = 0;
+let globalAccessor = 0;
 
+export default class {
   constructor(scene, nodeTree, meshParser) {
     this.scene = scene;
     this.nodeTree = nodeTree;
     this.meshParser = meshParser;
-    this.accessor = Parsable._accessor++;
+    this.accessor = globalAccessor++;
+  }
+
+  asArray() {
+    return Array.from(this);
   }
 
   *[Symbol.iterator]() {

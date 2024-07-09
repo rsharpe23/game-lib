@@ -1,10 +1,7 @@
 import Renderer from './renderer.js';
 
 export default class extends Renderer {
-  constructor(actors = []) {
-    super();
-    this.actors = actors;
-  }
+  actors = [];
 
   addActor(actor) {
     this.actors.push(actor);

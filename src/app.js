@@ -2,7 +2,8 @@ import Program from './core/program.js';
 
 const canvas = document.getElementById('canvas');
 const gl = canvas.getContext('webgl');
-const prog = await Program.fromOwnShaders(gl);
+const prog = await Program.create(gl);
+const { mat4 } = glMatrix
 
 export default {
   props: {
@@ -24,6 +25,6 @@ export default {
       requestAnimationFrame(render);
     };
 
-    render();
+    render(time);
   }
 };

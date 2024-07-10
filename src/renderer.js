@@ -14,4 +14,4 @@ export default class {
   _render(appProps) {
     throw new Error('Not implemented');
   }
-}
+};

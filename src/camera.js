@@ -13,7 +13,7 @@ export default class {
   };
 
   constructor(perspectiveOpts, position, lookPoint) {
-    
+
     this.perspectiveOpts = { 
       ...this.defaultPerspectiveOpts, 
       ...perspectiveOpts 

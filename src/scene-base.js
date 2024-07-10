@@ -23,4 +23,4 @@ export default class extends Renderer {
       actor.render(appProps);
     }
   }
-}
+};

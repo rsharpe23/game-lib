@@ -1,7 +1,7 @@
 import '../require/gl-matrix.js';
 import '../require/global-ext.js';
 
-import { loadGeometry } from '../src/core/gltf-api/index.js'
+import { loadGeometry } from '../src/core/gltf-api/index.js';
 import { loadBlob } from '../lib/load-api.js';
 
 import app from '../src/app.js';
@@ -23,8 +23,8 @@ const _loadGeometry = async dir => {
 };
 
 const createScene = ([texAtlas, geometry]) => {
-  const { width, height } = app.props.canvas;
-  const camera = new Camera({ aspect: width / height }, [0, 5, 20]);
+  const { drawingBufferWidth: w, drawingBufferHeight: h } = app.props.gl;
+  const camera = new Camera({ aspect: w / h }, [0, 5, 20]);
 
   const light = new Light([0, -70, -100]);
 

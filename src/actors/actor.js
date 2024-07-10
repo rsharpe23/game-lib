@@ -12,4 +12,4 @@ export default class extends Renderer {
   render(appProps) {
     if (!this.isHidden) super.render(appProps);
   }
-} 
+};

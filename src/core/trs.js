@@ -84,4 +84,4 @@ export default class {
     mat4.fromRotationTranslationScale(out, 
       this.rotation, this.translation, this.scale);
   }
-}
+};

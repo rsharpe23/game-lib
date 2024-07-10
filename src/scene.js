@@ -1,6 +1,6 @@
 import SceneBase from '../src/scene-base.js';
 
-const applyGlobalMaterial = (gl, prog) => {
+const applyMaterialColors = (gl, prog) => {
   gl.uniform3f(prog.u_MaterialAmbientColor, 0.2, 0.2, 0.2);
   gl.uniform3f(prog.u_MaterialSpecularColor, 0.8, 0.8, 0.8);
 };
@@ -24,11 +24,10 @@ export default class extends SceneBase {
   }
 
   _render(appProps) {
-    const canvas = appProps.canvas;
     const gl =  appProps.gl;
     const prog =  appProps.prog;
 
-    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     prog.use(gl);
@@ -36,6 +35,6 @@ export default class extends SceneBase {
     this.camera.apply(appProps);
     this.light.apply(appProps);
 
-    applyGlobalMaterial(gl, prog);
+    applyMaterialColors(gl, prog);
   }
-}
+};

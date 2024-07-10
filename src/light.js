@@ -8,15 +8,14 @@ const applyColors = (gl, prog, colors) => {
 };
 
 export default class {
-  defaultColors = {
+  colors = {
     ambient: [0.4, 0.4, 0.4],
     diffuse: [0.8, 0.8, 0.8],
     specular: [1, 1, 1],
   };
 
-  constructor(position, colors) {
+  constructor(position) {
     this.position = position ?? [0, 0, 0];
-    this.colors = { ...this.defaultColors, ...colors };
   }
 
   apply(appProps) {

@@ -12,6 +12,7 @@ export default {
       projection: mat4.create(),
       view: mat4.create(),
     },
+    deltaTime: 0,
     store: {},
   },
 

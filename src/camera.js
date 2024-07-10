@@ -1,22 +1,25 @@
 const { mat4 } = glMatrix;
 
-const applyProjMatrix = (gl, prog, matrix, props) => {
-  mat4.perspective(matrix, props.fov, props.aspect, 
-    props.near, props.far);
-
-  gl.uniformMatrix4fv(prog.u_PMatrix, false, matrix);
-};
+export class Perspective {
+  constructor(fov, aspect, near, far) {
+    this.fov = fov;
+    this.aspect = aspect;
+    this.near = near;
+    this.far = far;
+  }
+  
+  applyMatrix(gl, prog, matrix) {
+    mat4.perspective(matrix, this.fov, this.aspect, this.near, this.far);
+    gl.uniformMatrix4fv(prog.u_PMatrix, false, matrix);
+  }
+}
 
 export default class {
-  perspectiveProps = {
-    fov: 1.04,
-    near: 0.1,
-    far: 1000,
-  };
+  lookAtPoint = [0, 0, 0];
 
-  constructor(position, lookPoint) {
-    this.position = position ?? [0, 0, 0];
-    this.lookPoint = lookPoint ?? [0, 0, 0];
+  constructor(position, projection) {
+    this.position = position;
+    this.projection = projection;
   }
 
   apply(appProps) {
@@ -24,10 +27,8 @@ export default class {
     const prog = appProps.prog;
     const matrices = appProps.matrices;
 
-    applyProjMatrix(gl, prog, matrices.projection, 
-      this.perspectiveProps);
-
+    this.projection.applyMatrix(gl, prog, matrices.projection);
     mat4.lookAt(matrices.view, this.position, 
-      this.lookPoint, [0, 1, 0]);
+      this.lookAtPoint, [0, 1, 0]);
   }
 };

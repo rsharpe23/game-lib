@@ -23,11 +23,8 @@ const _loadGeometry = async dir => {
 };
 
 const createScene = ([texAtlas, geometry]) => {
-  const { drawingBufferWidth: w, drawingBufferHeight: h } = app.props.gl;
-  const camera = new Camera({ aspect: w / h }, [0, 5, 20]);
-
+  const camera = new Camera([0, 5, 20]); 
   const light = new Light([0, -70, -100]);
-
   const scene = new Scene(texAtlas, camera, light);
 
   const translations = [
@@ -43,9 +40,8 @@ const createScene = ([texAtlas, geometry]) => {
   ];
 
   for (const translation of translations) {
-    const tank = new Mesh('tank', new TRS({ translation }), 
-      geometry.asArray());
-
+    const trs = new TRS({ translation });
+    const tank = new Mesh('tank', trs, geometry.asArray());
     scene.addActor(tank);
   }
 

@@ -15,7 +15,7 @@ export default class {
   };
 
   constructor(position) {
-    this.position = position ?? [0, 0, 0];
+    this.position = position;
   }
 
   apply(appProps) {

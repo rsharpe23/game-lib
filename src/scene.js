@@ -39,12 +39,3 @@ export default class extends SceneBase {
     applyGlobalMaterial(gl, prog);
   }
 }
-
-// const cameraRot = {
-//   q: quat.create(),
-
-//   update(deltaTime) {
-//     quat.fromEuler(this.q, 0, degToRad(deltaTime), 0);
-//     vec3.transformQuat(camera.position, camera.position, this.q);
-//   }
-// };

@@ -6,7 +6,7 @@ import { loadBlob } from '../lib/load-api.js';
 
 import app from '../src/app.js';
 import Scene from '../src/scene.js';
-import Camera from '../src/camera.js';
+import Camera from './camera.js';
 import Light from '../src/light.js';
 import Mesh from '../src/actors/mesh.js';
 import TRS from '../src/core/trs.js';
@@ -43,8 +43,10 @@ const createScene = ([texAtlas, geometry]) => {
   ];
 
   for (const translation of translations) {
-    scene.addActor( new Mesh('tank', 
-      new TRS({ translation }), geometry.asArray()) );
+    const tank = new Mesh('tank', new TRS({ translation }), 
+      geometry.asArray());
+
+    scene.addActor(tank);
   }
 
   return scene;

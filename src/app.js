@@ -24,7 +24,6 @@ export default {
       this.props.deltaTime = elapsedTime - time;
       renderer.render(this.props);
       time = elapsedTime;
-      
       requestAnimationFrame(render);
     };
 

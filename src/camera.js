@@ -1,7 +1,9 @@
 const { mat4 } = glMatrix;
 
 const applyProjMatrix = (gl, prog, matrix, props) => {
-  mat4.perspective(matrix, props.fov, props.aspect, props.near, props.far);
+  mat4.perspective(matrix, props.fov, props.aspect, 
+    props.near, props.far);
+
   gl.uniformMatrix4fv(prog.u_PMatrix, false, matrix);
 };
 

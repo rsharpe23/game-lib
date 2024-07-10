@@ -9,9 +9,7 @@ export default class extends Renderer {
     this.trs = trs;
   }
 
-  render(appProps, deltaTime) {
-    if (!this.isHidden) {
-      super.render(appProps, deltaTime);
-    }
+  render(appProps) {
+    if (!this.isHidden) super.render(appProps);
   }
 } 

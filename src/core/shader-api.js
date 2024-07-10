@@ -1,9 +1,9 @@
 import { loadText } from '../../lib/load-api.js'; 
 import { createShader } from '../../lib/glu.js';
 
-const files = [
-  { name: 'vs', shaderType: 35633 },
-  { name: 'fs', shaderType: 35632 },
+const shaders = [
+  { name: 'vs', type: 35633 },
+  { name: 'fs', type: 35632 },
 ];
 
 export const loadShader = async url => {
@@ -12,9 +12,9 @@ export const loadShader = async url => {
 };
 
 export const loadShaders = async dir => {
-  const requests = files.map(async ({ name, shaderType }) => {
+  const requests = shaders.map(async ({ name, type }) => {
     const fn = await loadShader(`${dir}/${name}.glsl`);
-    return gl => fn(gl, shaderType);
+    return gl => fn(gl, type);
   });
 
   return Promise.all(requests);

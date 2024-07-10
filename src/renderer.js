@@ -1,9 +1,9 @@
 export default class {
   _isReady = false;
 
-  render(appProps, deltaTime) {
+  render(appProps) {
     if (this._isReady) {
-      this._render(appProps, deltaTime);
+      this._render(appProps);
       return;
     }
 
@@ -11,7 +11,7 @@ export default class {
     this._isReady = true;
   }
 
-  _render(appProps, deltaTime) {
+  _render(appProps) {
     throw new Error('Not implemented');
   }
 }

@@ -2,21 +2,18 @@ import Actor from './actor.js';
 import { setAttribute, drawElements } from '../../lib/glu.js'
 
 const { mat4 } = glMatrix;
+const mvMatrix = mat4.create();
+const normalMatrix = mat4.create();
 
-const matrixStack = {
-  items: [],
+const applyMvMatrix = (gl, prog, viewMatrix, modelMatrix) => {
+  mat4.mul(mvMatrix, viewMatrix, modelMatrix);
+  gl.uniformMatrix4fv(prog.u_MVMatrix, false, mvMatrix);
+};
 
-  push(matrix) {
-    const temp = mat4.create();
-    mat4.copy(temp, matrix);
-    this.items.push(temp);
-  },
-  
-  pop(matrix) {
-    if (this.items.length > 0) {
-      matrix.set(this.items.pop());
-    }
-  },  
+const applyNormalMatrix = (gl, prog) => {
+  mat4.invert(normalMatrix, mvMatrix);
+  mat4.transpose(normalMatrix, normalMatrix);
+  gl.uniformMatrix4fv(prog.u_NMatrix, false, normalMatrix);
 };
 
 export default class extends Actor {
@@ -35,7 +32,6 @@ export default class extends Actor {
     }
   }
 
-  // Из-за лишней работы GC могут возникать фризы
   _render(appProps) {
     for (const node of this.nodes) {
       const gl = appProps.gl;
@@ -45,16 +41,8 @@ export default class extends Actor {
 
       gl.uniform1i(prog.u_Sampler, 0);
 
-      matrixStack.push(matrices.modelView);
-
-      mat4.mul(matrices.modelView, matrices.modelView, node.trs.matrix);
-      gl.uniformMatrix4fv(prog.u_MVMatrix, false, matrices.modelView);
-
-      mat4.invert(matrices.normal, matrices.modelView);
-      mat4.transpose(matrices.normal, matrices.normal);
-      gl.uniformMatrix4fv(prog.u_NMatrix, false, matrices.normal);
-
-      matrixStack.pop(matrices.modelView);
+      applyMvMatrix(gl, prog, matrices.view, node.trs.matrix);
+      applyNormalMatrix(gl, prog);
 
       for (const prim of node.primitives) {
         setAttribute(gl, store, prog.a_Position, prim.vbo);

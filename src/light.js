@@ -1,29 +1,32 @@
 const { vec3 } = glMatrix;
+const position = vec3.create();
 
-export default {
-  _position: vec3.create(),
-  position: [0, 0, 0],
+const applyColors = (gl, prog, colors) => {
+  gl.uniform3fv(prog.u_AmbientColor, colors.ambient);
+  gl.uniform3fv(prog.u_DiffuseColor, colors.diffuse);
+  gl.uniform3fv(prog.u_SpecularColor, colors.specular);
+};
 
-  colors: {
+export default class {
+  defaultColors = {
     ambient: [0.4, 0.4, 0.4],
     diffuse: [0.8, 0.8, 0.8],
     specular: [1, 1, 1],
+  };
 
-    apply(gl, prog) {
-      gl.uniform3fv(prog.u_AmbientColor, this.ambient);
-      gl.uniform3fv(prog.u_DiffuseColor, this.diffuse);
-      gl.uniform3fv(prog.u_SpecularColor, this.specular);
-    },
-  },
+  constructor(position, colors) {
+    this.position = position ?? [0, 0, 0];
+    this.colors = { ...this.defaultColors, ...colors };
+  }
 
   apply(appProps) {
     const gl = appProps.gl;
     const prog = appProps.prog;
     const matrices = appProps.matrices;
 
-    vec3.transformMat4(this._position, this.position, matrices.modelView);
-    gl.uniform3fv(prog.u_LightingPos, this._position);
+    vec3.transformMat4(position, this.position, matrices.view);
+    gl.uniform3fv(prog.u_LightingPos, position);
 
-    this.colors.apply(gl, prog);
+    applyColors(gl, prog, this.colors);
   }
-}
+};

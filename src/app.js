@@ -7,8 +7,7 @@ const { mat4 } = glMatrix;
 
 export default {
   props: {
-    canvas, gl, 
-    prog: program(gl),
+    gl, prog: program(gl),
     matrices: {
       projection: mat4.create(),
       view: mat4.create(),

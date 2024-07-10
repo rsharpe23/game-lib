@@ -45,4 +45,4 @@ export default class {
 
     return createBuffer(gl, data, target);
   }
-}
+};

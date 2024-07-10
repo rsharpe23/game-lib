@@ -26,4 +26,4 @@ export default class {
     const primitives = this.meshParser.parseMesh(mesh);
     return { name, trs, primitives, accessor: this.accessor };
   }
-}
+};

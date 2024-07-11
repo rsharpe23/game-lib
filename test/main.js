@@ -8,7 +8,7 @@ import app from '../src/app.js';
 import Scene from '../src/scene.js';
 import Camera from './camera.js';
 import Light from '../src/light.js';
-import Mesh from '../src/drawings/mesh.js';
+import Mesh from '../src/visuals/mesh.js';
 import TRS from '../src/core/trs.js';
 
 const loadImg = async url => {
@@ -35,7 +35,7 @@ const createScene = ([texAtlas, geometry]) => {
     [ 7,  0,  7],
     [ 7,  0, -7],
     [-7,  0,  7],
-    [-7,  0, -7]
+    [-7,  0, -7],
   ];
   
   for (const translation of translations) {

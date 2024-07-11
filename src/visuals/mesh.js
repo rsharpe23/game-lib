@@ -1,4 +1,4 @@
-import Drawing from './drawing.js';
+import Visuality from './visuality.js';
 import { setAttribute, drawElements } from '../../lib/glu.js'
 import { find } from '../mixins/list-mixin.js';
 
@@ -17,7 +17,7 @@ const applyNormalMatrix = (gl, prog) => {
   gl.uniformMatrix4fv(prog.u_NMatrix, false, normalMatrix);
 };
 
-export default class Mesh extends Drawing {
+export default class Mesh extends Visuality {
   constructor(name, trs, geometry) {
     super(name, trs);
     this.geometry = geometry;

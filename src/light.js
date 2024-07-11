@@ -1,3 +1,5 @@
+import Updatable from "./updatable.js";
+
 const { vec3 } = glMatrix;
 const position = vec3.create();
 
@@ -7,7 +9,7 @@ const applyColors = (gl, prog, colors) => {
   gl.uniform3fv(prog.u_SpecularColor, colors.specular);
 };
 
-export default class {
+export default class extends Updatable {
   colors = {
     ambient: [0.4, 0.4, 0.4],
     diffuse: [0.8, 0.8, 0.8],
@@ -15,10 +17,11 @@ export default class {
   };
 
   constructor(position) {
+    super();
     this.position = position;
   }
 
-  apply(appProps) {
+  _update(appProps) {
     const gl = appProps.gl;
     const prog = appProps.prog;
     const matrices = appProps.matrices;

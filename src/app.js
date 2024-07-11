@@ -16,16 +16,16 @@ export default {
     store: {},
   },
 
-  run(renderer) {
+  run(updatable) {
     let time = performance.now();
 
-    const render = elapsedTime => {
+    const loop = elapsedTime => {
       this.props.deltaTime = elapsedTime - time;
-      renderer.render(this.props);
+      updatable.update(this.props);
       time = elapsedTime;
-      requestAnimationFrame(render);
+      requestAnimationFrame(loop);
     };
 
-    render(time);
+    loop(time);
   }
 };

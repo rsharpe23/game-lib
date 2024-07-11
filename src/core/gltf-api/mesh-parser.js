@@ -33,13 +33,13 @@ export default class {
     rest.typeSize = typeSizeMap[type];
     rest.buffer = (gl, store) => {
       return store[accessor] ?? ( store[accessor] = this
-        ._createBufferRaw(gl, this.bufferViews[bufferView]) );
+        ._createRawBuffer(gl, this.bufferViews[bufferView]) );
     };
 
     return rest;
   }
 
-  _createBufferRaw(gl, { buffer, byteLength, byteOffset, target }) {
+  _createRawBuffer(gl, { buffer, byteLength, byteOffset, target }) {
     const data = new Uint8Array(this.buffers[buffer], 
       byteOffset, byteLength);
 

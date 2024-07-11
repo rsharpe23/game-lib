@@ -1,5 +1,6 @@
-import Actor from './actor.js';
+import Drawing from './drawing.js';
 import { setAttribute, drawElements } from '../../lib/glu.js'
+import { find } from '../mixins/list-mixin.js';
 
 const { mat4 } = glMatrix;
 const mvMatrix = mat4.create();
@@ -16,35 +17,40 @@ const applyNormalMatrix = (gl, prog) => {
   gl.uniformMatrix4fv(prog.u_NMatrix, false, normalMatrix);
 };
 
-export default class extends Actor {
-  constructor(name, trs, nodes) {
+export default class Mesh extends Drawing {
+  constructor(name, trs, geometry) {
     super(name, trs);
-    this.nodes = nodes;
+    this.geometry = geometry;
   }
 
-  findNode(name) {
-    return this.nodes.find(node => node.name === name);
+  get items() {
+    if (!this._items) {
+      this._items = Array.from(this.geometry);
+    }
+
+    return this._items;
   }
 
-  _beforeRender() {
-    for (const { trs } of this.nodes) {
+  _beforeUpdate() {
+    for (const { trs } of this.items) {
       if (!trs.parent) trs.parent = this.trs;
     }
   }
 
-  _render(appProps) {
-    for (const node of this.nodes) {
+  _update(appProps) {
+    const store = appProps.store[this.geometry.accessor];
+
+    for (const item of this.items) {
       const gl = appProps.gl;
       const prog = appProps.prog;
       const matrices = appProps.matrices;
-      const store = appProps.store[node.accessor];
+
+      applyMvMatrix(gl, prog, matrices.view, item.trs.matrix);
+      applyNormalMatrix(gl, prog);
 
       gl.uniform1i(prog.u_Sampler, 0);
 
-      applyMvMatrix(gl, prog, matrices.view, node.trs.matrix);
-      applyNormalMatrix(gl, prog);
-
-      for (const prim of node.primitives) {
+      for (const prim of item.primitives) {
         setAttribute(gl, store, prog.a_Position, prim.vbo);
         setAttribute(gl, store, prog.a_Normal, prim.nbo);
         setAttribute(gl, store, prog.a_Texcoord, prim.tbo);
@@ -52,4 +58,6 @@ export default class extends Actor {
       }
     }
   }
-};
+}
+
+Object.assign(Mesh.prototype, { find });

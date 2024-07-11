@@ -1,19 +1,15 @@
 import TRS from '../trs.js';
 
-let globalAccessor = 0;
+let storeAccessor = 0;
 
 export default class {
   constructor(scene, nodeTree, meshParser) {
     this.scene = scene;
     this.nodeTree = nodeTree;
     this.meshParser = meshParser;
-    this.accessor = globalAccessor++;
+    this.accessor = storeAccessor++;
   }
-
-  asArray() {
-    return Array.from(this);
-  }
-
+  
   *[Symbol.iterator]() {
     yield* this.nodeTree.traverse(this.scene.nodes, 
       (node, parent) => {
@@ -24,6 +20,6 @@ export default class {
 
   _parseNode({ name, trs, mesh }) {
     const primitives = this.meshParser.parseMesh(mesh);
-    return { name, trs, primitives, accessor: this.accessor };
+    return { name, trs, primitives };
   }
 };

@@ -8,7 +8,7 @@ import app from '../src/app.js';
 import Scene from '../src/scene.js';
 import Camera from './camera.js';
 import Light from '../src/light.js';
-import Mesh from '../src/actors/mesh.js';
+import Mesh from '../src/drawings/mesh.js';
 import TRS from '../src/core/trs.js';
 
 const loadImg = async url => {
@@ -23,9 +23,8 @@ const _loadGeometry = async dir => {
 };
 
 const createScene = ([texAtlas, geometry]) => {
-  const camera = new Camera([0, 5, 20]); 
-  const light = new Light([0, -70, -100]);
-  const scene = new Scene(texAtlas, camera, light);
+  const scene = new Scene(texAtlas, 
+    new Camera([0, 5, 20]), new Light([0, -70, -100]));
 
   const translations = [
     [ 0,  0,  0],
@@ -38,11 +37,9 @@ const createScene = ([texAtlas, geometry]) => {
     [-7,  0,  7],
     [-7,  0, -7]
   ];
-
+  
   for (const translation of translations) {
-    const trs = new TRS({ translation });
-    const tank = new Mesh('tank', trs, geometry.asArray());
-    scene.addActor(tank);
+    scene.add(new Mesh('tank', new TRS({ translation }), geometry));
   }
 
   return scene;

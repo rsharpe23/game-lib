@@ -1,7 +1,8 @@
-import Renderer from './renderer.js';
+import Updatable from './updatable.js';
+import { add, find } from './mixins/list-mixin.js';
 
-export default class extends Renderer {
-  actors = [];
+export default class SceneBase extends Updatable {
+  items = [];
 
   constructor(camera, light) {
     super();
@@ -9,18 +10,16 @@ export default class extends Renderer {
     this.light = light;
   }
 
-  addActor(actor) {
-    this.actors.push(actor);
-  }
+  update(appProps) {
+    super.update(appProps);
 
-  findActor(name) {
-    return this.actors.find(actor => actor.name === name);
-  }
+    this.camera.update(appProps);
+    this.light.update(appProps);
 
-  render(appProps) {
-    super.render(appProps);
-    for (const actor of this.actors) {
-      actor.render(appProps);
+    for (const item of this.items) {
+      item.update(appProps);
     }
   }
-};
+}
+
+Object.assign(SceneBase.prototype, { add, find });

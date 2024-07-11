@@ -1,3 +1,5 @@
+import Updatable from "./updatable.js";
+
 const { mat4 } = glMatrix;
 
 export class Perspective {
@@ -14,15 +16,16 @@ export class Perspective {
   }
 }
 
-export default class {
+export default class extends Updatable {
   lookAtPoint = [0, 0, 0];
 
   constructor(position, projection) {
+    super();
     this.position = position;
     this.projection = projection;
   }
 
-  apply(appProps) {
+  _update(appProps) {
     const gl = appProps.gl;
     const prog = appProps.prog;
     const matrices = appProps.matrices;

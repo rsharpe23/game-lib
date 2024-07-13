@@ -30,7 +30,9 @@ export default class extends Updatable {
     const prog = appProps.prog;
     const matrices = appProps.matrices;
 
+    // Возможно лучше перенести матрицу проекции в класс Perspective
     this.projection.applyMatrix(gl, prog, matrices.projection);
+
     mat4.lookAt(matrices.view, this.position, 
       this.lookAtPoint, [0, 1, 0]);
   }

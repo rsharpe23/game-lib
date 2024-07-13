@@ -1,5 +1,5 @@
 import { loadText } from '../../lib/load-api.js'; 
-import { createShader } from '../../lib/glu.js';
+import { createShader } from '../core/gl-api.js';
 
 const shaders = [
   { name: 'vs', type: 35633 },

@@ -1,4 +1,4 @@
-import { createBuffer } from '../../../lib/glu.js';
+import { createBuffer } from '../gl-api.js';
 
 const typeSizeMap = {
   'SCALAR': 1,

@@ -1,5 +1,5 @@
+import { createProgram } from './gl-api.js';
 import { loadShaders } from './shader-api.js';
-import { createProgram } from '../../lib/glu.js';
 
 export default class {
   constructor(origin) {

@@ -1,5 +1,5 @@
 import Updatable from './updatable.js';
-import { add, find } from './mixins/list-mixin.js';
+import { add, find } from '../mixins/list-mixin.js';
 
 export default class SceneBase extends Updatable {
   items = [];

@@ -1,5 +1,5 @@
 export default class {
-  _canUpdate = false;
+  _canUpdate = false; 
 
   update(appProps) {
     if (this._canUpdate) {

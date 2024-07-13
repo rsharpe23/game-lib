@@ -1,6 +1,6 @@
 import Visuality from './visuality.js';
-import { setAttribute, drawElements } from '../../lib/glu.js'
-import { find } from '../mixins/list-mixin.js';
+import { setAttribute, drawElements } from '../core/gl-api.js';
+import { find } from '../../mixins/list-mixin.js';
 
 const { mat4 } = glMatrix;
 const mvMatrix = mat4.create();
@@ -23,6 +23,8 @@ export default class Mesh extends Visuality {
     this.geometry = geometry;
   }
 
+  // Переделать в метод, т.к. если поменять 
+  // geometry, то items не изменятся
   get items() {
     if (!this._items) {
       this._items = Array.from(this.geometry);

@@ -42,3 +42,5 @@ export const drawElements = (gl, store, buffer) => {
   gl.drawElements(gl.TRIANGLES, buffer.count, 
     buffer.componentType, 0);
 };
+
+const setMatrixUniform = (gl, uniform, matrix) => {};

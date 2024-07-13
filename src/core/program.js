@@ -1,4 +1,4 @@
-import { createProgram } from './gl-api.js';
+import { createProgram } from './gl-utils.js';
 import { loadShaders } from './shader-api.js';
 
 export default class {
@@ -6,6 +6,8 @@ export default class {
     this.origin = origin;
   }
 
+  // TODO: Переделать немного, т.к. при переопределении придется 
+  // полностью переписывать ф-цию, указывая также и gl => ...
   static async load() {
     const shaders = await loadShaders('/shaders/default');
     return gl => this.from(gl, shaders);

@@ -3,4 +3,4 @@ export const getFile = dir => {
   return `${name}.gltf`;
 };
 
-export const getURL = (dir, file = getFile(dir)) => `${dir}/${file}`;
+export const getUrl = (dir, file = getFile(dir)) => `${dir}/${file}`;

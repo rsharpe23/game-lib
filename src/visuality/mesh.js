@@ -1,36 +1,44 @@
 import Visuality from './visuality.js';
-import { setAttribute, drawElements } from '../core/gl-api.js';
+import { setAttribute, drawElements } from '../core/gl-utils.js';
 import { find } from '../../mixins/list-mixin.js';
 
 const { mat4 } = glMatrix;
-const mvMatrix = mat4.create();
-const normalMatrix = mat4.create();
-
-const applyMvMatrix = (gl, prog, viewMatrix, modelMatrix) => {
-  mat4.mul(mvMatrix, viewMatrix, modelMatrix);
-  gl.uniformMatrix4fv(prog.u_MVMatrix, false, mvMatrix);
-};
-
-const applyNormalMatrix = (gl, prog) => {
-  mat4.invert(normalMatrix, mvMatrix);
-  mat4.transpose(normalMatrix, normalMatrix);
-  gl.uniformMatrix4fv(prog.u_NMatrix, false, normalMatrix);
-};
 
 export default class Mesh extends Visuality {
+  mvMat = mat4.create();
+  normalMat = mat4.create();
+
   constructor(name, trs, geometry) {
     super(name, trs);
-    this.geometry = geometry;
+    this.setGeometry(geometry);
   }
 
-  // Переделать в метод, т.к. если поменять 
-  // geometry, то items не изменятся
   get items() {
-    if (!this._items) {
+    if (!this._items || this._items.needsUpdate) {
       this._items = Array.from(this.geometry);
+      this._items.needsUpdate = false;
+      console.log('!!!');
     }
 
     return this._items;
+  }
+
+  setGeometry(value) {
+    this.geometry = value;
+    // BUG: Сначала создается _items, затем его св-во needsUpdate 
+    // тут же перезаписывается в true, из-за этого получается двойное определение 
+    this.items.needsUpdate = true;  
+  }
+
+  _applyMvMatrix(gl, prog, viewMat, modelMat) {
+    mat4.mul(this.mvMat, viewMat, modelMat);
+    gl.uniformMatrix4fv(prog.u_MVMatrix, false, this.mvMat);
+  }
+
+  _applyNormalMatrix(gl, prog) {
+    mat4.invert(this.normalMat, this.mvMat);
+    mat4.transpose(this.normalMat, this.normalMat);
+    gl.uniformMatrix4fv(prog.u_NMatrix, false, this.normalMat);
   }
 
   _beforeUpdate() {
@@ -40,17 +48,16 @@ export default class Mesh extends Visuality {
   }
 
   _update(appProps) {
-    const store = appProps.store[this.geometry.accessor];
+    const gl = appProps.gl;
+    const prog = appProps.prog;
+    const camera = appProps.updatable.camera;
+    const store = appProps.store[this.geometry.id];
+
+    gl.uniform1i(prog.u_Sampler, 0);
 
     for (const item of this.items) {
-      const gl = appProps.gl;
-      const prog = appProps.prog;
-      const matrices = appProps.matrices;
-
-      applyMvMatrix(gl, prog, matrices.view, item.trs.matrix);
-      applyNormalMatrix(gl, prog);
-
-      gl.uniform1i(prog.u_Sampler, 0);
+      this._applyMvMatrix(gl, prog, camera.viewMat, item.trs.matrix);
+      this._applyNormalMatrix(gl, prog);
 
       for (const prim of item.primitives) {
         setAttribute(gl, store, prog.a_Position, prim.vbo);

@@ -3,29 +3,32 @@ import Program from './core/program.js';
 const canvas = document.getElementById('canvas');
 const gl = canvas.getContext('webgl');
 const program = await Program.load();
-const { mat4 } = glMatrix;
 
 export default {
   props: {
     gl, prog: program(gl),
-    matrices: {
-      projection: mat4.create(),
-      view: mat4.create(),
-    },
+    updatable: null,
     deltaTime: 0,
+    time: 0,
     store: {},
   },
 
+  get loop() {
+    if (!this._loop) {
+      this._loop = elapsedTime => {
+        const props = this.props;
+        props.deltaTime = elapsedTime - props.time;
+        props.time = elapsedTime;
+        props.updatable.update(props);
+        requestAnimationFrame(this.loop);
+      };
+    }
+
+    return this._loop;
+  },
+
   run(updatable) {
-    let time = performance.now();
-
-    const loop = elapsedTime => {
-      this.props.deltaTime = elapsedTime - time;
-      updatable.update(this.props);
-      time = elapsedTime;
-      requestAnimationFrame(loop);
-    };
-
-    loop(time);
-  }
+    this.props.updatable = updatable;
+    this.loop(performance.now());
+  },
 };

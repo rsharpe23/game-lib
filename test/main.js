@@ -18,7 +18,7 @@ const loadImg = async url => {
 
 const _loadGeometry = async dir => {
   const geometry = await loadGeometry(dir);
-  app.props.store[geometry.accessor] = {};
+  app.props.store[geometry.id] = {};
   return geometry;
 };
 
@@ -26,21 +26,23 @@ const createScene = ([texAtlas, geometry]) => {
   const scene = new Scene(texAtlas, 
     new Camera([0, 5, 20]), new Light([0, -70, -100]));
 
-  const translations = [
-    [ 0,  0,  0],
-    [ 0,  0,  7],
-    [ 0,  0, -7],
-    [ 7,  0,  0],
-    [-7,  0,  0],
-    [ 7,  0,  7],
-    [ 7,  0, -7],
-    [-7,  0,  7],
-    [-7,  0, -7],
-  ];
+  // const translations = [
+  //   [ 0,  0,  0],
+  //   [ 0,  0,  7],
+  //   [ 0,  0, -7],
+  //   [ 7,  0,  0],
+  //   [-7,  0,  0],
+  //   [ 7,  0,  7],
+  //   [ 7,  0, -7],
+  //   [-7,  0,  7],
+  //   [-7,  0, -7],
+  // ];
   
-  for (const translation of translations) {
-    scene.add(new Mesh('tank', new TRS({ translation }), geometry));
-  }
+  // for (const translation of translations) {
+  //   scene.add(new Mesh('tank', new TRS({ translation }), geometry));
+  // }
+
+  scene.add(new Mesh('tank', new TRS({ translation: [0, 0, 0] }), geometry));
 
   return scene;
 };

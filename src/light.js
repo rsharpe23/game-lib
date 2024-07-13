@@ -24,9 +24,9 @@ export default class extends Updatable {
   _update(appProps) {
     const gl = appProps.gl;
     const prog = appProps.prog;
-    const matrices = appProps.matrices;
+    const camera = appProps.updatable.camera;
 
-    vec3.transformMat4(position, this.position, matrices.view);
+    vec3.transformMat4(position, this.position, camera.viewMat);
     gl.uniform3fv(prog.u_LightingPos, position);
 
     applyColors(gl, prog, this.colors);

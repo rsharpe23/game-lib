@@ -5,6 +5,9 @@ import { find } from '../../mixins/list-mixin.js';
 const { mat4 } = glMatrix;
 
 export default class Mesh extends Visuality {
+  // Это неправильно, т.к. матрицы используются сразу для 
+  // всех нодов поочередно. По хорошему, у каждого 
+  // нода должны быть свои mvMat и normalMat
   mvMat = mat4.create();
   normalMat = mat4.create();
 
@@ -14,20 +17,13 @@ export default class Mesh extends Visuality {
   }
 
   get items() {
-    if (!this._items || this._items.needsUpdate) {
-      this._items = Array.from(this.geometry);
-      this._items.needsUpdate = false;
-      console.log('!!!');
-    }
-
-    return this._items;
+    return this._items ??= Array.from(this.geometry);
   }
 
   setGeometry(value) {
+    if (this.geometry === value) return;
     this.geometry = value;
-    // BUG: Сначала создается _items, затем его св-во needsUpdate 
-    // тут же перезаписывается в true, из-за этого получается двойное определение 
-    this.items.needsUpdate = true;  
+    this._items = null; 
   }
 
   _applyMvMatrix(gl, prog, viewMat, modelMat) {
@@ -52,8 +48,6 @@ export default class Mesh extends Visuality {
     const prog = appProps.prog;
     const camera = appProps.updatable.camera;
     const store = appProps.store[this.geometry.id];
-
-    gl.uniform1i(prog.u_Sampler, 0);
 
     for (const item of this.items) {
       this._applyMvMatrix(gl, prog, camera.viewMat, item.trs.matrix);

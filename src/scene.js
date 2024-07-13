@@ -39,6 +39,9 @@ export default class extends SceneBase {
     // переключить программу на дефолтную
     prog.use(gl);
 
+    // Семплер должен устанавливаться в том же месте, где и useProgram
+    gl.uniform1i(prog.u_Sampler, 0);
+
     applyMaterialColors(gl, prog);
   }
 };

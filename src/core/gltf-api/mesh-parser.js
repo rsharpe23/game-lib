@@ -32,8 +32,8 @@ export default class {
 
     rest.typeSize = typeSizeMap[type];
     rest.buffer = (gl, store) => {
-      return store[accessor] ?? ( store[accessor] = this
-        ._createRawBuffer(gl, this.bufferViews[bufferView]) );
+      return store[accessor] ??= this._createRawBuffer(
+        gl, this.bufferViews[bufferView]);
     };
 
     return rest;

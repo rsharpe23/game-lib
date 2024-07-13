@@ -5,7 +5,8 @@ import MeshParser from './mesh-parser.js';
 import { loadJson, loadBuffer } from '../../../lib/load-api.js';
 import { getUrl } from './utils.js';
 
-export const parseGltf = ({ scene, scenes, nodes, ...rest }) => {
+export const parseGltf = gltf => {
+  const { scene, scenes, nodes, ...rest } = gltf;
   const nodeTree = new NodeTree(nodes);
   const meshParser = new MeshParser(rest);
   return new Geometry(scenes[scene], nodeTree, meshParser);

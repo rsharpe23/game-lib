@@ -20,6 +20,6 @@ export default class {
 
   _parseNode({ name, trs, mesh }) {
     const primitives = this.meshParser.parseMesh(mesh);
-    return { name, trs, primitives }; // добавить геттер matrix
+    return { name, trs, primitives };
   }
 };

@@ -22,7 +22,7 @@ export default class extends SceneBase {
     gl.generateMipmap(gl.TEXTURE_2D);
 
     // TODO: Также вынести в drawing
-    prog.setLocations(gl);
+    // prog.setLocations(gl);
   }
 
   _update(appProps) {
@@ -37,7 +37,7 @@ export default class extends SceneBase {
     // перебьет дефолтную для всех последующий drawing'ов. В этом случае 
     // следующий drawing, который не имеет своей программы, должен 
     // переключить программу на дефолтную
-    prog.use(gl);
+    prog.use();
 
     // Семплер должен устанавливаться в том же месте, где и useProgram
     gl.uniform1i(prog.u_Sampler, 0);

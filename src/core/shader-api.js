@@ -2,8 +2,8 @@ import { loadText } from '../../lib/load-api.js';
 import { createShader } from './gl-utils.js';
 
 const shaders = [
-  { name: 'vs', type: 35633 },
-  { name: 'fs', type: 35632 },
+  { file: 'vs.glsl', type: 35633 },
+  { file: 'fs.glsl', type: 35632 },
 ];
 
 export const loadShader = async url => {
@@ -12,8 +12,8 @@ export const loadShader = async url => {
 };
 
 export const loadShaders = async dir => {
-  const requests = shaders.map(async ({ name, type }) => {
-    const fn = await loadShader(`${dir}/${name}.glsl`);
+  const requests = shaders.map(async ({ file, type }) => {
+    const fn = await loadShader(`${dir}/${file}`);
     return gl => fn(gl, type);
   });
 

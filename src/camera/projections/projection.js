@@ -1,6 +1,6 @@
 export default class {
-  constructor(matrix) {
-    this.matrix = matrix;
+  constructor(matrix) { 
+    this.matrix = matrix; 
   }
 
   applyMatrix(gl, prog) {

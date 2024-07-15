@@ -1,4 +1,4 @@
-import Mesh from '../src/visuality/mesh.js';
+import Mesh from '../src/visuality/mesh/index.js';
 import TRS from '../src/core/trs.js';
 import { degToRad } from '../lib/math.js';
 

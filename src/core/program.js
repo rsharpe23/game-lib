@@ -1,43 +1,29 @@
-import { createProgram } from './gl-utils.js';
 import { loadShaders } from './shader-api.js';
+import ProgramBase from './program-base.js';
 
-export default class {
-  constructor(origin) {
-    this.origin = origin;
+const shaders = await loadShaders('/shaders/default');
+
+export default class extends ProgramBase {
+  static fromOwnShaders(gl) {
+    return super.from(gl, shaders);
   }
 
-  // TODO: Переделать немного, т.к. при переопределении придется 
-  // полностью переписывать ф-цию, указывая также и gl => ...
-  static async load() {
-    const shaders = await loadShaders('/shaders/default');
-    return gl => this.from(gl, shaders);
-  }
-
-  static from(gl, [vs, fs]) {
-    const origin = createProgram(gl, vs(gl), fs(gl));
-    return new this(origin);
-  }
-
-  setLocations(gl) {
-    this.a_Position = gl.getAttribLocation(this.origin, "a_Position");
-    this.a_Normal = gl.getAttribLocation(this.origin, "a_Normal");
-    this.a_Texcoord = gl.getAttribLocation(this.origin, "a_Texcoord");
+  _setLocations({ gl, target }) {
+    this.a_Position = gl.getAttribLocation(target, "a_Position");
+    this.a_Normal = gl.getAttribLocation(target, "a_Normal");
+    this.a_Texcoord = gl.getAttribLocation(target, "a_Texcoord");
   
-    this.u_PMatrix = gl.getUniformLocation(this.origin, "u_PMatrix");
-    this.u_MVMatrix = gl.getUniformLocation(this.origin, "u_MVMatrix");
-    this.u_NMatrix = gl.getUniformLocation(this.origin, "u_NMatrix");
-    this.u_Sampler = gl.getUniformLocation(this.origin, "u_Sampler");
+    this.u_PMatrix = gl.getUniformLocation(target, "u_PMatrix");
+    this.u_MVMatrix = gl.getUniformLocation(target, "u_MVMatrix");
+    this.u_NMatrix = gl.getUniformLocation(target, "u_NMatrix");
+    this.u_Sampler = gl.getUniformLocation(target, "u_Sampler");
   
-    this.u_AmbientColor = gl.getUniformLocation(this.origin, "u_AmbientColor");
-    this.u_DiffuseColor = gl.getUniformLocation(this.origin, "u_DiffuseColor");
-    this.u_SpecularColor = gl.getUniformLocation(this.origin, "u_SpecularColor");
-    this.u_LightingPos = gl.getUniformLocation(this.origin, "u_LightingPos");
+    this.u_AmbientColor = gl.getUniformLocation(target, "u_AmbientColor");
+    this.u_DiffuseColor = gl.getUniformLocation(target, "u_DiffuseColor");
+    this.u_SpecularColor = gl.getUniformLocation(target, "u_SpecularColor");
+    this.u_LightingPos = gl.getUniformLocation(target, "u_LightingPos");
   
-    this.u_MaterialAmbientColor = gl.getUniformLocation(this.origin, "u_MaterialAmbientColor");
-    this.u_MaterialSpecularColor = gl.getUniformLocation(this.origin, "u_MaterialSpecularColor");
-  }
-
-  use(gl) {
-    gl.useProgram(this.origin);
+    this.u_MaterialAmbientColor = gl.getUniformLocation(target, "u_MaterialAmbientColor");
+    this.u_MaterialSpecularColor = gl.getUniformLocation(target, "u_MaterialSpecularColor");
   }
 };

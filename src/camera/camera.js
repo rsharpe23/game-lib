@@ -13,7 +13,7 @@ export default class extends Updatable {
     this.lookAtPoint = lookAtPoint;
   }
 
-  get projectionMat() {
+  get projMat() {
     return this.projection.matrix;
   }
 

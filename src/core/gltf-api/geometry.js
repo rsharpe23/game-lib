@@ -1,13 +1,13 @@
 import TRS from '../trs.js';
 
-let uid = 0;
+let accessor = 0;
 
 export default class {
   constructor(scene, nodeTree, meshParser) {
     this.scene = scene;
     this.nodeTree = nodeTree;
     this.meshParser = meshParser;
-    this.id = uid++;
+    this.accessor = accessor++;
   }
   
   *[Symbol.iterator]() {
@@ -19,7 +19,12 @@ export default class {
   }
 
   _parseNode({ name, trs, mesh }) {
-    const primitives = this.meshParser.parseMesh(mesh);
-    return { name, trs, primitives };
+    return { 
+      name, trs, 
+      primitives: this.meshParser.parseMesh(mesh),
+      get matrix() { 
+        return this.trs.matrix; 
+      }, 
+    };
   }
 };

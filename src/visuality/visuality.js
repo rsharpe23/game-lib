@@ -1,7 +1,7 @@
 import Updatable from '../updatable.js';
 
 export default class extends Updatable {
-  isHidden = false;
+   isHidden = false;
 
   constructor(name, trs) {
     super();

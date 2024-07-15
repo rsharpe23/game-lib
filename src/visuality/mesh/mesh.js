@@ -13,7 +13,7 @@ export default class extends MeshBase {
     const gl = appProps.gl;
     const prog = appProps.prog;
     const camera = appProps.updatable.camera;
-    const store = appProps.store[this.geometry.accessor];
+    const store = appProps.store.get(this.geometry);
 
     for (const item of this.items) {
       matApplicator.applyMatrices(gl, prog, camera, item);

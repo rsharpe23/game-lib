@@ -16,10 +16,10 @@ const loadImg = async url => {
   return Image.from(URL.createObjectURL(blob));
 };
 
-// Инкапсулировать создание стора по geometry.id
-const _loadGeometry = async dir => {
+// TODO: Инкапсулировать установку стора
+const loadGeometryProxy = async dir => {
   const geometry = await loadGeometry(dir);
-  app.props.store[geometry.accessor] = {};
+  app.props.store.set(geometry, {});
   return geometry;
 };
 
@@ -28,32 +28,34 @@ const createScene = ([texAtlas, geometry]) => {
   const light = new Light([0, -70, -100]);
 
   const scene = new Scene(texAtlas, camera, light);
-  scene.add(new Mesh('tank', new TRS(), geometry));
+  // scene.add(new Mesh('tank', new TRS(), geometry));
 
-  // const translations = [
-  //   [ 0,  0,  0],
-  //   [ 0,  0,  7],
-  //   [ 0,  0, -7],
-  //   [ 7,  0,  0],
-  //   [-7,  0,  0],
-  //   [ 7,  0,  7],
-  //   [ 7,  0, -7],
-  //   [-7,  0,  7],
-  //   [-7,  0, -7],
-  // ];
+  const translations = [
+    [ 0,  0,  0],
+    [ 0,  0,  7],
+    [ 0,  0, -7],
+    [ 7,  0,  0],
+    [-7,  0,  0],
+    [ 7,  0,  7],
+    [ 7,  0, -7],
+    [-7,  0,  7],
+    [-7,  0, -7],
+  ];
   
-  // for (const translation of translations) {
-  //   scene.add(new Mesh('tank', new TRS({ translation }), geometry));
-  // }
+  for (const translation of translations) {
+    scene.add(new Mesh('tank', new TRS({ translation }), geometry));
+  }
 
   return scene;
 };
 
 const res = await Promise.all([
   loadImg('tex-atlas.jpg'), 
-  _loadGeometry('tank'),
+  loadGeometryProxy('tank'),
 ]);
 
-
-
+// Если app.props.updatable задать null, то weakMap очистится автоматически.
+// Но если перед этим вывести props на консоль, то будет показано
+// что weakMap имеет по прежнему геометрию. Возможно, это из-за того, 
+// что ссылка на неё попадает в ф-цию log().
 app.run(createScene(res));

@@ -6,10 +6,10 @@ const gl = canvas.getContext('webgl');
 export default {
   props: {
     gl, prog: Program.fromOwnShaders(gl),
+    store: new WeakMap(),
     updatable: null,
     deltaTime: 0,
     time: 0,
-    store: {},
   },
 
   get loop() {

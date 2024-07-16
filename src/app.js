@@ -1,13 +1,11 @@
-import Program from './core/program.js';
-
-const canvas = document.getElementById('canvas');
-const gl = canvas.getContext('webgl');
+const elem = document.getElementById('canvas');
 
 export default {
   props: {
-    gl, prog: Program.fromOwnShaders(gl),
-    store: new WeakMap(),
+    gl: elem.getContext('webgl'), 
+    prog: null,
     updatable: null,
+    store: new WeakMap(),
     deltaTime: 0,
     time: 0,
   },
@@ -20,10 +18,5 @@ export default {
       props.updatable.update(props);
       requestAnimationFrame(this.loop);
     };
-  },
-
-  run(updatable) {
-    this.props.updatable = updatable;
-    this.loop(performance.now());
   },
 };

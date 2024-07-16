@@ -1,8 +1,13 @@
 import { setAttribute, drawElements } from '../../core/gl-utils.js';
 import MeshBase from './mesh-base.js';
+import ItemList from './item-list.js';
 import matApplicator from './matrix-applicator.js';
 
 export default class extends MeshBase {
+  constructor(name, trs, geometry) {
+    super(name, trs, new ItemList(geometry));
+  }
+
   _beforeUpdate() {
     for (const { trs } of this.items) {
       if (!trs.parent) trs.parent = this.trs;

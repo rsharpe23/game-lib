@@ -2,7 +2,7 @@ import SceneBase from './scene-base.js';
 
 const applyMaterialColors = (gl, prog) => {
   gl.uniform3f(prog.u_MaterialAmbientColor, 0.2, 0.2, 0.2);
-  gl.uniform3f(prog.u_MaterialSpecularColor, 0.8, 0.8, 0.8);
+  gl.uniform3f(prog.u_MaterialSpecularColor, 1.0, 1.0, 1.0);
 };
 
 export default class extends SceneBase {
@@ -11,7 +11,7 @@ export default class extends SceneBase {
     this.texAtlas = texAtlas;
   }
 
-  _beforeUpdate({ gl, prog }) {
+  _beforeUpdate({ gl }) {
     gl.clearColor(0.0, 0.0, 0.14, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
@@ -20,9 +20,6 @@ export default class extends SceneBase {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, 
       gl.UNSIGNED_BYTE, this.texAtlas);
     gl.generateMipmap(gl.TEXTURE_2D);
-
-    // TODO: Также вынести в drawing
-    // prog.setLocations(gl);
   }
 
   _update(appProps) {
@@ -37,9 +34,9 @@ export default class extends SceneBase {
     // перебьет дефолтную для всех последующий drawing'ов. В этом случае 
     // следующий drawing, который не имеет своей программы, должен 
     // переключить программу на дефолтную
-    prog.use();
+    gl.useProgram(prog);
 
-    // Семплер должен устанавливаться в том же месте, где и useProgram
+    // Семплер лучше устанавливать в том месте, где вызов useProgram
     gl.uniform1i(prog.u_Sampler, 0);
 
     applyMaterialColors(gl, prog);

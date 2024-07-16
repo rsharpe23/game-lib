@@ -19,4 +19,4 @@ export default {
     mat4.transpose(this.normalMat, this.normalMat);
     gl.uniformMatrix4fv(prog.u_NMatrix, false, this.normalMat);
   },
-};
+}

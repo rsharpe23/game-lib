@@ -1,6 +1,6 @@
 import Visual from '../visual.js';
 
-export default class MeshBase extends Visual {
+export default class extends Visual {
   constructor(name, trs, items) {
     super(name, trs);
     this.items = items;

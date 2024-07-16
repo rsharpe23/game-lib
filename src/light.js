@@ -31,4 +31,4 @@ export default class extends Updatable {
 
     applyColors(gl, prog, this.colors);
   }
-};
+}

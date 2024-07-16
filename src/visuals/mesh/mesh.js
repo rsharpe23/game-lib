@@ -20,6 +20,8 @@ export default class extends MeshBase {
     const camera = appProps.updatable.camera;
     const store = appProps.store.get(this.geometry);
 
+    gl.uniform1i(prog.u_Sampler, 0);
+
     for (const item of this.items) {
       matApplicator.applyMatrices(gl, prog, camera, item);
 
@@ -31,4 +33,4 @@ export default class extends MeshBase {
       }
     }
   }
-};
+}

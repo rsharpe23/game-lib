@@ -15,7 +15,7 @@ export default class extends SceneBase {
     gl.clearColor(0.0, 0.0, 0.14, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
-    // TODO: Вынести в drawing
+    // TODO: Перенести в Mesh
     gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, 
       gl.UNSIGNED_BYTE, this.texAtlas);
@@ -29,16 +29,12 @@ export default class extends SceneBase {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // TODO: Добавить проверку и вынести в drawing, т.к. если 
-    // использовать отдельную программу одного из drawing'а, то она 
-    // перебьет дефолтную для всех последующий drawing'ов. В этом случае 
-    // следующий drawing, который не имеет своей программы, должен 
-    // переключить программу на дефолтную
-    gl.useProgram(prog);
-
-    // Семплер лучше устанавливать в том месте, где вызов useProgram
-    gl.uniform1i(prog.u_Sampler, 0);
+    // Можно сделать отдельную ф-цию в glu
+    const currentProg = gl.getParameter(gl.CURRENT_PROGRAM);
+    if (prog !== currentProg) {
+      gl.useProgram(prog);
+    }
 
     applyMaterialColors(gl, prog);
   }
-};
+}

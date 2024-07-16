@@ -14,4 +14,4 @@ export default class extends Updatable {
       super.update(appProps);
     }
   }
-};
+}

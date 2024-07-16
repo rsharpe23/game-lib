@@ -14,4 +14,4 @@ export default class {
   _update(appProps) {
     throw new Error('Not implemented');
   }
-};
+}

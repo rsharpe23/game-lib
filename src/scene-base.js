@@ -1,6 +1,6 @@
 import Updatable from './updatable.js';
 
-export default class SceneBase extends Updatable {
+export default class extends Updatable {
   visuals = [];
 
   constructor(camera, light) {

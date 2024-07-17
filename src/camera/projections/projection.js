@@ -3,7 +3,7 @@ export default class {
     this.matrix = matrix; 
   }
 
-  applyMatrix(gl, prog) {
+  passMatrix(gl, prog) {
     gl.uniformMatrix4fv(prog.u_PMatrix, false, this.matrix);
   }
 };

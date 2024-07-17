@@ -1,4 +1,4 @@
-import { createBuffer } from '../gl-utils.js';
+import { createBuffer } from '../gl-util.js';
 
 const typeSizeMap = {
   'SCALAR': 1,

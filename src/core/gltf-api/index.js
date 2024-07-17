@@ -3,7 +3,7 @@ import NodeTree from './node-tree.js';
 import MeshParser from './mesh-parser.js';
 
 import { loadJson, loadBuffer } from '../../../lib/load-api.js';
-import { getPath } from './utils.js';
+import { getPath } from './util.js';
 
 export const parseGltf = gltf => {
   const { scene, scenes, nodes, ...rest } = gltf;

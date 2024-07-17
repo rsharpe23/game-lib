@@ -12,10 +12,10 @@ export default class extends Projection {
     super(mat4.create());
   }
 
-  applyMatrix(gl, prog) {
+  passMatrix(gl, prog) {
     mat4.perspective(this.matrix, this.fov, this.aspect, 
       this.near, this.far);
       
-    super.applyMatrix(gl, prog);
+    super.passMatrix(gl, prog);
   }
 };

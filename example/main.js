@@ -4,7 +4,9 @@ import '../lib/global-ext.js';
 import { loadImage } from '../lib/load-api.js';
 import { loadShaders } from '../src/core/shader-api.js'
 import { loadGeometry } from '../src/core/gltf-api/index.js';
-import { createProgram as glCreateProgram } from '../src/core/gl-utils.js';
+
+import { createProgram as glCreateProgram, createTexture 
+} from '../src/core/gl-util.js';
 
 import app from '../src/app.js';
 import Scene from '../src/scene.js';
@@ -16,9 +18,9 @@ import TRS from '../src/core/trs.js';
 const { props } = app;
 const { gl, store } = props;
 
-const [shaders, texAtlas, geometry] = await Promise.all([
+const [shaders, texImg, geometry] = await Promise.all([
   loadShaders('/shaders/default'),
-  loadImage('tex-atlas.jpg'), 
+  loadImage('texture.jpg'), 
   loadGeometry('tank'),
 ]);
 
@@ -46,7 +48,7 @@ const createProgram = ([vs, fs]) => {
 };
 
 const createScene = (camera, light) => {
-  const scene = new Scene(texAtlas, camera, light);
+  const scene = new Scene(camera, light);
 
   const translations = [
     [ 0,  0,  0],
@@ -59,19 +61,25 @@ const createScene = (camera, light) => {
     [-7,  0,  7],
     [-7,  0, -7],
   ];
+
   for (const translation of translations) {
-    scene.addVisual(new Mesh('tank', new TRS({ translation }), geometry));
+    const mesh = new Mesh('tank', 
+      new TRS({ translation }), geometry, texImg);
+
+    scene.addVisual(mesh);
   }
 
   return scene;
 };
 
-// Если props.updatable задать null, то weakMap очистится автоматически.
+// Если props.updatable задать null, то store очистится автоматически.
 // Но если перед этим вывести props на консоль, то будет показано
-// что weakMap имеет по прежнему геометрию. Возможно, это из-за того, 
-// что ссылка на неё попадает в ф-цию log().
+// что store имеет по прежнему данные. Возможно, это из-за того, 
+// что ссылка на weakMap попадает в ф-цию log().
 
 store.set(geometry, {});
+store.set(texImg, createTexture(gl, texImg));
+
 props.prog = createProgram(shaders);
 props.updatable = createScene(new Camera([0, 5, 20]), new Light([0, -70, -100]));
 

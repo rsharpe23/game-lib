@@ -10,7 +10,13 @@ export default class extends Updatable {
   }
 
   addVisual(visual) {
+    // Не тестировалось
     this.visuals.push(visual);
+    this.visuals.sort((a, b) => {
+      if (!a.renderProps.prog) return -1;
+      if (a === b) return 0;
+      if (a !== b) return 1;
+    });
   }
 
   findVisual(name) {

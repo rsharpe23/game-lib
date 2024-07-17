@@ -3,7 +3,7 @@ import Updatable from "./updatable.js";
 const { vec3 } = glMatrix;
 const worldPos = vec3.create();
 
-const applyColors = (gl, prog, colors) => {
+const passColors = (gl, prog, colors) => {
   gl.uniform3fv(prog.u_AmbientColor, colors.ambient);
   gl.uniform3fv(prog.u_DiffuseColor, colors.diffuse);
   gl.uniform3fv(prog.u_SpecularColor, colors.specular);
@@ -29,6 +29,6 @@ export default class extends Updatable {
     vec3.transformMat4(worldPos, this.position, camera.viewMat);
     gl.uniform3fv(prog.u_LightingPos, worldPos);
 
-    applyColors(gl, prog, this.colors);
+    passColors(gl, prog, this.colors);
   }
 }

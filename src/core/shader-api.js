@@ -6,8 +6,8 @@ const shaders = [
   { file: 'fs.glsl', type: 35632 },
 ];
 
-export const loadShader = async url => {
-  const text = await loadText(url);
+export const loadShader = async path => {
+  const text = await loadText(path);
   return (gl, type) => createShader(gl, type, text);
 };
 

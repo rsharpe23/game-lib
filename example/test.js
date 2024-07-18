@@ -1,31 +1,12 @@
-class A {
-  constructor(prop) {
-    this.prop = prop;
-  }
-}
+const requests = Promise.all([
+  new Promise(resolve => setTimeout(() => resolve('hello'), 1500)),
+  new Promise(resolve => setTimeout(() => resolve('world'), 1000)),
+]);
 
-const arr = [];
-fn(arr, new A());
-fn(arr, new A());
-fn(arr, new A('hello'));
-fn(arr, new A('world'));
-fn(arr, new A('hello'));
-fn(arr, new A());
-fn(arr, new A('world'));
-fn(arr, new A('hello'));
-console.log(arr);
+const requests2 = Promise.all([
+  requests,
+  new Promise(resolve => setTimeout(() => resolve(2), 150)),
+  new Promise(resolve => setTimeout(() => resolve(3), 100)),
+]);
 
-function fn(arr, obj) {
-  if (!obj.prop) {
-    arr.unshift(obj);
-    return;
-  }
-  
-  const index = arr.findLastIndex(o => o.prop === obj.prop);
-  if (~index) {
-    arr.splice(index, 0, obj);
-    return;
-  }
-  
-  arr.push(obj);
-}
+console.log(await requests2);

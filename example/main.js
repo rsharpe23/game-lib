@@ -6,7 +6,7 @@ import { loadShaders } from '../src/core/shader-api.js'
 import { loadGeometry } from '../src/core/gltf-api/index.js';
 
 import { createProgram as glCreateProgram, createTexture 
-} from '../src/core/gl-util.js';
+  } from '../src/core/gl-util.js';
 
 import app from '../src/app.js';
 import Scene from '../src/scene.js';
@@ -64,7 +64,7 @@ const createScene = (camera, light) => {
 
   for (const translation of translations) {
     const mesh = new Mesh('tank', 
-      new TRS({ translation }), geometry, texImg);
+      new TRS({ translation }), texImg, geometry);
 
     scene.addVisual(mesh);
   }

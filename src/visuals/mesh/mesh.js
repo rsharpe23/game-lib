@@ -1,5 +1,5 @@
 import { passTexture, passAttribute, drawElements 
-} from '../../core/gl-util.js';
+  } from '../../core/gl-util.js';
 
 import MeshBase from './mesh-base.js';
 import matrixPasser from './matrix-passer.js';

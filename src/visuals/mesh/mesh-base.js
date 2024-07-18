@@ -2,7 +2,7 @@ import Visual from '../visual.js';
 import ItemList from './item-list.js';
 
 export default class extends Visual {
-  constructor(name, trs, geometry, texImg) {
+  constructor(name, trs, texImg, geometry) {
     super(name, trs);
     this.texImg = texImg;
     this.items = new ItemList(geometry);

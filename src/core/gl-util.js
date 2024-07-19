@@ -30,20 +30,27 @@ export const createBuffer = (gl, data, target) => {
   return buffer;
 };
 
-export const createTexture = (gl, img) => {
+export const createTexture = (gl, img, isPowerOf2) => {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-  gl.generateMipmap(gl.TEXTURE_2D);
+
+  if (isPowerOf2(img.width) && isPowerOf2(img.height)) {
+    gl.generateMipmap(gl.TEXTURE_2D);
+  } else {
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  }
+
   return texture;
 };
 
 export const useProgram = (gl, prog) => {
-  // Ф-ция getParameter(gl.CURRENT_PROGRAM) влияет на производительность. 
-  // Её лучше не использовать в цикле отрисовки
+  // getParameter(gl.CURRENT_PROGRAM) влияет на производительность. 
+  // Эту ф-цию лучше не использовать в цикле отрисовки
   if (prog === gl.currentProg) return;
   gl.currentProg = prog;
-  gl.useProgram(prog);
+  gl.useProgram(prog.glProg);
 };
 
 export const setMatUniform = (gl, uniform, matrix) => {
@@ -57,14 +64,14 @@ export const setTexUniform = (gl, uniform, texture, unitIndex = 0) => {
 };
 
 export const setAttribute = (gl, store, attr, buffer) => {
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer.buffer(gl, store));
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer.glBuffer(gl, store));
   gl.enableVertexAttribArray(attr);
   gl.vertexAttribPointer(attr, buffer.typeSize, 
     buffer.componentType, false, 0, 0);
 };
 
 export const drawElements = (gl, store, buffer) => {
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.buffer(gl, store));
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.glBuffer(gl, store));
   gl.drawElements(gl.TRIANGLES, buffer.count, 
     buffer.componentType, 0);
 };

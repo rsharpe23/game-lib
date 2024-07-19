@@ -16,6 +16,7 @@ export default {
       props.deltaTime = elapsedTime - props.time;
       props.time = elapsedTime;
       props.updatable.update(props);
+      // TODO: Приостанавливать цикл, когда приложение теряет фокус
       requestAnimationFrame(this.loop);
     };
   },

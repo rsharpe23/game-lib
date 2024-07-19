@@ -25,7 +25,6 @@ export default class extends MeshBase {
       uniformUtil.setMatUniforms(gl, prog, camera, item);
 
       for (const primitive of item.primitives) {
-        // Во многих примерах используется именование setAttribute
         setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
         setAttribute(gl, geomStore, prog.a_Normal, primitive.nbo);
         setAttribute(gl, geomStore, prog.a_Texcoord, primitive.tbo);

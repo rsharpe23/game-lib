@@ -31,15 +31,15 @@ export default class {
     const { bufferView, type, ...rest } = this.accessors[accessor];
 
     rest.typeSize = typeSizeMap[type];
-    rest.buffer = (gl, store) => {
-      return store[accessor] ??= this._createRawBuffer(
+    rest.glBuffer = (gl, store) => {
+      return store[accessor] ??= this._createGLBuffer(
         gl, this.bufferViews[bufferView]);
     };
 
     return rest;
   }
 
-  _createRawBuffer(gl, { buffer, byteLength, byteOffset, target }) {
+  _createGLBuffer(gl, { buffer, byteLength, byteOffset, target }) {
     const data = new Uint8Array(this.buffers[buffer], 
       byteOffset, byteLength);
 

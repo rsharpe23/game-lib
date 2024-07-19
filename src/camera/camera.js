@@ -19,6 +19,8 @@ export default class extends Updatable {
 
   _update(appProps) {
     this.projection.setMatUniform(appProps.gl, appProps.prog);
+
+    // Вокруг glMatrix тоже можно сделать обертку
     mat4.lookAt(this.viewMat, this.position, 
       this.lookAtPoint, [0, 1, 0]);
   }

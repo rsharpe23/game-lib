@@ -4,8 +4,8 @@ import '../lib/global-ext.js';
 import { loadImage } from '../lib/load-api.js';
 import { loadShaders } from '../src/core/shader-api.js'
 import { loadGeometry } from '../src/core/gltf-api/index.js';
-import { createProgram } from '../src/core/program-factory.js';
-import { createTexture } from '../src/core/gl-util.js';
+import { createProgram } from '../src/core/program-api.js';
+import { createTexture } from '../src/core/texture-api.js';
 
 import app from '../src/app.js';
 import Scene from '../src/scene.js';
@@ -19,7 +19,7 @@ const { gl, store } = props;
 
 // После того, как был изменен способ загрузки gltf (с раздельного gltf + bin на сплошной), 
 // стала появлятся ошибка: "WebGL warning: tex(Sub)Image[23]D: Resource has no data (yet?)."
-// До этого она появлялась лишь изредко. При этом чем быстрее загрузка данных, 
+// До этого она появлялась лишь изредко. При этом, чем быстрее загрузка данных, 
 // тем больше вероятностью её появления. Возникает она, скорей всего, 
 // из-за загрузки изображений через fetch, а сам процесс создания 
 // обьекта изображения не совсем синхронный (даже через blob).

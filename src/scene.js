@@ -1,7 +1,7 @@
 import SceneBase from './scene-base.js';
 import { useProgram } from './core/gl-util.js';
 
-const passMaterialColors = (gl, prog) => {
+const setMaterialUniforms = (gl, prog) => {
   gl.uniform3f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4);
   gl.uniform3f(prog.u_MaterialSpecularColor, 1.0, 1.0, 1.0);
 };
@@ -20,6 +20,6 @@ export default class extends SceneBase {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     useProgram(gl, prog);
-    passMaterialColors(gl, prog);
+    setMaterialUniforms(gl, prog);
   }
 }

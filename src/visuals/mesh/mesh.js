@@ -1,8 +1,8 @@
-import { passTexture, passAttribute, drawElements 
+import { setTexUniform, setAttribute, drawElements 
   } from '../../core/gl-util.js';
 
 import MeshBase from './mesh-base.js';
-import matrixPasser from './matrix-passer.js';
+import uniformUtil from './uniform-util.js';
 
 export default class extends MeshBase {
   _beforeUpdate() {
@@ -19,15 +19,16 @@ export default class extends MeshBase {
     const texture = appProps.store.get(this.texImg);
     const geomStore = appProps.store.get(this.geometry);
 
-    passTexture(gl, prog.u_Sampler, texture);
+    setTexUniform(gl, prog.u_Sampler, texture);
     
     for (const item of this.items) {
-      matrixPasser.passMatrices(gl, prog, camera, item);
+      uniformUtil.setMatUniforms(gl, prog, camera, item);
 
       for (const primitive of item.primitives) {
-        passAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
-        passAttribute(gl, geomStore, prog.a_Normal, primitive.nbo);
-        passAttribute(gl, geomStore, prog.a_Texcoord, primitive.tbo);
+        // Во многих примерах используется именование setAttribute
+        setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
+        setAttribute(gl, geomStore, prog.a_Normal, primitive.nbo);
+        setAttribute(gl, geomStore, prog.a_Texcoord, primitive.tbo);
         drawElements(gl, geomStore, primitive.ibo);
       }
     }

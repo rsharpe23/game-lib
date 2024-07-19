@@ -1,4 +1,4 @@
-// Утилита для загрузки раздельных gltf + bin
+// Утилита для загрузки раздельного gltf + bin
 
 export const getFile = dir => {
   const name = dir.split('/').pop();

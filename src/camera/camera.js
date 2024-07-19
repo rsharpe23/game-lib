@@ -18,7 +18,7 @@ export default class extends Updatable {
   }
 
   _update(appProps) {
-    this.projection.passMatrix(appProps.gl, appProps.prog);
+    this.projection.setMatUniform(appProps.gl, appProps.prog);
     mat4.lookAt(this.viewMat, this.position, 
       this.lookAtPoint, [0, 1, 0]);
   }

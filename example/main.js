@@ -19,39 +19,38 @@ const { gl, store } = props;
 
 // После того, как был изменен способ загрузки gltf (с раздельного gltf + bin на сплошной), 
 // стала появлятся ошибка: "WebGL warning: tex(Sub)Image[23]D: Resource has no data (yet?)."
-// До этого она появлялась лишь изредко. Возникает она из-за вложенного Promise.all() 
-// внутри другого Promise.all() и только когда нет задержки при получении данных. 
-// При тестир. с throttling'ом (3g/4g) такой ошибки не было, но с доб. WiFi уже появлялась.
+// До этого она появлялась лишь изредко. При этом чем быстрее загрузка данных, 
+// тем больше вероятностью её появления. Возникает она, скорей всего, 
+// из-за загрузки изображений через fetch, а сам процесс создания 
+// обьекта изображения не совсем синхронный (даже через blob).
 const [shaders, texImg, geometry] = await Promise.all([
   loadShaders('/shaders/default'),
-  loadImage('texture.jpg'), 
-  loadGeometry('tank.gltf'),
-  new Promise(resolve => setTimeout(() => resolve(), 100)), // HACK 
+  loadImage('assets/texture.jpg'),
+  loadGeometry('assets/tank.gltf'),
 ]);
 
 const createScene = (camera, light) => {
   const scene = new Scene(camera, light);
+  // scene.addVisual(new Mesh('tank', new TRS(), texImg, geometry));
 
-  // const translations = [
-  //   [ 0,  0,  0],
-  //   [ 0,  0,  7],
-  //   [ 0,  0, -7],
-  //   [ 7,  0,  0],
-  //   [-7,  0,  0],
-  //   [ 7,  0,  7],
-  //   [ 7,  0, -7],
-  //   [-7,  0,  7],
-  //   [-7,  0, -7],
-  // ];
+  const translations = [
+    [ 0,  0,  0],
+    [ 0,  0,  7],
+    [ 0,  0, -7],
+    [ 7,  0,  0],
+    [-7,  0,  0],
+    [ 7,  0,  7],
+    [ 7,  0, -7],
+    [-7,  0,  7],
+    [-7,  0, -7],
+  ];
 
-  // for (const translation of translations) {
-  //   const mesh = new Mesh('tank', 
-  //     new TRS({ translation }), texImg, geometry);
+  for (const translation of translations) {
+    const mesh = new Mesh('tank', 
+      new TRS({ translation }), texImg, geometry);
 
-  //   scene.addVisual(mesh);
-  // }
-
-  scene.addVisual(new Mesh('tank', new TRS(), texImg, geometry));
+    scene.addVisual(mesh);
+  }
 
   return scene;
 };
@@ -61,7 +60,7 @@ props.updatable = createScene(new Camera([0, 5, 20]), new Light([0, -70, -100]))
 
 // Создавать текстуру лучше после создания программы, иначе может 
 // появиться всё таже ошибка "WebGL warning: tex(Sub)Image[23]D"
-store.set(texImg, createTexture(gl, texImg));
 store.set(geometry, {});
+store.set(texImg, createTexture(gl, texImg));
 
 app.loop(performance.now());

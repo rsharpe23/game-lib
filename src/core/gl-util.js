@@ -39,18 +39,24 @@ export const createTexture = (gl, img) => {
 };
 
 export const useProgram = (gl, prog) => {
-  const currentProg = gl.getParameter(gl.CURRENT_PROGRAM);
-  if (prog === currentProg) return;
+  // Ф-ция getParameter(gl.CURRENT_PROGRAM) влияет на производительность. 
+  // Её лучше не использовать в цикле отрисовки
+  if (prog === gl.currentProg) return;
+  gl.currentProg = prog;
   gl.useProgram(prog);
 };
 
-export const passTexture = (gl, uniform, texture, unitIndex = 0) => {
+export const setMatUniform = (gl, uniform, matrix) => {
+  gl.uniformMatrix4fv(uniform, false, matrix);
+};
+
+export const setTexUniform = (gl, uniform, texture, unitIndex = 0) => {
   gl.activeTexture(gl.TEXTURE0 + unitIndex);
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.uniform1i(uniform, unitIndex);
 };
 
-export const passAttribute = (gl, store, attr, buffer) => {
+export const setAttribute = (gl, store, attr, buffer) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer.buffer(gl, store));
   gl.enableVertexAttribArray(attr);
   gl.vertexAttribPointer(attr, buffer.typeSize, 

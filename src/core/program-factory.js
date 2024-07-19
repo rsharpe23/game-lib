@@ -1,7 +1,7 @@
-import { createProgram as glCreateProgram } from './gl-util.js';
+import { createProgram as gluCreateProgram } from './gl-util.js';
 
 export const createProgram = (gl, [vs, fs]) => {
-  const prog = glCreateProgram(gl, vs(gl), fs(gl));
+  const prog = gluCreateProgram(gl, vs(gl), fs(gl));
 
   prog.a_Position = gl.getAttribLocation(prog, "a_Position");
   prog.a_Normal = gl.getAttribLocation(prog, "a_Normal");

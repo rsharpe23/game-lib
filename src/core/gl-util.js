@@ -11,9 +11,9 @@ export const createProgram = (gl, vs, fs) => {
   return prog;
 };
 
-export const createShader = (gl, type, text) => {
+export const createShader = (gl, type, src) => {
   const shader = gl.createShader(type);
-  gl.shaderSource(shader, text);
+  gl.shaderSource(shader, src);
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -45,9 +45,9 @@ export const createTexture = (gl, img, isPowerOf2) => {
   return texture;
 };
 
+// getParameter(gl.CURRENT_PROGRAM) влияет на производительность. 
+// Эту ф-цию лучше не использовать в цикле отрисовки
 export const useProgram = (gl, prog) => {
-  // getParameter(gl.CURRENT_PROGRAM) влияет на производительность. 
-  // Эту ф-цию лучше не использовать в цикле отрисовки
   if (prog === gl.currentProg) return;
   gl.currentProg = prog;
   gl.useProgram(prog.glProg);

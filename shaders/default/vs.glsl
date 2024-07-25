@@ -2,7 +2,7 @@ attribute vec3 a_Position;
 attribute vec3 a_Normal;
 attribute vec2 a_Texcoord;
 
-uniform mat4 u_PMatrix;
+uniform mat4 u_PMatrix; 
 uniform mat4 u_MVMatrix;
 uniform mat4 u_NMatrix;
 

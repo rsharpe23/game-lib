@@ -1,4 +1,5 @@
 uniform sampler2D u_Sampler;
+
 varying mediump vec3 v_Color;
 varying mediump vec2 v_Texcoord;
 

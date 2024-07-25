@@ -4,8 +4,8 @@ import Perspective from './projections/perspective.js';
 const { mat4 } = glMatrix;
 
 export default class extends Updatable {
-  projection = new Perspective();
   viewMat = mat4.create();
+  projection = new Perspective();
 
   constructor(position, lookAtPoint) {
     super();

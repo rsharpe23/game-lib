@@ -1,16 +1,8 @@
+import { loadJson, loadBuffer } from '../../../lib/load-api.js';
+
 import Geometry from './geometry.js';
 import NodeTree from './node-tree.js';
 import MeshParser from './mesh-parser.js';
-import { loadJson, loadBuffer } from '../../../lib/load-api.js';
-
-// import { getPath } from './util.js';
-
-// export const loadGltf = async dir => {
-//   const gltf = await loadJson(getPath(dir));
-//   const { uri } = gltf.buffers[0];
-//   gltf.buffers[0] = await loadBuffer(getPath(dir, uri));
-//   return gltf;
-// };
 
 export const loadGltf = async path => {
   const gltf = await loadJson(path);

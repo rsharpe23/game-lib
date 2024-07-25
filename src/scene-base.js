@@ -1,19 +1,18 @@
 import Updatable from './updatable.js';
 
 // Не тестировалось
-const addVisual = (visuals, visual) => {
+const addVisual = (out, visual) => {
   if (!visual.prog) {
-    visuals.unshift(visual);
+    out.unshift(visual);
     return;
   }
   
-  const index = visuals.findLastIndex(v => v.prog === visual.prog);
-  if (~index) {
-    visuals.splice(index, 0, visual);
+  if ( ~(index = out.findLastIndex(v => v.prog === visual.prog)) ) {
+    out.splice(index, 0, visual);
     return;
   }
   
-  visuals.push(visual);
+  out.push(visual);
 };
 
 export default class extends Updatable {
@@ -25,8 +24,8 @@ export default class extends Updatable {
     this.light = light;
   }
 
-  addVisual(visual) {
-    addVisual(this.visuals, visual);
+  addVisual(visual) { 
+    addVisual(this.visuals, visual); 
   }
 
   findVisual(name) {

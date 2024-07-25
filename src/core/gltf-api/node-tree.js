@@ -3,13 +3,13 @@ export default class {
     this.nodes = nodes;
   }
 
-  *traverse(roots, fn, parent) {
+  traverse(roots, cb, parentOfRoot) {
     for (const root of roots) {
       const { children, ...rest } = this.nodes[root];
-      yield fn(rest, parent);
+      cb(rest, parentOfRoot);
 
       if (children) {
-        yield* this.traverse(children, fn, rest);
+        this.traverse(children, cb, rest);
       }
     }
   }

@@ -4,7 +4,7 @@ export default class {
   }
 
   setLocationProps(gl, locations) {
-    for (const { name, qualifier } of locations) {
+    for (const [qualifier, name] of locations) {
       const action = qualifier === 'attribute' ? 'getAttribLocation' :
         qualifier === 'uniform' ? 'getUniformLocation' : '';
 

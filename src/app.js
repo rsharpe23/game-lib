@@ -2,7 +2,7 @@ const elem = document.getElementById('canvas');
 
 export default {
   props: {
-    gl: elem.getContext('webgl'),
+    gl: elem.getContext('webgl', { antialias: false }),
     prog: null,
     updatable: null,
     store: new WeakMap(),

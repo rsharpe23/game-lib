@@ -4,7 +4,7 @@ import '../lib/global-ext.js';
 import { loadImage } from '../lib/load-api.js';
 import { loadGeometry } from '../src/core/gltf-api/index.js';
 import { loadShaders } from '../src/core/shader-api/index.js';
-import { createProgramBy } from '../src/core/program-api/index.js';
+import { createProgram } from '../src/core/program-api/index.js';
 import { createTexture } from '../src/core/texture-api.js';
 
 import app from '../src/app.js';
@@ -13,6 +13,8 @@ import Camera from './camera.js';
 import Light from '../src/light.js';
 import Mesh from '../src/visuals/mesh/index.js';
 import TRS from '../src/core/trs.js';
+
+import Ray from '../src/visuals/effects/ray.js';
 
 const { props } = app;
 const { gl, store } = props;
@@ -32,6 +34,7 @@ const [shaders, texImg, geometry] = await Promise.all([
 const createScene = (camera, light) => {
   const scene = new Scene(camera, light);
   scene.addVisual(new Mesh('tank', new TRS(), texImg, geometry));
+  scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0] })));
 
   // const translations = [
   //   [ 0,  0,  0],
@@ -55,7 +58,7 @@ const createScene = (camera, light) => {
   return scene;
 };
 
-props.prog = createProgramBy(gl, shaders);
+props.prog = createProgram(gl, shaders);
 props.updatable = createScene(new Camera([0, 5, 20]), new Light([0, -70, -100]));
 
 // Создавать текстуру лучше после создания программы, иначе может 

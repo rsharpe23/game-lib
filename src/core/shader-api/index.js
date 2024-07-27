@@ -7,8 +7,8 @@ export const loadShader = async path => {
 };
 
 export const loadShaders = dir => {
-  const shaderFiles = ['vs.glsl', 'fs.glsl'];
-  const requests = shaderFiles
+  const requiredFiles = ['vs.glsl', 'fs.glsl'];
+  const requests = requiredFiles
     .map(file => loadShader(`${dir}/${file}`));
 
   return Promise.all(requests);

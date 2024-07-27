@@ -7,7 +7,8 @@ const addVisual = (out, visual) => {
     return;
   }
   
-  if ( ~(index = out.findLastIndex(v => v.prog === visual.prog)) ) {
+  const index = out.findLastIndex(v => v.prog === visual.prog);
+  if (~index) {
     out.splice(index, 0, visual);
     return;
   }

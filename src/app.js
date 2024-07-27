@@ -1,8 +1,9 @@
 const elem = document.getElementById('canvas');
+const renderProps = { antialias: false };
 
 export default {
   props: {
-    gl: elem.getContext('webgl', { antialias: false }),
+    gl: elem.getContext('webgl', renderProps),
     prog: null,
     updatable: null,
     store: new WeakMap(),
@@ -20,4 +21,12 @@ export default {
       requestAnimationFrame(this.loop);
     };
   },
+
+  run(prog, updatable) {
+    this.props.prog = prog;
+    this.props.updatable = updatable;
+    this.loop(performance.now());
+  },
+
+  // TODO: Добавить 2 метода: stop() и resume()
 };

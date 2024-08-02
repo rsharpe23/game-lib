@@ -1,6 +1,6 @@
-import Updatable from "./updatable.js";
+import { vec3 } from '../lib/gl-matrix';
+import Updatable from "./updatable";
 
-const { vec3 } = glMatrix;
 const worldPos = vec3.create();
 
 const setColorUniforms = (gl, prog, colors) => {

@@ -1,0 +1,37 @@
+{
+  "name": "game-framework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./build/game-framework.js",
+  "directories": {
+    "example": "example",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx gulp",
+    "build": "npx gulp build",
+    "build:prod": "npx gulp build --type=prod",
+    "shaders": "npx gulp shaders"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rsharpe23/game-framework2.0.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rsharpe23/game-framework2.0/issues"
+  },
+  "homepage": "https://github.com/rsharpe23/game-framework2.0#readme",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/stream": "^1.1.0",
+    "gulp": "^5.0.0",
+    "gulp-clean": "^0.4.0",
+    "gulp-cli": "^3.0.0",
+    "gulp-glslify-next": "github:rsharpe23/gulp-glslify-next",
+    "gulp-rename": "^2.0.0",
+    "vinyl-source-stream": "^2.0.0"
+  }
+}

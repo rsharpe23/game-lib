@@ -1,3 +1,10 @@
+// TODO: Этот модуль можно вообще вынести в lib, 
+// но для этого нужно убрать некоторые связи с ядром, 
+// в часности параметры: store, buffer, prog.
+
+// В этом случае исчезнуть коллизии между gl-util и api ядра, 
+// что позволит по сути экспорироват и ядро
+
 export const createProgram = (gl, vs, fs) => {
   const prog = gl.createProgram();
   gl.attachShader(prog, vs);

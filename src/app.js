@@ -21,12 +21,6 @@ export default {
       requestAnimationFrame(this.loop);
     };
   },
-
-  run(prog, updatable) {
-    this.props.prog = prog;
-    this.props.updatable = updatable;
-    this.loop(performance.now());
-  },
-
+  
   // TODO: Добавить 2 метода: stop() и resume()
 };

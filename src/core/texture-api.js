@@ -1,5 +1,5 @@
-import { isPowerOf2 } from '../../lib/math.js';
-import { createTexture as gluCreateTexture } from './gl-util.js';
+import { isPowerOf2 } from '../../lib/math';
+import { createTexture as gluCreateTexture } from './gl-util';
 
 export const createTexture = (gl, img) => {
   return gluCreateTexture(gl, img, isPowerOf2);

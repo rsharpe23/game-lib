@@ -1,8 +1,14 @@
-import { loadJson, loadBuffer } from '../../../lib/load-api.js';
+// Если в файле index.js участвуют также некоторые классы api, 
+// которые также нужно экспортировать, то вместо реэкспорта в начале 
+// можно импортировать их, как будто они внутренний, а после использования 
+// экспортировать в самом конце, после дефолтного экспорта. 
+// Такой вариант более понятен, чем реэкспорт в начале файла.
 
-import Geometry from './geometry.js';
-import NodeTree from './node-tree.js';
-import MeshParser from './mesh-parser.js';
+import { loadJson, loadBuffer } from '../../../lib/load-api';
+
+import Geometry from './geometry';
+import NodeTree from './node-tree';
+import MeshParser from './mesh-parser';
 
 export const loadGltf = async path => {
   const gltf = await loadJson(path);
@@ -22,3 +28,5 @@ export const loadGeometry = async path => {
   const gltf = await loadGltf(path);
   return parseGltf(gltf);
 };
+
+export { Geometry, NodeTree, MeshParser };

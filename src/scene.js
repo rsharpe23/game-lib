@@ -1,5 +1,5 @@
-import SceneBase from './scene-base.js';
-import { useProgram } from './core/gl-util.js';
+import SceneBase from './scene-base';
+import { useProgram } from './core/gl-util';
 
 const setMaterialUniforms = (gl, prog) => {
   gl.uniform3f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4);

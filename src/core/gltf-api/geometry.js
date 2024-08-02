@@ -1,4 +1,4 @@
-import TRS from '../trs.js';
+import TRS from '../trs';
 
 export default class {
   constructor(scene, nodeTree, meshParser) {

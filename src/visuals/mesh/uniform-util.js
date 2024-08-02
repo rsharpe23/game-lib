@@ -1,6 +1,5 @@
-import { setMatUniform } from '../../core/gl-util.js';
-
-const { mat4 } = glMatrix;
+import { mat4 } from '../../../lib/gl-matrix';
+import { setMatUniform } from '../../core/gl-util';
 
 export default {
   mvMat: mat4.create(),

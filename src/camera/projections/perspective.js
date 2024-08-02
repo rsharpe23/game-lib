@@ -1,6 +1,5 @@
-import Projection from './projection.js';
-
-const { mat4 } = glMatrix;
+import { mat4 } from '../../../lib/gl-matrix';
+import Projection from './projection';
 
 export default class extends Projection {
   fov = 1.04;

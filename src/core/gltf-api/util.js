@@ -1,4 +1,4 @@
-// Утилита для загрузки раздельного gltf + bin
+// Утилита для загрузки раздельного формата gltf + bin
 
 // const loadGltf = async dir => {
 //   const gltf = await loadJson(getPath(dir));

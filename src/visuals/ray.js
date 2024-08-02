@@ -1,9 +1,8 @@
-import { useProgram, setMatUniform } from '../../core/gl-util.js';
-import { createProgram } from '../../core/program-api/index.js';
-import Shader from '../../core/shader-api/shader.js';
-import Visual from '../visual.js';
-
-const { mat4 } = glMatrix;
+import { mat4 } from '../../lib/gl-matrix';
+import { useProgram, setMatUniform } from '../core/gl-util';
+import { createProgram } from '../core/program-api';
+import { Shader } from '../core/shader-api';
+import Visual from './visual';
 
 const matrix = mat4.create();
 const color = [1, 1, 1, 1];

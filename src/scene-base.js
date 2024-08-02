@@ -1,4 +1,4 @@
-import Updatable from './updatable.js';
+import Updatable from './updatable';
 
 // Не тестировалось
 const addVisual = (out, visual) => {

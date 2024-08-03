@@ -2,8 +2,8 @@ import '../lib/global-ext.js';
 import { loadImage } from '../lib/load-api.js';
 import Camera from './camera.js';
 
-import { app, mesh, progApi, shaderApi, gltfApi, texApi, 
-  Scene, Light, Ray, TRS } from 'game-framework';
+import { app, progApi, shaderApi, gltfApi, texApi,
+  Scene, Light, Mesh, Ray, TRS } from 'game-framework';
 
 const { props } = app;
 const { gl, store } = props;
@@ -22,8 +22,8 @@ const [shaders, texImg, geometry] = await Promise.all([
 
 const createScene = (camera, light) => {
   const scene = new Scene(camera, light);
-  scene.addVisual(new mesh.Mesh('tank', new TRS(), texImg, geometry));
-  scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0], scale: [5, 1, 1] }) ));
+  scene.addVisual(new Mesh('tank', new TRS(), texImg, geometry));
+  // scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0], scale: [3, 1, 1] }) ));
 
   // const translations = [
   //   [ 0,  0,  0],
@@ -55,5 +55,5 @@ store.set(texImg, texApi.createTexture(gl, texImg));
 // TODO: Сделать так, чтобы при потере ссылки на сцену, 
 // очищались свяазанные данные из store
 props.prog = progApi.createProgram(gl, shaders);
-props.updatable = createScene(new Camera([0, 5, 20]), new Light([0, -70, -100]));
+props.updatable = createScene(new Camera([0, 2, 10]), new Light([0, -70, -100]));
 app.loop(performance.now());

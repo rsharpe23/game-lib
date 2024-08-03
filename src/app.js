@@ -1,5 +1,5 @@
 const elem = document.getElementById('canvas');
-const renderProps = { antialias: false };
+const renderProps = {}; // { antialias: false };
 
 export default {
   props: {

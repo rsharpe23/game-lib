@@ -7,6 +7,13 @@ import Visual from './visual';
 const matrix = mat4.create();
 const color = [1, 1, 1, 1];
 
+// TODO: Попробовать перенести часть логики в шейдер, 
+// чтобы не создавать буфер и атрибут в js
+
+// Не получится это сделать, т.к. луч требует минимум 2х точек 
+// в пространстве, начальной и конечной, кот. должны 
+// передаваться через атрибуты и соотв. задаваться через буфер.
+
 const shaders = [
   new Shader(`
     attribute vec4 a_Position;
@@ -33,6 +40,9 @@ export default class extends Visual {
   }
 
   _beforeUpdate({ gl }) {
+    // TODO: Попробовать сделать так, чтобы в буфер 
+    // сразу попадали нужны координаты
+
     const { renderProps } = this;
     renderProps.prog = createProgram(gl, shaders);
     renderProps.vbo = gl.createBuffer();

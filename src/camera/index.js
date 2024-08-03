@@ -1,16 +1,18 @@
 // В одной папке camera не может быть несколько разных файлов камер, 
 // например сamera и orbit-camera. В этом случае нужно сделать папку cameras, 
-// которая будет содержать подпапку camera (с её функционалом) и orbit-camera. 
+// которая будет содержать подпапку camera (с её функционалом) и файл orbit-camera. 
 // Посему можно смело размещать основные классы в файлах index.js
 
-// Кроме того, если модуль определен папкой, а не файлом, то лучше не делать 
-// экспорт его по умолчанию, поскольку в экспорт могут входить и внутр. модули.
+// Если модуль имеет подмодули, которые также могут вызываться 
+// во внешнем коде (например у камеры это может быть подмодуль проекции),
+// то такие подмодули могут экспортироваться с доп. префиксом: 
+// Projection  -->  CameraProjection
 
 import { mat4 } from '../../lib/gl-matrix';
 import Updatable from '../updatable';
 import Perspective from './projections/perspective';
 
-export class Camera extends Updatable {
+export default class extends Updatable {
   viewMat = mat4.create();
   projection = new Perspective();
 
@@ -33,5 +35,5 @@ export class Camera extends Updatable {
   }
 };
 
-export { default as Projection } from './projections/projection';
-export { Perspective };
+export { default as CameraProjection } from './projections/projection';
+export { Perspective as CameraPerspective };

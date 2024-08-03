@@ -1,23 +1,50 @@
 import { mat4 } from '../../../lib/gl-matrix';
 import { setMatUniform } from '../../core/gl-util';
 
-export default {
-  mvMat: mat4.create(),
-  normalMat: mat4.create(),
+// TODO: Порефакторить подобным образом класс Projection или попробовать 
+// сразу сделать униформы и атрибуты программы такими объектами 
 
-  setMatUniforms(gl, prog, camera, item) {
-    this.setMvMatUniform(gl, prog, camera.viewMat, item.matrix);
-    this.setNormalMatUniform(gl, prog);
-  },
+// class MatrixUniform {
+//   matrix = mat4.create();
 
-  setMvMatUniform(gl, prog, viewMat, modelMat) {
-    mat4.mul(this.mvMat, viewMat, modelMat);
-    setMatUniform(gl, prog.u_MVMatrix, this.mvMat);
-  },
+//   constructor(location) {
+//     this.location = location;
+//   }
 
-  setNormalMatUniform(gl, prog) {
-    mat4.invert(this.normalMat, this.mvMat);
-    mat4.transpose(this.normalMat, this.normalMat);
-    setMatUniform(gl, prog.u_NMatrix, this.normalMat);
-  },
+//   set(gl) { 
+//     setMatUniform(gl, this.location, this.matrix); 
+//   }
+// }
+
+class MatrixUniform {
+  matrix = mat4.create();
+
+  // Временный перенос location из констурктора 
+  // в параметры, для удобства
+  set(gl, location) { 
+    setMatUniform(gl, location, this.matrix); 
+  }
 }
+
+class ModelViewMatrixUniform extends MatrixUniform {
+  set(gl, prog, viewMat, modelMat) {
+    mat4.mul(this.matrix, viewMat, modelMat);
+    super.set(gl, prog.u_MVMatrix);
+  }
+}
+
+class NormalMatrixUniform extends MatrixUniform {
+  set(gl, prog, modelViewMat) {
+    mat4.invert(this.matrix, modelViewMat);
+    mat4.transpose(this.matrix, this.matrix);
+    super.set(gl, prog.u_NMatrix);
+  }
+}
+
+const mvMatUniform = new ModelViewMatrixUniform();
+const nMatUniform = new NormalMatrixUniform();
+
+export const setMatUniforms = (gl, prog, camera, item) => {
+  mvMatUniform.set(gl, prog, camera.viewMat, item.matrix);
+  nMatUniform.set(gl, prog, mvMatUniform.matrix);
+};

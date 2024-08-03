@@ -3,9 +3,9 @@ import { setTexUniform, setAttribute, drawElements
 
 import Visual from '../visual';
 import ItemList from './item-list';
-import uniformUtil from './uniform-util';
+import { setMatUniforms } from './uniform-util';
 
-export class Mesh extends Visual {
+export default class extends Visual {
   constructor(name, trs, texImg, geometry) {
     super(name, trs);
     this.texImg = texImg;
@@ -37,7 +37,7 @@ export class Mesh extends Visual {
     setTexUniform(gl, prog.u_Sampler, texture);
     
     for (const item of this.items) {
-      uniformUtil.setMatUniforms(gl, prog, camera, item);
+      setMatUniforms(gl, prog, camera, item);
   
       for (const primitive of item.primitives) {
         setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
@@ -49,5 +49,3 @@ export class Mesh extends Visual {
   }
 
 }
-
-export { ItemList, uniformUtil };

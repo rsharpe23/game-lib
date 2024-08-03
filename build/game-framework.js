@@ -1,3 +1,12 @@
+const loadResource = async (path, type) => {
+  const res = await fetch(path);
+  return res[type]();
+};
+
+const loadText = async path => loadResource(path, 'text');
+const loadJson = async path => loadResource(path, 'json');
+const loadBuffer = async path => loadResource(path, 'arrayBuffer');
+
 /**
  * Common utilities
  * @module glMatrix
@@ -1058,305 +1067,6 @@ function create() {
   };
 })();
 
-class Updatable {
-  _canUpdate = false; 
-
-  update(appProps) {
-    if (this._canUpdate) {
-      this._update(appProps);
-      return;
-    }
-
-    this._beforeUpdate?.(appProps);
-    this._canUpdate = true;
-  }
-
-  _update(appProps) {
-    throw new Error('Not implemented');
-  }
-}
-
-// TODO: Этот модуль можно вообще вынести в lib, 
-// но для этого нужно убрать некоторые связи с ядром, 
-// в часности параметры: store, buffer, prog.
-
-// В этом случае исчезнуть коллизии между gl-util и api ядра, 
-// что позволит по сути экспорироват и ядро
-
-const createProgram$1 = (gl, vs, fs) => {
-  const prog = gl.createProgram();
-  gl.attachShader(prog, vs);
-  gl.attachShader(prog, fs);
-  gl.linkProgram(prog);
-
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-    throw new Error('Program link error');
-  }
-
-  return prog;
-};
-
-const createShader = (gl, type, src) => {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, src);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    throw new Error(`Shader error: ${gl.getShaderInfoLog(shader)}`);
-  }
-
-  return shader;
-};
-
-const createBuffer = (gl, data, target) => {
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(target, buffer);
-  gl.bufferData(target, data, gl.STATIC_DRAW);
-  return buffer;
-};
-
-const createTexture$1 = (gl, img, isPowerOf2) => {
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-
-  if (isPowerOf2(img.width) && isPowerOf2(img.height)) {
-    gl.generateMipmap(gl.TEXTURE_2D);
-  } else {
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  }
-
-  return texture;
-};
-
-// getParameter(gl.CURRENT_PROGRAM) влияет на производительность. 
-// Эту ф-цию лучше не использовать в цикле отрисовки
-const useProgram = (gl, prog) => {
-  if (prog === gl.currentProg) return;
-  gl.currentProg = prog;
-  gl.useProgram(prog.glProg);
-};
-
-const setMatUniform = (gl, uniform, matrix) => {
-  gl.uniformMatrix4fv(uniform, false, matrix);
-};
-
-const setTexUniform = (gl, uniform, texture, unitIndex = 0) => {
-  gl.activeTexture(gl.TEXTURE0 + unitIndex);
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.uniform1i(uniform, unitIndex);
-};
-
-const setAttribute = (gl, store, attr, buffer) => {
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer.glBuffer(gl, store));
-  gl.enableVertexAttribArray(attr);
-  gl.vertexAttribPointer(attr, buffer.typeSize, 
-    buffer.componentType, false, 0, 0);
-};
-
-const drawElements = (gl, store, buffer) => {
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.glBuffer(gl, store));
-  gl.drawElements(gl.TRIANGLES, buffer.count, 
-    buffer.componentType, 0);
-};
-
-var glUtil = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  createProgram: createProgram$1,
-  createShader: createShader,
-  createBuffer: createBuffer,
-  createTexture: createTexture$1,
-  useProgram: useProgram,
-  setMatUniform: setMatUniform,
-  setTexUniform: setTexUniform,
-  setAttribute: setAttribute,
-  drawElements: drawElements
-});
-
-class Projection {
-  constructor(matrix) { 
-    this.matrix = matrix; 
-  }
-
-  setMatUniform(gl, prog) {
-    setMatUniform(gl, prog.u_PMatrix, this.matrix);
-  }
-}
-
-// const { mat4 } = glMatrix;
-
-class Perspective extends Projection {
-  fov = 1.04;
-  aspect = 1;
-  near = 0.1;
-  far = 1000;
-
-  constructor() {
-    super(create$4());
-  }
-
-  setMatUniform(gl, prog) {
-    perspective(this.matrix, this.fov, this.aspect, 
-      this.near, this.far);
-      
-    super.setMatUniform(gl, prog);
-  }
-}
-
-// В одной папке camera не может быть несколько разных файлов камер, 
-
-class Camera extends Updatable {
-  viewMat = create$4();
-  projection = new Perspective();
-
-  constructor(position, lookAtPoint) {
-    super();
-    this.position = position;
-    this.lookAtPoint = lookAtPoint;
-  }
-
-  get projMat() {
-    return this.projection.matrix;
-  }
-
-  _update(appProps) {
-    this.projection.setMatUniform(appProps.gl, appProps.prog);
-
-    // Вокруг glMatrix тоже можно сделать обертку
-    lookAt(this.viewMat, this.position, 
-      this.lookAtPoint, [0, 1, 0]);
-  }
-}
-
-var index$4 = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  Camera: Camera,
-  Perspective: Perspective,
-  Projection: Projection
-});
-
-class Visual extends Updatable {
-  tag = 'default';
-  isHidden = false;
-  // Может хранить любые данные пользовательского 
-  // рендеринга, например: материал, вспом. текстуры 
-  // и шейдерную программу для их обработки.
-  renderProps = {};
-
-  constructor(name, trs) {
-    super();
-    this.name = name;
-    this.trs = trs;
-  }
-
-  get prog() {
-    return this.renderProps.prog;
-  }
-
-  update(appProps) {
-    if (this.isHidden) return;
-    super.update(appProps);
-  }
-}
-
-class ItemList extends Array {
-  constructor(geometry) {
-    super();
-    this._geometry = geometry;
-    geometry.traverse(node => this.push(node));
-    Object.freeze(this);
-  }
-  
-  get geometry() {
-    return this._geometry;
-  }
-}
-
-var uniformUtil = {
-  mvMat: create$4(),
-  normalMat: create$4(),
-
-  setMatUniforms(gl, prog, camera, item) {
-    this.setMvMatUniform(gl, prog, camera.viewMat, item.matrix);
-    this.setNormalMatUniform(gl, prog);
-  },
-
-  setMvMatUniform(gl, prog, viewMat, modelMat) {
-    mul(this.mvMat, viewMat, modelMat);
-    setMatUniform(gl, prog.u_MVMatrix, this.mvMat);
-  },
-
-  setNormalMatUniform(gl, prog) {
-    invert(this.normalMat, this.mvMat);
-    transpose(this.normalMat, this.normalMat);
-    setMatUniform(gl, prog.u_NMatrix, this.normalMat);
-  },
-};
-
-class Mesh extends Visual {
-  constructor(name, trs, texImg, geometry) {
-    super(name, trs);
-    this.texImg = texImg;
-    this.items = new ItemList(geometry);
-  }
-
-  get geometry() {
-    return this.items.geometry;
-  }
-
-  findItem(name) {
-    return this.items.find(item => item.name === name);
-  }
-
-  _beforeUpdate() {
-    for (const { trs } of this.items) {
-      if (!trs.parent) trs.parent = this.trs;
-    }
-  }
-  
-  _update(appProps) {
-    const gl = appProps.gl;
-    const prog = appProps.prog;
-    const camera = appProps.updatable.camera;
-  
-    const texture = appProps.store.get(this.texImg);
-    const geomStore = appProps.store.get(this.geometry);
-  
-    setTexUniform(gl, prog.u_Sampler, texture);
-    
-    for (const item of this.items) {
-      uniformUtil.setMatUniforms(gl, prog, camera, item);
-  
-      for (const primitive of item.primitives) {
-        setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
-        setAttribute(gl, geomStore, prog.a_Normal, primitive.nbo);
-        setAttribute(gl, geomStore, prog.a_Texcoord, primitive.tbo);
-        drawElements(gl, geomStore, primitive.ibo);
-      }
-    }
-  }
-
-}
-
-var index$3 = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  Mesh: Mesh,
-  ItemList: ItemList,
-  uniformUtil: uniformUtil
-});
-
-const loadResource = async (path, type) => {
-  const res = await fetch(path);
-  return res[type]();
-};
-
-const loadText = async path => loadResource(path, 'text');
-const loadJson = async path => loadResource(path, 'json');
-const loadBuffer = async path => loadResource(path, 'arrayBuffer');
-
-// Файлы core недоступны для импорта через основной файл библиотеки
-
 class TRS {
   _matrix = create$4();
   _changed = false;
@@ -1486,6 +1196,101 @@ class NodeTree {
   }
 }
 
+// TODO: Этот модуль можно вообще вынести в lib, 
+// но для этого нужно убрать некоторые связи с ядром, 
+// в часности параметры: store, buffer, prog.
+
+const createProgram$1 = (gl, vs, fs) => {
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    throw new Error('Program link error');
+  }
+
+  return prog;
+};
+
+const createShader = (gl, type, src) => {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, src);
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    throw new Error(`Shader error: ${gl.getShaderInfoLog(shader)}`);
+  }
+
+  return shader;
+};
+
+const createBuffer = (gl, data, target) => {
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(target, buffer);
+  gl.bufferData(target, data, gl.STATIC_DRAW);
+  return buffer;
+};
+
+const createTexture$1 = (gl, img, isPowerOf2) => {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+
+  if (isPowerOf2(img.width) && isPowerOf2(img.height)) {
+    gl.generateMipmap(gl.TEXTURE_2D);
+  } else {
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  }
+
+  return texture;
+};
+
+// getParameter(gl.CURRENT_PROGRAM) влияет на производительность. 
+// Эту ф-цию лучше не использовать в цикле отрисовки
+const useProgram = (gl, prog) => {
+  if (prog === gl.currentProg) return;
+  gl.currentProg = prog;
+  gl.useProgram(prog.glProg);
+};
+
+const setMatUniform = (gl, uniform, matrix) => {
+  gl.uniformMatrix4fv(uniform, false, matrix);
+};
+
+const setTexUniform = (gl, uniform, texture, unitIndex = 0) => {
+  gl.activeTexture(gl.TEXTURE0 + unitIndex);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.uniform1i(uniform, unitIndex);
+};
+
+const setAttribute = (gl, store, attr, buffer) => {
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer.glBuffer(gl, store));
+  gl.enableVertexAttribArray(attr);
+  gl.vertexAttribPointer(attr, buffer.typeSize, 
+    buffer.componentType, false, 0, 0);
+};
+
+const drawElements = (gl, store, buffer) => {
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.glBuffer(gl, store));
+  gl.drawElements(gl.TRIANGLES, buffer.count, 
+    buffer.componentType, 0);
+};
+
+var glUtil = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  createProgram: createProgram$1,
+  createShader: createShader,
+  createBuffer: createBuffer,
+  createTexture: createTexture$1,
+  useProgram: useProgram,
+  setMatUniform: setMatUniform,
+  setTexUniform: setTexUniform,
+  setAttribute: setAttribute,
+  drawElements: drawElements
+});
+
 const typeSizeMap = {
   'SCALAR': 1,
   'VEC2': 2,
@@ -1533,8 +1338,6 @@ class MeshParser {
   }
 }
 
-// Если в файле index.js участвуют также некоторые классы api, 
-
 const loadGltf = async path => {
   const gltf = await loadJson(path);
   const { uri } = gltf.buffers[0];
@@ -1554,14 +1357,11 @@ const loadGeometry = async path => {
   return parseGltf(gltf);
 };
 
-var index$2 = /*#__PURE__*/Object.freeze({
+var index$4 = /*#__PURE__*/Object.freeze({
   __proto__: null,
   loadGltf: loadGltf,
   parseGltf: parseGltf,
-  loadGeometry: loadGeometry,
-  Geometry: Geometry,
-  NodeTree: NodeTree,
-  MeshParser: MeshParser
+  loadGeometry: loadGeometry
 });
 
 class Program {
@@ -1584,7 +1384,7 @@ class Program {
   }
 }
 
-const program = (gl, glProg, locations) => {
+const _createProgram = (gl, glProg, locations) => {
   const prog = new Program(glProg);
   prog.setLocationProps(gl, locations);
   return prog;
@@ -1597,10 +1397,10 @@ const createProgram = (gl, shaders) => {
   const glProg = createProgram$1(gl, vs(gl, gl.VERTEX_SHADER), 
     fs(gl, gl.FRAGMENT_SHADER));
 
-  return program(gl, glProg, locations);
+  return _createProgram(gl, glProg, locations);
 };
 
-var index$1 = /*#__PURE__*/Object.freeze({
+var index$3 = /*#__PURE__*/Object.freeze({
   __proto__: null,
   createProgram: createProgram,
   Program: Program
@@ -1625,6 +1425,8 @@ class Shader extends Callable {
   }
 }
 
+// Если в файле index.js участвуют также некоторые классы api, 
+
 const loadShader = async path => {
   const src = await loadText(path);
   return new Shader(src);
@@ -1639,7 +1441,7 @@ const loadShaders = dir => {
   return Promise.all(requests);
 };
 
-var index = /*#__PURE__*/Object.freeze({
+var index$2 = /*#__PURE__*/Object.freeze({
   __proto__: null,
   loadShader: loadShader,
   loadShaders: loadShaders,
@@ -1648,9 +1450,8 @@ var index = /*#__PURE__*/Object.freeze({
 
 const isPowerOf2 = value => (value & (value - 1)) === 0;
 
-const createTexture = (gl, img) => {
-  return createTexture$1(gl, img, isPowerOf2);
-};
+const createTexture = (gl, img) => 
+  createTexture$1(gl, img, isPowerOf2);
 
 var textureApi = /*#__PURE__*/Object.freeze({
   __proto__: null,
@@ -1658,7 +1459,7 @@ var textureApi = /*#__PURE__*/Object.freeze({
 });
 
 const elem = document.getElementById('canvas');
-const renderProps = { antialias: false };
+const renderProps = {}; // { antialias: false };
 
 var app = {
   props: {
@@ -1683,6 +1484,24 @@ var app = {
   
   // TODO: Добавить 2 метода: stop() и resume()
 };
+
+class Updatable {
+  _canUpdate = false; 
+
+  update(appProps) {
+    if (this._canUpdate) {
+      this._update(appProps);
+      return;
+    }
+
+    this._beforeUpdate?.(appProps);
+    this._canUpdate = true;
+  }
+
+  _update(appProps) {
+    throw new Error('Not implemented');
+  }
+}
 
 // Не тестировалось
 const addVisual = (out, visual) => {
@@ -1788,8 +1607,194 @@ class light extends Updatable {
   }
 }
 
+class Projection {
+  constructor(matrix) { 
+    this.matrix = matrix; 
+  }
+
+  setMatUniform(gl, prog) {
+    setMatUniform(gl, prog.u_PMatrix, this.matrix);
+  }
+}
+
+class Perspective extends Projection {
+  fov = 1.04;
+  aspect = 1;
+  near = 0.1;
+  far = 1000;
+
+  constructor() {
+    super(create$4());
+  }
+
+  setMatUniform(gl, prog) {
+    perspective(this.matrix, this.fov, this.aspect, 
+      this.near, this.far);
+      
+    super.setMatUniform(gl, prog);
+  }
+}
+
+// В одной папке camera не может быть несколько разных файлов камер, 
+
+class index$1 extends Updatable {
+  viewMat = create$4();
+  projection = new Perspective();
+
+  constructor(position, lookAtPoint) {
+    super();
+    this.position = position;
+    this.lookAtPoint = lookAtPoint;
+  }
+
+  get projMat() {
+    return this.projection.matrix;
+  }
+
+  _update(appProps) {
+    this.projection.setMatUniform(appProps.gl, appProps.prog);
+
+    // Вокруг glMatrix тоже можно сделать обертку
+    lookAt(this.viewMat, this.position, 
+      this.lookAtPoint, [0, 1, 0]);
+  }
+}
+
+class Visual extends Updatable {
+  tag = 'default';
+  isHidden = false;
+  // Может хранить любые данные пользовательского 
+  // рендеринга, например: материал, вспом. текстуры 
+  // и шейдерную программу для их обработки.
+  renderProps = {};
+
+  constructor(name, trs) {
+    super();
+    this.name = name;
+    this.trs = trs;
+  }
+
+  get prog() {
+    return this.renderProps.prog;
+  }
+
+  update(appProps) {
+    if (this.isHidden) return;
+    super.update(appProps);
+  }
+}
+
+class ItemList extends Array {
+  constructor(geometry) {
+    super();
+    this._geometry = geometry;
+    geometry.traverse(node => this.push(node));
+    Object.freeze(this);
+  }
+  
+  get geometry() {
+    return this._geometry;
+  }
+}
+
+// TODO: Порефакторить подобным образом класс Projection или попробовать 
+// сразу сделать униформы и атрибуты программы такими объектами 
+
+// class MatrixUniform {
+//   matrix = mat4.create();
+
+//   constructor(location) {
+//     this.location = location;
+//   }
+
+//   set(gl) { 
+//     setMatUniform(gl, this.location, this.matrix); 
+//   }
+// }
+
+class MatrixUniform {
+  matrix = create$4();
+
+  // Временный перенос location из констурктора 
+  // в параметры, для удобства
+  set(gl, location) { 
+    setMatUniform(gl, location, this.matrix); 
+  }
+}
+
+class ModelViewMatrixUniform extends MatrixUniform {
+  set(gl, prog, viewMat, modelMat) {
+    mul(this.matrix, viewMat, modelMat);
+    super.set(gl, prog.u_MVMatrix);
+  }
+}
+
+class NormalMatrixUniform extends MatrixUniform {
+  set(gl, prog, modelViewMat) {
+    invert(this.matrix, modelViewMat);
+    transpose(this.matrix, this.matrix);
+    super.set(gl, prog.u_NMatrix);
+  }
+}
+
+const mvMatUniform = new ModelViewMatrixUniform();
+const nMatUniform = new NormalMatrixUniform();
+
+const setMatUniforms = (gl, prog, camera, item) => {
+  mvMatUniform.set(gl, prog, camera.viewMat, item.matrix);
+  nMatUniform.set(gl, prog, mvMatUniform.matrix);
+};
+
+class index extends Visual {
+  constructor(name, trs, texImg, geometry) {
+    super(name, trs);
+    this.texImg = texImg;
+    this.items = new ItemList(geometry);
+  }
+
+  get geometry() {
+    return this.items.geometry;
+  }
+
+  findItem(name) {
+    return this.items.find(item => item.name === name);
+  }
+
+  _beforeUpdate() {
+    for (const { trs } of this.items) {
+      if (!trs.parent) trs.parent = this.trs;
+    }
+  }
+  
+  _update(appProps) {
+    const gl = appProps.gl;
+    const prog = appProps.prog;
+    const camera = appProps.updatable.camera;
+  
+    const texture = appProps.store.get(this.texImg);
+    const geomStore = appProps.store.get(this.geometry);
+  
+    setTexUniform(gl, prog.u_Sampler, texture);
+    
+    for (const item of this.items) {
+      setMatUniforms(gl, prog, camera, item);
+  
+      for (const primitive of item.primitives) {
+        setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
+        setAttribute(gl, geomStore, prog.a_Normal, primitive.nbo);
+        setAttribute(gl, geomStore, prog.a_Texcoord, primitive.tbo);
+        drawElements(gl, geomStore, primitive.ibo);
+      }
+    }
+  }
+
+}
+
 const matrix = create$4();
 const color = [1, 1, 1, 1];
+
+// Попробовать перенести часть логики в шейдер, 
+// чтобы не создавать буфер и атрибут в js
 
 const shaders = [
   new Shader(`
@@ -1846,4 +1851,4 @@ class ray extends Visual {
   }
 }
 
-export { light as Light, ray as Ray, scene as Scene, TRS, Updatable, Visual, app, index$4 as cam, index$2 as gltfApi, glUtil as glu, index$3 as mesh, index$1 as progApi, index as shaderApi, textureApi as texApi };
+export { index$1 as Camera, Perspective as CameraPerspective, Projection as CameraProjection, light as Light, index as Mesh, ray as Ray, scene as Scene, TRS, Updatable, Visual, app, index$4 as gltfApi, glUtil as glu, index$3 as progApi, index$2 as shaderApi, textureApi as texApi };

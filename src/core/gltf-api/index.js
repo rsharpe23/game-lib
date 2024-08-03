@@ -1,9 +1,3 @@
-// Если в файле index.js участвуют также некоторые классы api, 
-// которые также нужно экспортировать, то вместо реэкспорта в начале 
-// можно импортировать их, как будто они внутренний, а после использования 
-// экспортировать в самом конце, после дефолтного экспорта. 
-// Такой вариант более понятен, чем реэкспорт в начале файла.
-
 import { loadJson, loadBuffer } from '../../../lib/load-api';
 
 import Geometry from './geometry';
@@ -28,5 +22,3 @@ export const loadGeometry = async path => {
   const gltf = await loadGltf(path);
   return parseGltf(gltf);
 };
-
-export { Geometry, NodeTree, MeshParser };

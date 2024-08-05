@@ -36,7 +36,7 @@ exports.build = () => {
         nodeResolve()
       ], 
     })
-    .pipe(source('game-framework.js'))
+    .pipe(source('game-lib.js'))
     .pipe(dest('./build'));
 };
 

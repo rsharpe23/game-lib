@@ -1,8 +1,8 @@
 {
-  "name": "game-framework",
+  "name": "game-lib",
   "version": "1.0.0",
-  "description": "",
-  "main": "./build/game-framework.js",
+  "description": "Simple library for 3D games",
+  "main": "./build/game-lib.js",
   "directories": {
     "example": "example",
     "lib": "lib"
@@ -16,20 +16,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rsharpe23/game-framework2.0.git"
+    "url": "git+https://github.com/rsharpe23/game-lib.git"
   },
-  "author": "",
+  "author": "Roman Sharpe",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/rsharpe23/game-framework2.0/issues"
+    "url": "https://github.com/rsharpe23/game-lib/issues"
   },
-  "homepage": "https://github.com/rsharpe23/game-framework2.0#readme",
+  "homepage": "https://github.com/rsharpe23/game-lib#readme",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/stream": "^1.1.0",
     "browser-sync": "^3.0.2",
     "gulp": "^5.0.0",
-    "gulp-clean": "^0.4.0",
     "gulp-cli": "^3.0.0",
     "gulp-glslify-next": "github:rsharpe23/gulp-glslify-next",
     "gulp-rename": "^2.0.0",

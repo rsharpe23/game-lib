@@ -13,7 +13,7 @@ export const loadShader = async path => {
 };
 
 export const loadShaders = dir => {
-  const requiredFiles = ['vert.build.glsl', 'frag.build.glsl'];
+  const requiredFiles = ['vert.glsl', 'frag.glsl'];
 
   const requests = requiredFiles
     .map(file => loadShader(`${dir}/${file}`));

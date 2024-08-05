@@ -16,6 +16,8 @@ import { setMatUniform } from '../../core/gl-util';
 //   }
 // }
 
+// TODO: Перенести в более подходящий раздел
+
 class MatrixUniform {
   matrix = mat4.create();
 
@@ -34,8 +36,8 @@ class ModelViewMatrixUniform extends MatrixUniform {
 }
 
 class NormalMatrixUniform extends MatrixUniform {
-  set(gl, prog, modelViewMat) {
-    mat4.invert(this.matrix, modelViewMat);
+  set(gl, prog, mvMat) {
+    mat4.invert(this.matrix, mvMat);
     mat4.transpose(this.matrix, this.matrix);
     super.set(gl, prog.u_NMatrix);
   }

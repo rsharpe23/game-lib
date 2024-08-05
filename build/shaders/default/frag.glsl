@@ -1,20 +1,13 @@
 precision mediump float;
 #define GLSLIFY 1
 
-uniform sampler2D u_Sampler;
+uniform sampler2D u_Sampler; // можно назвать u_Texture0
 varying vec3 v_Color;
 varying vec2 v_Texcoord;
 
 // glsl-fxaa нужно все таки устанавливать в dependencies, 
 // поскольку это часть проекта, как и другие шейдеры, 
 // а лучше вообще перенести в папку shaders
-
-// Еще лучше, компилировать шейдеры не в *.build.glsl, 
-// а в отдельный бандл /build/shaders.js
-
-// По итогу все ресурсы загружаются вместе, одним архивом/бандлом, 
-// т.к. на локальном клиенте нет возможности проверить, 
-// что игроку надо, а что нет.
 
 // #pragma glslify: fxaa = require(glsl-fxaa)
 

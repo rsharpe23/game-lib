@@ -28,7 +28,6 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/stream": "^1.1.0",
     "browser-sync": "^3.0.2",
-    "glsl-fxaa": "github:mattdesl/glsl-fxaa",
     "gulp": "^5.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-cli": "^3.0.0",

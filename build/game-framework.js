@@ -1,3 +1,8 @@
+// Диначеская загрузка лучше тем, что позволяет загружать ресурсы 
+// постепенно, например сначала для начальной сцены, затем для игровой и т.д.
+// Если собрать статический бандл (шейдеры, текстуры, модели), то его нужно 
+// будет подгружать целиком, что приведет к долгой начальной загрузке.
+
 const loadResource = async (path, type) => {
   const res = await fetch(path);
   return res[type]();
@@ -1433,7 +1438,7 @@ const loadShader = async path => {
 };
 
 const loadShaders = dir => {
-  const requiredFiles = ['vert.build.glsl', 'frag.build.glsl'];
+  const requiredFiles = ['vert.glsl', 'frag.glsl'];
 
   const requests = requiredFiles
     .map(file => loadShader(`${dir}/${file}`));
@@ -1458,12 +1463,17 @@ var textureApi = /*#__PURE__*/Object.freeze({
   createTexture: createTexture
 });
 
-const elem = document.getElementById('canvas');
-const renderProps = {}; // { antialias: false };
+// Контекст webgl можно создать и динамически (см. demo fxaa)
+const elem = document.getElementById('app');
+
+const ctxOpts = {
+  // antialias: false,
+};
 
 var app = {
   props: {
-    gl: elem.getContext('webgl', renderProps),
+    gl: elem.getContext('webgl', ctxOpts),
+    shaderDir: elem.dataset.shaderDir,
     prog: null,
     updatable: null,
     store: new WeakMap(),
@@ -1481,7 +1491,7 @@ var app = {
       requestAnimationFrame(this.loop);
     };
   },
-  
+
   // TODO: Добавить 2 метода: stop() и resume()
 };
 
@@ -1503,7 +1513,6 @@ class Updatable {
   }
 }
 
-// Не тестировалось
 const addVisual = (out, visual) => {
   if (!visual.prog) {
     out.unshift(visual);
@@ -1712,6 +1721,8 @@ class ItemList extends Array {
 //   }
 // }
 
+// TODO: Перенести в более подходящий раздел
+
 class MatrixUniform {
   matrix = create$4();
 
@@ -1730,8 +1741,8 @@ class ModelViewMatrixUniform extends MatrixUniform {
 }
 
 class NormalMatrixUniform extends MatrixUniform {
-  set(gl, prog, modelViewMat) {
-    invert(this.matrix, modelViewMat);
+  set(gl, prog, mvMat) {
+    invert(this.matrix, mvMat);
     transpose(this.matrix, this.matrix);
     super.set(gl, prog.u_NMatrix);
   }
@@ -1793,8 +1804,14 @@ class index extends Visual {
 const matrix = create$4();
 const color = [1, 1, 1, 1];
 
-// Попробовать перенести часть логики в шейдер, 
+// TODO: Попробовать перенести часть логики в шейдер, 
 // чтобы не создавать буфер и атрибут в js
+
+// Не получится это сделать, т.к. луч требует минимум 2х точек 
+// в пространстве, начальной и конечной, кот. должны 
+// передаваться через атрибуты и соотв. задаваться через буфер.
+
+// Можно еще попытаться реализовать луч через gl.POINTS
 
 const shaders = [
   new Shader(`
@@ -1822,6 +1839,9 @@ class ray extends Visual {
   }
 
   _beforeUpdate({ gl }) {
+    // TODO: Попробовать сделать так, чтобы в буфер 
+    // сразу попадали нужны координаты
+
     const { renderProps } = this;
     renderProps.prog = createProgram(gl, shaders);
     renderProps.vbo = gl.createBuffer();

@@ -1,9 +1,14 @@
-const elem = document.getElementById('canvas');
-const renderProps = {}; // { antialias: false };
+// Контекст webgl можно создать и динамически (см. demo fxaa)
+const elem = document.getElementById('app');
+
+const ctxOpts = {
+  // antialias: false,
+};
 
 export default {
   props: {
-    gl: elem.getContext('webgl', renderProps),
+    gl: elem.getContext('webgl', ctxOpts),
+    shaderDir: elem.dataset.shaderDir,
     prog: null,
     updatable: null,
     store: new WeakMap(),
@@ -21,6 +26,6 @@ export default {
       requestAnimationFrame(this.loop);
     };
   },
-  
+
   // TODO: Добавить 2 метода: stop() и resume()
 };

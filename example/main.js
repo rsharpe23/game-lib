@@ -6,16 +6,19 @@ import { app, progApi, shaderApi, gltfApi, texApi,
   Scene, Light, Mesh, Ray, TRS } from 'game-framework';
 
 const { props } = app;
-const { gl, store } = props;
+const { gl, store, shaderDir } = props;
+
+const loadShaders = subdir => 
+  shaderApi.loadShaders(`${shaderDir}/${subdir}`);
 
 // После того, как был изменен способ загрузки gltf (с раздельного gltf + bin на сплошной), 
 // стала появлятся ошибка: "WebGL warning: tex(Sub)Image[23]D: Resource has no data (yet?)."
 // До этого она появлялась лишь изредко. При этом, чем быстрее загрузка данных, 
 // тем больше вероятностью её появления. Возникает она, скорей всего, 
 // из-за загрузки изображений через fetch, а сам процесс создания 
-// обьекта изображения не совсем синхронный (даже через blob).
+// обьекта изображения несинхронный (даже через blob).
 const [shaders, texImg, geometry] = await Promise.all([
-  shaderApi.loadShaders('/shaders/@default'),
+  loadShaders('default'),
   loadImage('assets/texture.jpg'),
   gltfApi.loadGeometry('assets/tank.gltf'),
 ]);

@@ -1,6 +1,5 @@
 import Updatable from './updatable';
 
-// Не тестировалось
 const addVisual = (out, visual) => {
   if (!visual.prog) {
     out.unshift(visual);

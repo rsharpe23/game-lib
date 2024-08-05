@@ -8,9 +8,9 @@
 // то такие подмодули могут экспортироваться с доп. префиксом: 
 // Projection  -->  CameraProjection
 
-import { mat4 } from '../../lib/gl-matrix';
-import Updatable from '../updatable';
-import Perspective from './projections/perspective';
+import { mat4 } from '../../lib/gl-matrix/index.js';
+import Updatable from '../updatable.js';
+import Perspective from './projections/perspective.js';
 
 export default class extends Updatable {
   viewMat = mat4.create();
@@ -35,5 +35,5 @@ export default class extends Updatable {
   }
 };
 
-export { default as CameraProjection } from './projections/projection';
+export { default as CameraProjection } from './projections/projection.js';
 export { Perspective as CameraPerspective };

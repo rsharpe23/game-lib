@@ -1,4 +1,4 @@
-import { createShader } from '../gl-util';
+import { createShader } from '../gl-util.js';
 
 export default class extends Callable {
   constructor(src) {

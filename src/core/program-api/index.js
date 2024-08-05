@@ -1,5 +1,5 @@
-import { createProgram as gluCreateProgram } from '../gl-util';
-import Program from './program';
+import { createProgram as gluCreateProgram } from '../gl-util.js';
+import Program from './program.js';
 
 const _createProgram = (gl, glProg, locations) => {
   const prog = new Program(glProg);

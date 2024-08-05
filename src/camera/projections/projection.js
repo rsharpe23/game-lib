@@ -1,4 +1,4 @@
-import { setMatUniform } from '../../core/gl-util';
+import { setMatUniform } from '../../core/gl-util.js';
 
 export default class {
   constructor(matrix) { 

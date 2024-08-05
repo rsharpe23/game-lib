@@ -1,5 +1,5 @@
-import { mat4 } from '../../../lib/gl-matrix';
-import { setMatUniform } from '../../core/gl-util';
+import { mat4 } from '../../../lib/gl-matrix/index.js';
+import { setMatUniform } from '../../core/gl-util.js';
 
 // TODO: Порефакторить подобным образом класс Projection или попробовать 
 // сразу сделать униформы и атрибуты программы такими объектами 

@@ -1,4 +1,4 @@
-import { mat4 } from '../../lib/gl-matrix';
+import { mat4 } from '../../lib/gl-matrix/index.js';
 
 export default class {
   _matrix = mat4.create();

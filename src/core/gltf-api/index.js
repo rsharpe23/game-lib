@@ -1,8 +1,8 @@
-import { loadJson, loadBuffer } from '../../../lib/load-api';
+import { loadJson, loadBuffer } from '../../../lib/load-api.js';
 
-import Geometry from './geometry';
-import NodeTree from './node-tree';
-import MeshParser from './mesh-parser';
+import Geometry from './geometry.js';
+import NodeTree from './node-tree.js';
+import MeshParser from './mesh-parser.js';
 
 export const loadGltf = async path => {
   const gltf = await loadJson(path);

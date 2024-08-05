@@ -1,5 +1,5 @@
-import { vec3 } from '../lib/gl-matrix';
-import Updatable from "./updatable";
+import { vec3 } from '../lib/gl-matrix/index.js';
+import Updatable from "./updatable.js";
 
 const worldPos = vec3.create();
 

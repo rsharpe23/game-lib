@@ -1,6 +1,6 @@
 import { degToRad } from '../lib/math.js';
 import { vec3, quat } from '../lib/gl-matrix/index.js';
-import { Camera } from 'game-framework';
+import Camera from '../src/camera/index.js';
 
 export default class extends Camera {
   rotation = quat.create();

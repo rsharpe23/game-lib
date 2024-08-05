@@ -1,8 +1,8 @@
-import { mat4 } from '../../lib/gl-matrix';
-import { useProgram, setMatUniform } from '../core/gl-util';
-import { createProgram } from '../core/program-api';
-import { Shader } from '../core/shader-api';
-import Visual from './visual';
+import { mat4 } from '../../lib/gl-matrix/index.js';
+import { useProgram, setMatUniform } from '../core/gl-util.js';
+import { createProgram } from '../core/program-api/index.js';
+import { Shader } from '../core/shader-api/index.js';
+import Visual from './visual.js';
 
 const matrix = mat4.create();
 const color = [1, 1, 1, 1];
@@ -70,6 +70,7 @@ export default class extends Visual {
     gl.enableVertexAttribArray(attr);
     gl.vertexAttribPointer(attr, 3, gl.FLOAT, false, 0, 0);
 
+    // gl.lineWidth(4);
     gl.drawArrays(gl.LINES, 0, 2);
   }
 }

@@ -1,9 +1,9 @@
 import { setTexUniform, setAttribute, drawElements 
-  } from '../../core/gl-util';
+  } from '../../core/gl-util.js';
 
-import Visual from '../visual';
-import ItemList from './item-list';
-import { setMatUniforms } from './uniform-util';
+import Visual from '../visual.js';
+import ItemList from './item-list.js';
+import { setMatUniforms } from './uniform-util.js';
 
 export default class extends Visual {
   constructor(name, trs, texImg, geometry) {

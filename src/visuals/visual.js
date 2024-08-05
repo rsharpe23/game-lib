@@ -1,4 +1,4 @@
-import Updatable from '../updatable';
+import Updatable from '../updatable.js';
 
 export default class extends Updatable {
   tag = 'default';

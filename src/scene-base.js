@@ -1,4 +1,4 @@
-import Updatable from './updatable';
+import Updatable from './updatable.js';
 
 const addVisual = (out, visual) => {
   if (!visual.prog) {

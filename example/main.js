@@ -2,14 +2,14 @@ import '../lib/global-ext.js';
 import { loadImage } from '../lib/load-api.js';
 import Camera from './camera.js';
 
-import { app, progApi, shaderApi, gltfApi, texApi,
-  Scene, Light, Mesh, Ray, TRS } from 'game-framework';
+import { app, progApi, shaderApi, gltfApi, texApi, 
+  Scene, Light, Mesh, Ray, TRS } from '../src/index.js';
 
 const { props } = app;
 const { gl, store, shaderDir } = props;
 
-const loadShaders = subdir => 
-  shaderApi.loadShaders(`${shaderDir}/${subdir}`);
+const loadShaders = subDir => 
+  shaderApi.loadShaders(`${shaderDir}/${subDir}`);
 
 // После того, как был изменен способ загрузки gltf (с раздельного gltf + bin на сплошной), 
 // стала появлятся ошибка: "WebGL warning: tex(Sub)Image[23]D: Resource has no data (yet?)."
@@ -26,26 +26,25 @@ const [shaders, texImg, geometry] = await Promise.all([
 const createScene = (camera, light) => {
   const scene = new Scene(camera, light);
   scene.addVisual(new Mesh('tank', new TRS(), texImg, geometry));
-  // scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0], scale: [3, 1, 1] }) ));
+  scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0], scale: [3, 1, 1] }) ));
 
-  // const translations = [
-  //   [ 0,  0,  0],
-  //   [ 0,  0,  7],
-  //   [ 0,  0, -7],
-  //   [ 7,  0,  0],
-  //   [-7,  0,  0],
-  //   [ 7,  0,  7],
-  //   [ 7,  0, -7],
-  //   [-7,  0,  7],
-  //   [-7,  0, -7],
-  // ];
+  const translations = [
+    [ 0,  0,  7],
+    [ 0,  0, -7],
+    [ 7,  0,  0],
+    [-7,  0,  0],
+    [ 7,  0,  7],
+    [ 7,  0, -7],
+    [-7,  0,  7],
+    [-7,  0, -7],
+  ];
 
-  // for (const translation of translations) {
-  //   const mesh = new Mesh('tank', 
-  //     new TRS({ translation }), texImg, geometry);
+  for (const translation of translations) {
+    const mesh = new Mesh('tank', 
+      new TRS({ translation }), texImg, geometry);
 
-  //   scene.addVisual(mesh);
-  // }
+    scene.addVisual(mesh);
+  }
 
   return scene;
 };

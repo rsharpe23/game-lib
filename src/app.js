@@ -1,13 +1,13 @@
 // Контекст webgl можно создать и динамически (см. demo fxaa)
 const elem = document.getElementById('app');
 
-const ctxOpts = {
+const webglOpts = {
   // antialias: false,
 };
 
 export default {
   props: {
-    gl: elem.getContext('webgl', ctxOpts),
+    gl: elem.getContext('webgl', webglOpts),
     shaderDir: elem.dataset.shaderDir,
     prog: null,
     updatable: null,

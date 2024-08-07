@@ -1,5 +1,5 @@
 import { mat4 } from '../../lib/gl-matrix/index.js';
-import { useProgram, setMatUniform } from '../core/gl-util.js';
+import { setMatrixUniform } from '../../lib/gl-utils.js';
 import { createProgram } from '../core/program-api/index.js';
 import { Shader } from '../core/shader-api/index.js';
 import Visual from './visual.js';
@@ -57,11 +57,11 @@ export default class extends Visual {
     const gl = appProps.gl;
     const camera = appProps.updatable.camera;
 
-    useProgram(gl, this.prog);
+    this.prog.use(gl);
 
     mat4.mul(matrix, camera.viewMat, this.trs.matrix);
     mat4.mul(matrix, camera.projMat, matrix);
-    setMatUniform(gl, this.prog.u_Matrix, matrix);
+    setMatrixUniform(gl, this.prog.u_Matrix, matrix);
 
     gl.uniform4fv(this.prog.u_Color, color);
 

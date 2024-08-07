@@ -1,9 +1,13 @@
 import SceneBase from './scene-base.js';
-import { useProgram } from './core/gl-util.js';
+
+// const setMaterialUniforms = (gl, prog) => {
+//   gl.uniform3f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4);
+//   gl.uniform3f(prog.u_MaterialSpecularColor, 1.0, 1.0, 1.0);
+// };
 
 const setMaterialUniforms = (gl, prog) => {
-  gl.uniform3f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4);
-  gl.uniform3f(prog.u_MaterialSpecularColor, 1.0, 1.0, 1.0);
+  gl.uniform4f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4, 1);
+  gl.uniform4f(prog.u_MaterialSpecularColor, 1, 1, 1, 1);
 };
 
 export default class extends SceneBase {
@@ -19,7 +23,8 @@ export default class extends SceneBase {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    useProgram(gl, prog);
+    prog.use(gl);
+
     setMaterialUniforms(gl, prog);
   }
 }

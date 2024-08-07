@@ -1,9 +1,8 @@
-import { setTexUniform, setAttribute, drawElements 
-  } from '../../core/gl-util.js';
-
+import { setTextureUniform } from '../../../lib/gl-utils.js';
 import Visual from '../visual.js';
 import ItemList from './item-list.js';
-import { setMatUniforms } from './uniform-util.js';
+import { setMatrixUniforms } from './uniform-util.js';
+import { setAttribute, drawElements } from './utils.js';
 
 export default class extends Visual {
   constructor(name, trs, texImg, geometry) {
@@ -34,10 +33,10 @@ export default class extends Visual {
     const texture = appProps.store.get(this.texImg);
     const geomStore = appProps.store.get(this.geometry);
   
-    setTexUniform(gl, prog.u_Sampler, texture);
+    setTextureUniform(gl, prog.u_Sampler, texture);
     
     for (const item of this.items) {
-      setMatUniforms(gl, prog, camera, item);
+      setMatrixUniforms(gl, prog, item, camera);
   
       for (const primitive of item.primitives) {
         setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);

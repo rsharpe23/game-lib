@@ -4,16 +4,16 @@ import Updatable from "./updatable.js";
 const worldPos = vec3.create();
 
 const setColorUniforms = (gl, prog, colors) => {
-  gl.uniform3fv(prog.u_AmbientColor, colors.ambient);
-  gl.uniform3fv(prog.u_DiffuseColor, colors.diffuse);
-  gl.uniform3fv(prog.u_SpecularColor, colors.specular);
+  gl.uniform4fv(prog.u_AmbientColor, colors.ambient);
+  gl.uniform4fv(prog.u_DiffuseColor, colors.diffuse);
+  gl.uniform4fv(prog.u_SpecularColor, colors.specular);
 };
 
 export default class extends Updatable {
   colors = {
-    ambient: [0.4, 0.4, 0.4],
-    diffuse: [0.8, 0.8, 0.8],
-    specular: [1, 1, 1],
+    ambient: [0.4, 0.4, 0.4, 1],
+    diffuse: [0.8, 0.8, 0.8, 1],
+    specular: [1, 1, 1, 1],
   };
 
   constructor(position) {

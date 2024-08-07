@@ -1,11 +1,19 @@
-import { setMatUniform } from '../../core/gl-util.js';
+import { mat4 } from '../../../lib/gl-matrix/index.js';
+import { setMatrixUniform } from '../../../lib/gl-utils.js';
+
+// Projection и TRS могли бы наследоваться от класса 
+// MatrixProvider, со свойством matrix и методом onChange()
 
 export default class {
-  constructor(matrix) { 
-    this.matrix = matrix; 
+  _matrix = mat4.create();
+
+  get matrix() { 
+    // Можно оптимизировать, как в TRS
+    this._calcMatrix(this._matrix);
+    return this._matrix;
   }
 
-  setMatUniform(gl, prog) {
-    setMatUniform(gl, prog.u_PMatrix, this.matrix);
+  setMatrixUniform(gl, prog) {
+    setMatrixUniform(gl, prog.u_PMatrix, this.matrix);
   }
 };

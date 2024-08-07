@@ -2,19 +2,16 @@ import { mat4 } from '../../../lib/gl-matrix/index.js';
 import Projection from './projection.js';
 
 export default class extends Projection {
-  fov = 1.04;
-  aspect = 1;
-  near = 0.1;
-  far = 1000;
-
-  constructor() {
-    super(mat4.create());
+  constructor(fov, aspect, near, far) {
+    super();
+    this.fov = fov;
+    this.aspect = aspect;
+    this.near = near;
+    this.far = far;
   }
 
-  setMatUniform(gl, prog) {
-    mat4.perspective(this.matrix, this.fov, this.aspect, 
+  _calcMatrix(out) {
+    mat4.perspective(out, this.fov, this.aspect, 
       this.near, this.far);
-      
-    super.setMatUniform(gl, prog);
   }
-};
+}

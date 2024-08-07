@@ -1,13 +1,9 @@
-// Если нужен доступ к нереэкспортированным модулям, 
-// то следует обращаться к ним напрямую, через node_modules.
-
 import * as gltfApi from './core/gltf-api/index.js';
 import * as progApi from './core/program-api/index.js';
 import * as shaderApi from './core/shader-api/index.js';
 import * as texApi from './core/texture-api.js';
-import * as glu from './core/gl-util.js';
 
-export { gltfApi, progApi, shaderApi, texApi, glu };
+export { gltfApi, progApi, shaderApi, texApi };
 export { default as TRS } from './core/trs.js';
 
 export { default as app } from './app.js';

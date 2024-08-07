@@ -18,6 +18,8 @@ export default class extends Updatable {
     return this.renderProps.prog;
   }
 
+  // Можно добавить еще геттеры: position, rotation, scale
+
   update(appProps) {
     if (this.isHidden) return;
     super.update(appProps);

@@ -16,4 +16,12 @@ export default class {
       this[name] = gl[action](this.glProg, name);
     }
   }
+
+  use(gl) {
+    // Вызов getParameter(gl.CURRENT_PROGRAM) не следует использ.
+    // в цикле отрисовки, т.к. эта ф-ция влияет на производительность
+    const { glProg } = this;
+    if (gl.prog === glProg) return;
+    gl.useProgram(gl.prog = glProg);
+  }
 }

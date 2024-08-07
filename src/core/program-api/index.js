@@ -1,4 +1,4 @@
-import { createProgram as gluCreateProgram } from '../gl-util.js';
+import { createProgram as gluCreateProgram } from '../../../lib/gl-utils.js';
 import Program from './program.js';
 
 const _createProgram = (gl, glProg, locations) => {

@@ -1,8 +1,9 @@
+
 import '../lib/global-ext.js';
 import { loadImage } from '../lib/load-api.js';
 import Camera from './camera.js';
 
-import { app, progApi, shaderApi, gltfApi, texApi, 
+import { app, gltfApi, progApi, shaderApi, texApi, 
   Scene, Light, Mesh, Ray, TRS } from '../src/index.js';
 
 const { props } = app;
@@ -25,26 +26,33 @@ const [shaders, texImg, geometry] = await Promise.all([
 
 const createScene = (camera, light) => {
   const scene = new Scene(camera, light);
-  scene.addVisual(new Mesh('tank', new TRS(), texImg, geometry));
-  scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0], scale: [3, 1, 1] }) ));
 
-  const translations = [
-    [ 0,  0,  7],
-    [ 0,  0, -7],
-    [ 7,  0,  0],
-    [-7,  0,  0],
-    [ 7,  0,  7],
-    [ 7,  0, -7],
-    [-7,  0,  7],
-    [-7,  0, -7],
-  ];
+  const tank = new Mesh('tank', new TRS(), texImg, geometry);
+  scene.addVisual(tank);
 
-  for (const translation of translations) {
-    const mesh = new Mesh('tank', 
-      new TRS({ translation }), texImg, geometry);
+  // setTimeout(() => {
+  //   tank.trs.translation[0] += 2;
+  // }, 1000);
 
-    scene.addVisual(mesh);
-  }
+  // scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0], scale: [3, 1, 1] }) ));
+
+  // const translations = [
+  //   [ 0,  0,  7],
+  //   [ 0,  0, -7],
+  //   [ 7,  0,  0],
+  //   [-7,  0,  0],
+  //   [ 7,  0,  7],
+  //   [ 7,  0, -7],
+  //   [-7,  0,  7],
+  //   [-7,  0, -7],
+  // ];
+
+  // for (const translation of translations) {
+  //   const mesh = new Mesh('tank', 
+  //     new TRS({ translation }), texImg, geometry);
+
+  //   scene.addVisual(mesh);
+  // }
 
   return scene;
 };
@@ -58,4 +66,6 @@ store.set(texImg, texApi.createTexture(gl, texImg));
 // очищались свяазанные данные из store
 props.prog = progApi.createProgram(gl, shaders);
 props.updatable = createScene(new Camera([0, 2, 10]), new Light([0, -70, -100]));
+
 app.loop(performance.now());
+app.watchFps();

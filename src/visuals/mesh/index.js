@@ -1,8 +1,8 @@
 import { setTextureUniform } from '../../../lib/gl-utils.js';
 import Visual from '../visual.js';
 import ItemList from './item-list.js';
-import { setMatrixUniforms } from './uniform-util.js';
-import { setAttribute, drawElements } from './utils.js';
+import { setMatrixUniforms } from './uniform-utils.js';
+import { setAttribute, drawElements } from './gl-utils.js';
 
 export default class extends Visual {
   constructor(name, trs, texImg, geometry) {

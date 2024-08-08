@@ -1,16 +1,11 @@
-import SceneBase from './scene-base.js';
-
-// const setMaterialUniforms = (gl, prog) => {
-//   gl.uniform3f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4);
-//   gl.uniform3f(prog.u_MaterialSpecularColor, 1.0, 1.0, 1.0);
-// };
+import Base from './base.js';
 
 const setMaterialUniforms = (gl, prog) => {
   gl.uniform4f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4, 1);
   gl.uniform4f(prog.u_MaterialSpecularColor, 1, 1, 1, 1);
 };
 
-export default class extends SceneBase {
+export default class extends Base {
   _beforeUpdate({ gl }) {
     gl.clearColor(0.0, 0.0, 0.14, 1.0);
     gl.enable(gl.DEPTH_TEST);

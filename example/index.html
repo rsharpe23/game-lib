@@ -6,8 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Game Library</title>
   <link rel="shortcut icon" href="#">
+
+  <style>
+    .fps {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #fff;
+      font-size: 13px;
+    }
+  </style>
 </head>
 <body>
+  <div id="fps" class="fps">FPS: 0</div>
   <canvas id="app" width="960" height="640" data-shader-dir="/build/shaders"></canvas>
 
   <!-- TODO: Прочитать https://github.com/guybedford/es-module-shims -->

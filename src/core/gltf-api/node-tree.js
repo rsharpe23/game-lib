@@ -3,13 +3,12 @@ export default class {
     this.nodes = nodes;
   }
 
-  traverse(roots, cb, parentOfRoot) {
+  traverse(roots, callback, parentOfRoot) {
     for (const root of roots) {
       const { children, ...rest } = this.nodes[root];
-      cb(rest, parentOfRoot);
-
+      callback(rest, parentOfRoot);
       if (children) {
-        this.traverse(children, cb, rest);
+        this.traverse(children, callback, rest);
       }
     }
   }

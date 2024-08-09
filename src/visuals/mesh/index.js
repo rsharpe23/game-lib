@@ -9,6 +9,7 @@ export default class extends Visual {
     super(name, trs);
     this.texImg = texImg;
     this.items = new ItemList(geometry);
+    this._setParentForRootItems();
   }
 
   get geometry() {
@@ -19,9 +20,9 @@ export default class extends Visual {
     return this.items.find(item => item.name === name);
   }
 
-  _beforeUpdate() {
+  _setParentForRootItems() {
     for (const { trs } of this.items) {
-      if (!trs.parent) trs.parent = this.trs;
+      if (!trs.parent) trs.setParent(this.trs);
     }
   }
   

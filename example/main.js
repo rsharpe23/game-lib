@@ -1,4 +1,3 @@
-
 import '../lib/global-ext.js';
 import { loadImage } from '../lib/load-api.js';
 import Camera from './camera.js';
@@ -27,11 +26,17 @@ const [shaders, texImg, geometry] = await Promise.all([
 const createScene = (camera, light) => {
   const scene = new Scene(camera, light);
 
-  const tank = new Mesh('tank', new TRS(), texImg, geometry);
+  const tank = new Mesh('Tank', new TRS(), texImg, geometry);
   scene.addVisual(tank);
 
   // setTimeout(() => {
-  //   tank.trs.translation[0] += 2;
+  //   const { trs } = tank.findItem('Tower');
+  //   quat.fromEuler(trs.rotation, 0, 60, 0);
+  //   trs.commit();
+
+  //   const tower = tank.findItem('Tower');
+  //   tower.trs.setParent(null);
+  //   tank.trs.setTranslation(0, 0, 7);
   // }, 1000);
 
   // scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0], scale: [3, 1, 1] }) ));
@@ -65,7 +70,8 @@ store.set(texImg, texApi.createTexture(gl, texImg));
 // TODO: Сделать так, чтобы при потере ссылки на сцену, 
 // очищались свяазанные данные из store
 props.prog = progApi.createProgram(gl, shaders);
-props.updatable = createScene(new Camera([0, 2, 10]), new Light([0, -70, -100]));
+props.updatable = createScene(new Camera([0, 2, 10]), 
+  new Light([0, -70, -100]));
 
 app.loop(performance.now());
 app.watchFps();

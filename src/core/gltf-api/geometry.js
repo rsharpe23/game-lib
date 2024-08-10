@@ -19,9 +19,7 @@ export default class {
     return { 
       name, trs, 
       primitives: this._meshParser.parseMesh(mesh),
-      get matrix() { 
-        return this.trs.matrix; 
-      }, 
+      get matrix() { return this.trs.matrix; }, 
     };
   }
 }

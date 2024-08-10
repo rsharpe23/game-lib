@@ -30,13 +30,16 @@ const createScene = (camera, light) => {
   scene.addVisual(tank);
 
   // setTimeout(() => {
-  //   const { trs } = tank.findItem('Tower');
-  //   quat.fromEuler(trs.rotation, 0, 60, 0);
-  //   trs.commit();
+    // import('../lib/gl-matrix/index.js')
+    //   .then(({ quat }) => {
+    //     const { trs } = tank.findItem('Tower');
+    //     quat.fromEuler(trs.rotation, 0, 60, 0);
+    //     trs.commit();
+    //   });
 
-  //   const tower = tank.findItem('Tower');
-  //   tower.trs.parent = null;
-  //   tank.trs.translation = [0, 0, 7];
+    // const tower = tank.findItem('Tower');
+    // tower.trs.setParent(null);
+    // tank.trs.setTranslation([0, 0, 7]);
   // }, 1000);
 
   // scene.addVisual(new Ray('ray', new TRS({ translation: [0, 3, 0], scale: [3, 1, 1] }) ));
@@ -504,4 +507,5 @@ props.updatable = createScene(new Camera([0, 2, 10]),
   new Light([0, -70, -100]));
 
 app.loop(performance.now());
-app.watchFps();
+// app.watchFps();
+// setTimeout(() => app.report(), 5000);

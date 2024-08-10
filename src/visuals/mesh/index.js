@@ -22,7 +22,7 @@ export default class extends Visual {
 
   _setParentForRootItems() {
     for (const { trs } of this.items) {
-      if (!trs.parent) trs.parent = this.trs;
+      if (!trs.parent) trs.setParent(this.trs);
     }
   }
   

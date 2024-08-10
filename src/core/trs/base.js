@@ -1,26 +1,34 @@
-import { mat4 } from '../../../lib/gl-matrix/index.js';
-import MatrixProvider from '../matrix-provider.js';
+import { mat4 } from "../../../lib/gl-matrix/index.js";
+import MatrixProvider from "../matrix-provider.js";
 
 export default class extends MatrixProvider {
+  parent = null;
   children = [];
 
-  // Объект позволяют указ. только часть трансформаций, при необходим.
-  // Все трансформации, задаваемые по умолчанию, соответствуют 
-  // единичной матрице, создаваемой с пом. mat4.create()
+  // Дефолтные трансформации, соответствуют единичной 
+  // матрице, создаваемой через mat4.create()
+  translation = [0, 0, 0]; 
+  rotation = [0, 0, 0, 1]; 
+  scale = [1, 1, 1];
+
+  // Объект позволяют указывать только часть трансформаций, при необходим.
   constructor({ translation, rotation, scale } = {}, parent) {
     super();
-    this.translation = translation ?? [0, 0, 0];
-    this.rotation = rotation ?? [0, 0, 0, 1];
-    this.scale = scale ?? [1, 1, 1];
-    this.parent = parent;
+    if (translation) this.setTranslation(translation);
+    if (rotation) this.setRotation(rotation);
+    if (scale) this.setScale(scale);
+    if (parent) this.setParent(parent);
   }
 
-  get parent() { return this._parent; }
-  set parent(value) {
+  setParent(value) {
     if (value === this.parent) return;
+    this._setParent(value);
+  }
+
+  _setParent(value) {
     this.parent?.removeChild(this);
     value?.addChild(this);
-    this._setParent(value);
+    this.parent = value;
   }
 
   addChild(child) {
@@ -31,14 +39,10 @@ export default class extends MatrixProvider {
     this.children.remove(child);
   }
 
-  _setParent(value) {
-    this._parent = value;
-  }
-
-  _calcMatrix(out) {
+  _calcWorldMatrix(out) {
     this._calcLocalMatrix(out);
     if (this.parent) {
-      mat4.mul(out, this.parent.matrix, out); // мировая матрица
+      mat4.mul(out, this.parent.matrix, out);
     }
   }
 

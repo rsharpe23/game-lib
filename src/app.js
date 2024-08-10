@@ -19,12 +19,24 @@ export default {
     time: 0,
   },
 
+  // trigger: true,
+  // res: 0,
+
+  // report() {
+  //   this.trigger = false;
+  //   console.log(this.res);
+  // },
+
   get loop() {
     return this._loop ??= elapsedTime => {
+      // if (!this.trigger) return;
+
       const props = this.props;
       props.deltaTime = elapsedTime - props.time;
       props.time = elapsedTime;
-      props.updatable.update(props);
+      props.updatable.update(props)
+
+      // this.res += benchmark(() => props.updatable.update(props));
       
       // Любое проверочное число меньше делителя с остатком на 20 
       // if (Math.round(elapsedTime % 300) > 280) {

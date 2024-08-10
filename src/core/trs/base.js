@@ -2,48 +2,25 @@ import { mat4 } from '../../../lib/gl-matrix/index.js';
 import MatrixProvider from '../matrix-provider.js';
 
 export default class extends MatrixProvider {
-  parent = null;
   children = [];
-  
-  // Эти трансформации соотв. единичной матрице, 
-  // создаваемой через mat4.create()
-  translation = [0, 0, 0];
-  rotation = [0, 0, 0, 1];
-  scale = [1, 1, 1];
 
-  constructor({ translation, rotation, scale } = {}, parent) { 
+  // Объект позволяют указ. только часть трансформаций, при необходим.
+  // Все трансформации, задаваемые по умолчанию, соответствуют 
+  // единичной матрице, создаваемой с пом. mat4.create()
+  constructor({ translation, rotation, scale } = {}, parent) {
     super();
-    if (translation) this.setTranslation(...translation);
-    if (rotation) this.setRotation(...rotation);
-    if (scale) this.setScale(...scale);
-    if (parent) this.setParent(parent);
+    this.translation = translation ?? [0, 0, 0];
+    this.rotation = rotation ?? [0, 0, 0, 1];
+    this.scale = scale ?? [1, 1, 1];
+    this.parent = parent;
   }
 
-  setTranslation(x, y, z) {
-    this.translation[0] = x;
-    this.translation[1] = y;
-    this.translation[2] = z;
-  }
-
-  setRotation(x, y, z, w) {
-    this.rotation[0] = x;
-    this.rotation[1] = y;
-    this.rotation[2] = z;
-    this.rotation[3] = w;
-  }
-
-  setScale(x, y, z) {
-    this.scale[0] = x;
-    this.scale[1] = y;
-    this.scale[2] = z;
-  }
-
-  setParent(value) {
-    const { parent } = this;
-    if (value === parent) return;
-    if (parent) parent.removeChild(this);
-    if (value) value.addChild(this);
-    this.parent = value;
+  get parent() { return this._parent; }
+  set parent(value) {
+    if (value === this.parent) return;
+    this.parent?.removeChild(this);
+    value?.addChild(this);
+    this._setParent(value);
   }
 
   addChild(child) {
@@ -54,10 +31,14 @@ export default class extends MatrixProvider {
     this.children.remove(child);
   }
 
-  _calcWorldMatrix(out) {
+  _setParent(value) {
+    this._parent = value;
+  }
+
+  _calcMatrix(out) {
     this._calcLocalMatrix(out);
     if (this.parent) {
-      mat4.mul(out, this.parent.matrix, out);
+      mat4.mul(out, this.parent.matrix, out); // мировая матрица
     }
   }
 

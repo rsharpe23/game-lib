@@ -25,7 +25,7 @@ export default {
       props.deltaTime = elapsedTime - props.time;
       props.time = elapsedTime;
       props.updatable.update(props);
-
+      
       // Любое проверочное число меньше делителя с остатком на 20 
       // if (Math.round(elapsedTime % 300) > 280) {
       //   fpsElem.textContent = `FPS: ${fps(props.deltaTime)}`;

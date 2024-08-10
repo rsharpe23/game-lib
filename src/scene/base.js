@@ -1,6 +1,10 @@
 import Updatable from '../updatable.js';
 
 const addVisual = (out, visual) => {
+  // Можно проверять не по наличию программы, а по наличию 
+  // renderProps, т.к. по сути любые его св-ва говорят 
+  // о нестандартном рендеринге объекта
+
   if (!visual.prog) {
     out.unshift(visual);
     return;

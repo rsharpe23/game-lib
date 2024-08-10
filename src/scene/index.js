@@ -7,7 +7,8 @@ const setMaterialUniforms = (gl, prog) => {
 
 export default class extends Base {
   _beforeUpdate({ gl }) {
-    gl.clearColor(0.0, 0.0, 0.14, 1.0);
+    // gl.clearColor(0.0, 0.0, 0.14, 1.0);
+    gl.clearColor(0.7, 0.71, 0.72, 1.0);
     gl.enable(gl.DEPTH_TEST);
   }
 

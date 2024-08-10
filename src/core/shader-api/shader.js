@@ -7,10 +7,16 @@ export default class extends Callable {
   }
 
   parse() {
-    const matches = this.src.matchAll(
-      /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(\w+)\s*;/g);
+    // BUG: Шаблон (\w+) не находит переменные массивов
+    // const matches = this.src.matchAll(
+    //   /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(\w+)\s*;/g);
 
-    return Array.from(matches).map(item => [item[1], item[4]]);
+    // TODO: Отбрасывать закоментированные переменные
+    const matches = this.src.matchAll(
+      /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(\w+(\[\d+\])?)\s*;/g);
+
+    return Array.from(matches)
+      .map(item => [item[1], item[4].replace(/\[\d+\]/, '')]);
   }
 
   // Можно заменить на compile

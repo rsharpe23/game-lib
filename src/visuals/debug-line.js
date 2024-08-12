@@ -26,8 +26,8 @@ export default class extends Visual {
     this.endPos = endPos;
   }
 
-  get buffer() {
-    return this.renderProps.buffer;
+  get indexBuffer() {
+    return this.renderProps.indexBuffer;
   }
 
   _update(appProps) {
@@ -43,7 +43,7 @@ export default class extends Visual {
     gl.uniform4fv(prog.u_Color, this.color);
     setPositionsUniform(gl, prog, this.startPos, this.endPos);
 
-    setAttribute(gl, prog.a_Index, this.buffer, 1, gl.FLOAT);
+    setAttribute(gl, prog.a_Index, this.indexBuffer, 1, gl.FLOAT);
     gl.drawArrays(gl.LINES, 0, 2);
   }
 }

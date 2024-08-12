@@ -34,7 +34,8 @@ const createScene = (camera, light) => {
   const debugLine = new DebugLine('DebugLine', [0, 3, 0], [2, 3, 0]);
   debugLine.renderProps = {
     prog: progApi.createProgram(gl, dlShaders),
-    buffer: createBuffer(gl, new Float32Array([0, 1]), gl.ARRAY_BUFFER),
+    indexBuffer: createBuffer(gl, new Float32Array([0, 1]), 
+      gl.ARRAY_BUFFER),
   };
 
   scene.addVisual(tank);

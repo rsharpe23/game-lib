@@ -28,6 +28,10 @@ export default class extends Updatable {
     addVisual(this.visuals, visual); 
   }
 
+  removeVisual(visual) {
+    this.visuals.remove(visual);
+  }
+
   findVisual(name) {
     return this.visuals.find(visual => visual.name === name);
   }

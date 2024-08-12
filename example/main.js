@@ -1,9 +1,11 @@
 import '../lib/global-ext.js';
 import { loadImage } from '../lib/load-api.js';
-import Camera from './camera.js';
+import { createBuffer } from '../lib/gl-utils.js';
 
 import { app, gltfApi, progApi, shaderApi, texApi, 
-  Scene, Light, Mesh, Ray, TRS } from '../src/index.js';
+  Scene, Light, Mesh, DebugLine, TRS } from '../src/index.js';
+
+import Camera from './camera.js';
 
 const { props } = app;
 const { gl, store, shaderDir } = props;
@@ -17,8 +19,9 @@ const loadShaders = subDir =>
 // тем больше вероятностью её появления. Возникает она, скорей всего, 
 // из-за загрузки изображений через fetch, а сам процесс создания 
 // обьекта изображения несинхронный (даже через blob).
-const [shaders, texImg, geometry] = await Promise.all([
+const [shaders, dlShaders, texImg, geometry] = await Promise.all([
   loadShaders('default'),
+  loadShaders('debug-line'),
   loadImage('assets/texture.jpg'),
   gltfApi.loadGeometry('assets/tank.gltf'),
 ]);
@@ -27,22 +30,30 @@ const createScene = (camera, light) => {
   const scene = new Scene(camera, light);
 
   const tank = new Mesh('Tank', new TRS(), texImg, geometry);
+
+  const debugLine = new DebugLine('DebugLine', [0, 3, 0], [2, 3, 0]);
+  debugLine.renderProps = {
+    prog: progApi.createProgram(gl, dlShaders),
+    buffer: createBuffer(gl, new Float32Array([0, 1]), gl.ARRAY_BUFFER),
+  };
+
   scene.addVisual(tank);
+  scene.addVisual(debugLine);
 
   // setTimeout(() => {
-    // import('../lib/gl-matrix/index.js')
-    //   .then(({ quat }) => {
-    //     const { trs } = tank.findItem('Tower');
-    //     quat.fromEuler(trs.rotation, 0, 60, 0);
-    //     trs.commit();
-    //   });
+  //   import('../lib/gl-matrix/index.js')
+  //     .then(({ quat }) => {
+  //       const { trs } = tank.findItem('Tower');
+  //       quat.fromEuler(trs.rotation, 0, 60, 0);
+  //       trs.commit();
+  //     });
 
-    // const tower = tank.findItem('Tower');
-    // tower.trs.setParent(null);
-    // tank.trs.setTranslation([0, 0, 7]);
+  //   const tower = tank.findItem('Tower');
+  //   tower.trs.setParent(null);
+  //   tank.trs.setTranslation([0, 0, 7]);
+
+  //   debugLine.startPos = [0, 4, 4];
   // }, 1000);
-
-  scene.addVisual(new Ray('ray', new TRS() ));
 
   /*
   const translations = [

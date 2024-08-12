@@ -1,5 +1,5 @@
-import { mat4 } from "../../../lib/gl-matrix/index.js";
-import MatrixProvider from "../matrix-provider.js";
+import { mat4 } from "../../lib/gl-matrix/index.js";
+import MatrixProvider from "./matrix-provider.js";
 
 export default class extends MatrixProvider {
   parent = null;

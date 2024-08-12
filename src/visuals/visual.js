@@ -3,15 +3,13 @@ import Updatable from '../updatable.js';
 export default class extends Updatable {
   tag = 'default';
   isHidden = false;
-  // Может хранить любые данные пользовательского 
-  // рендеринга, например: материал, вспом. текстуры 
-  // и шейдерную программу для их обработки.
+  // Может хранить данные пользовательского рендеринга, 
+  // например: материал, текстуры, программу и пр.
   renderProps = {};
 
-  constructor(name, trs) {
+  constructor(name) {
     super();
     this.name = name;
-    this.trs = trs;
   }
 
   get prog() {

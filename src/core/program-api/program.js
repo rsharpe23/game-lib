@@ -3,8 +3,8 @@ export default class {
     this.glProg = glProg;
   }
 
-  setLocationProps(gl, locations) {
-    for (const [qualifier, name] of locations) {
+  setLocations(gl, data) {
+    for (const [qualifier, name] of data) {
       const action = qualifier === 'attribute' ? 'getAttribLocation' :
         qualifier === 'uniform' ? 'getUniformLocation' : '';
 

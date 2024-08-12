@@ -1,13 +1,12 @@
-import Base from './base.js';
+import SceneBase from './scene-base.js';
 
 const setMaterialUniforms = (gl, prog) => {
   gl.uniform4f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4, 1);
   gl.uniform4f(prog.u_MaterialSpecularColor, 1, 1, 1, 1);
 };
 
-export default class extends Base {
+export default class extends SceneBase {
   _beforeUpdate({ gl }) {
-    // gl.clearColor(0.0, 0.0, 0.14, 1.0);
     gl.clearColor(0.7, 0.71, 0.72, 1.0);
     gl.enable(gl.DEPTH_TEST);
   }
@@ -19,8 +18,9 @@ export default class extends Base {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    // TODO: Материал и программу лучше перенести в меш, 
+    // т.к. метод use() все равно оптимизирован
     prog.use(gl);
-
     setMaterialUniforms(gl, prog);
   }
 }

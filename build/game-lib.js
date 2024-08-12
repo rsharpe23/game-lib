@@ -1072,77 +1072,51 @@ function create() {
   };
 })();
 
-class TRS {
+class MatrixProvider {
   _matrix = create$4();
-  _changed = false;
-
-  _translation = [0, 0, 0];
-  _rotation = [0, 0, 0, 1];
-  _scale = [1, 1, 1];
-  _parent = null;
-
-  constructor({ translation, rotation, scale } = {}, parent) {
-    if (translation) this.translation = translation;
-    if (rotation) this.rotation = rotation;
-    if (scale) this.scale = scale;
-    if (parent) this.parent = parent;
-  }
-
-  get translation() { return this._translation; }
-  set translation(value) {
-    this._translation = value;
-    this.onChange();
-  }
-
-  get rotation() { return this._rotation; }
-  set rotation(value) {
-    this._rotation = value;
-    this.onChange();
-  }
-
-  get scale() { return this._scale; }
-  set scale(value) {
-    this._scale = value;
-    this.onChange();
-  }
-
-  get parent() { return this._parent; }
-  set parent(value) {
-    // Перед тем, как задать новый parent, нужно очистить предыдущий, 
-    // иначе получится так, что trs, который уже не является 
-    // parent'ом, при обновлении будет дёргать onChange 
-    // тех trs, к которым уже не относится
-    if (this._parent) {
-      const { origin } = this._parent.onChange;
-      if (origin) this._parent.onChange = origin;
-    }
-
-    // Это условие должно идти вторым, т.к. если задавать parent'ом 
-    // один и тот же trs, то получится цепочка ф-ций, 
-    // в которых origin будет иметь зависимости
-    if (value) {
-      const { onChange } = value;
-      value.onChange = Object.assign(() => {
-        onChange.call(value);
-        this.onChange();
-      }, { origin: onChange });
-    }
-
-    this._parent = value;
-    this.onChange();
-  }
 
   get matrix() {
-    if (this._changed) {
-      this._calcWorldMatrix(this._matrix);
-      this._changed = false;
-    }
-
+    this._calcMatrix(this._matrix);
     return this._matrix;
   }
+}
 
-  onChange() {
-    this._changed = true;
+class TRSBase extends MatrixProvider {
+  parent = null;
+  children = [];
+
+  // Дефолтные трансформации, соответствуют единичной 
+  // матрице, создаваемой через mat4.create()
+  translation = [0, 0, 0]; 
+  rotation = [0, 0, 0, 1]; 
+  scale = [1, 1, 1];
+
+  // Объект позволяют указывать только часть трансформаций, при необходим.
+  constructor({ translation, rotation, scale } = {}, parent) {
+    super();
+    if (translation) this.setTranslation(translation);
+    if (rotation) this.setRotation(rotation);
+    if (scale) this.setScale(scale);
+    if (parent) this.setParent(parent);
+  }
+
+  setParent(value) {
+    if (value === this.parent) return;
+    this._setParent(value);
+  }
+
+  _setParent(value) {
+    this.parent?.removeChild(this);
+    value?.addChild(this);
+    this.parent = value;
+  }
+
+  addChild(child) {
+    this.children.push(child);
+  }
+
+  removeChild(child) {
+    this.children.remove(child);
   }
 
   _calcWorldMatrix(out) {
@@ -1158,6 +1132,58 @@ class TRS {
   }
 }
 
+// Для статических объектов, скорость вычисления увелич. примерно на 13%.
+// Для динамических - примерно на 3% (на уровне статистич. погрешности)
+
+// Если в классе явно объявить свойство _committed со значением false, 
+// то нарушится логика работы _calcMatrix(). Это из-за того, что сначала 
+// вызывается конструктор базового класса и this получает только то, что 
+// задаётся там. Т.е. по порядку будут вызыватся переопределенные сеттеры 
+// и их коммиты. Внутри коммита свойство _committed установится в true, 
+// но после того как базовый конструктор отработает, вызовется конструктор 
+// текущего класса и перезатрёт _commited в дефолтное значение false, и 
+// _calcMatrix() не сможет выполнить свой расчет. Эта ошибка приводит 
+// к тому, что когда вызывается new TRS(...) во внешнем коде, 
+// все первоначальные значения игнорируются.
+
+class TRS extends TRSBase {
+  setTranslation(value) {
+    this.translation = value;
+    this.commit();
+  }
+
+  setRotation(value) {
+    this.rotation = value;
+    this.commit();
+  }
+
+  setScale(value) {
+    this.scale = value;
+    this.commit();
+  }
+
+  _setParent(value) {
+    super._setParent(value);
+    this.commit();
+  }
+
+  commit() {
+    if (this._committed) return;
+    this._committed = true;
+    for (const child of this.children) {
+      child.commit();
+    }
+  }
+
+  _calcMatrix(out) {  
+    if (!this._committed) return;
+    this._calcWorldMatrix(out);
+    this._committed = false; 
+  }
+}
+
+// Придумать другое название
+
 class Geometry {
   constructor(scene, nodeTree, meshParser) {
     this._scene = scene;
@@ -1165,11 +1191,11 @@ class Geometry {
     this._meshParser = meshParser;
   }
   
-  traverse(cb) {
+  forEach(callback) {
     this._nodeTree.traverse(this._scene.nodes, 
       (node, parent) => {
         node.trs = new TRS(node, parent?.trs);
-        cb(this._parseNode(node));
+        callback(this._parseNode(node));
       });
   }
 
@@ -1177,9 +1203,7 @@ class Geometry {
     return { 
       name, trs, 
       primitives: this._meshParser.parseMesh(mesh),
-      get matrix() { 
-        return this.trs.matrix; 
-      }, 
+      get matrix() { return this.trs.matrix; }, 
     };
   }
 }
@@ -1189,21 +1213,16 @@ class NodeTree {
     this.nodes = nodes;
   }
 
-  traverse(roots, cb, parentOfRoot) {
+  traverse(roots, callback, parentOfRoot) {
     for (const root of roots) {
       const { children, ...rest } = this.nodes[root];
-      cb(rest, parentOfRoot);
-
+      callback(rest, parentOfRoot);
       if (children) {
-        this.traverse(children, cb, rest);
+        this.traverse(children, callback, rest);
       }
     }
   }
 }
-
-// TODO: Этот модуль можно вообще вынести в lib, 
-// но для этого нужно убрать некоторые связи с ядром, 
-// в часности параметры: store, buffer, prog.
 
 const createProgram$1 = (gl, vs, fs) => {
   const prog = gl.createProgram();
@@ -1252,49 +1271,31 @@ const createTexture$1 = (gl, img, isPowerOf2) => {
   return texture;
 };
 
-// getParameter(gl.CURRENT_PROGRAM) влияет на производительность. 
-// Эту ф-цию лучше не использовать в цикле отрисовки
-const useProgram = (gl, prog) => {
-  if (prog === gl.currentProg) return;
-  gl.currentProg = prog;
-  gl.useProgram(prog.glProg);
-};
-
-const setMatUniform = (gl, uniform, matrix) => {
+const setMatrixUniform = (gl, uniform, matrix) => {
   gl.uniformMatrix4fv(uniform, false, matrix);
 };
 
-const setTexUniform = (gl, uniform, texture, unitIndex = 0) => {
+const setTextureUniform = (
+  gl, uniform, texture, unitIndex = 0) => {
+  
   gl.activeTexture(gl.TEXTURE0 + unitIndex);
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.uniform1i(uniform, unitIndex);
 };
 
-const setAttribute = (gl, store, attr, buffer) => {
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer.glBuffer(gl, store));
+const setAttribute$1 = (
+  gl, attr, buffer, typeSize, componentType) => {
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   gl.enableVertexAttribArray(attr);
-  gl.vertexAttribPointer(attr, buffer.typeSize, 
-    buffer.componentType, false, 0, 0);
+  gl.vertexAttribPointer(attr, typeSize, 
+    componentType, false, 0, 0);
 };
 
-const drawElements = (gl, store, buffer) => {
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.glBuffer(gl, store));
-  gl.drawElements(gl.TRIANGLES, buffer.count, 
-    buffer.componentType, 0);
+const drawElements$1 = (gl, buffer, count, componentType) => {
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+  gl.drawElements(gl.TRIANGLES, count, componentType, 0);
 };
-
-var glUtil = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  createProgram: createProgram$1,
-  createShader: createShader,
-  createBuffer: createBuffer,
-  createTexture: createTexture$1,
-  useProgram: useProgram,
-  setMatUniform: setMatUniform,
-  setTexUniform: setTexUniform,
-  setAttribute: setAttribute,
-  drawElements: drawElements
-});
 
 const typeSizeMap = {
   'SCALAR': 1,
@@ -1387,6 +1388,14 @@ class Program {
       this[name] = gl[action](this.glProg, name);
     }
   }
+
+  use(gl) {
+    // Вызов getParameter(gl.CURRENT_PROGRAM) не следует использ.
+    // в цикле отрисовки, т.к. эта ф-ция влияет на производительность
+    const { glProg } = this;
+    if (gl.prog === glProg) return;
+    gl.useProgram(gl.prog = glProg);
+  }
 }
 
 const _createProgram = (gl, glProg, locations) => {
@@ -1418,13 +1427,19 @@ class Shader extends Callable {
   }
 
   parse() {
-    const matches = this.src.matchAll(
-      /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(\w+)\s*;/g);
+    // BUG: Шаблон (\w+) не находит переменные массивов
+    // const matches = this.src.matchAll(
+    //   /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(\w+)\s*;/g);
 
-    return Array.from(matches).map(item => [item[1], item[4]]);
+    // Точка, в отличии от \w, ищет все символы, в т.ч. и квадратные скобки
+    const matches = this.src.matchAll(
+      /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(.+)\s*;/g);
+
+    return Array.from(matches).map(
+      item => [item[1], item[4].replace(/\[\d+\]/, '')]);
   }
 
-  // Можно заменить на compile
+  // Можно переименовать на compile
   _call(gl, type) {
     return createShader(gl, type, this.src);
   }
@@ -1466,13 +1481,16 @@ var textureApi = /*#__PURE__*/Object.freeze({
 // Контекст webgl можно создать и динамически (см. demo fxaa)
 const elem = document.getElementById('app');
 
-const ctxOpts = {
+const webglOpts = {
   // antialias: false,
 };
 
+const fpsElem = document.getElementById('fps');
+const fps = deltaTime => Math.round(1 / deltaTime * 1000);
+
 var app = {
   props: {
-    gl: elem.getContext('webgl', ctxOpts),
+    gl: elem.getContext('webgl', webglOpts),
     shaderDir: elem.dataset.shaderDir,
     prog: null,
     updatable: null,
@@ -1481,15 +1499,39 @@ var app = {
     time: 0,
   },
 
+  // trigger: true,
+  // res: 0,
+
+  // report() {
+  //   this.trigger = false;
+  //   console.log(this.res);
+  // },
+
   get loop() {
     return this._loop ??= elapsedTime => {
+      // if (!this.trigger) return;
+
       const props = this.props;
       props.deltaTime = elapsedTime - props.time;
       props.time = elapsedTime;
       props.updatable.update(props);
+
+      // this.res += benchmark(() => props.updatable.update(props));
+      
+      // Любое проверочное число меньше делителя с остатком на 20 
+      // if (Math.round(elapsedTime % 300) > 280) {
+      //   fpsElem.textContent = `FPS: ${fps(props.deltaTime)}`;
+      // }
+
       // TODO: Приостанавливать цикл, когда приложение теряет фокус
       requestAnimationFrame(this.loop);
     };
+  },
+
+  watchFps() {
+    setInterval(() => {
+      fpsElem.textContent = `FPS: ${fps(this.props.deltaTime)}`;
+    }, 300);
   },
 
   // TODO: Добавить 2 метода: stop() и resume()
@@ -1510,6 +1552,38 @@ class Updatable {
 
   _update(appProps) {
     throw new Error('Not implemented');
+  }
+}
+
+const worldPos = create$3();
+
+const setColorUniforms = (gl, prog, colors) => {
+  gl.uniform4fv(prog.u_AmbientColor, colors.ambient);
+  gl.uniform4fv(prog.u_DiffuseColor, colors.diffuse);
+  gl.uniform4fv(prog.u_SpecularColor, colors.specular);
+};
+
+class light extends Updatable {
+  colors = {
+    ambient: [0.4, 0.4, 0.4, 1],
+    diffuse: [0.8, 0.8, 0.8, 1],
+    specular: [1, 1, 1, 1],
+  };
+
+  constructor(position) {
+    super();
+    this.position = position;
+  }
+
+  _update(appProps) {
+    const gl = appProps.gl;
+    const prog = appProps.prog;
+    const camera = appProps.updatable.camera;
+
+    transformMat4(worldPos, this.position, camera.viewMat);
+    gl.uniform3fv(prog.u_LightingPos, worldPos);
+
+    setColorUniforms(gl, prog, this.colors);
   }
 }
 
@@ -1562,13 +1636,14 @@ class SceneBase extends Updatable {
 }
 
 const setMaterialUniforms = (gl, prog) => {
-  gl.uniform3f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4);
-  gl.uniform3f(prog.u_MaterialSpecularColor, 1.0, 1.0, 1.0);
+  gl.uniform4f(prog.u_MaterialAmbientColor, 0.4, 0.4, 0.4, 1);
+  gl.uniform4f(prog.u_MaterialSpecularColor, 1, 1, 1, 1);
 };
 
 class scene extends SceneBase {
   _beforeUpdate({ gl }) {
-    gl.clearColor(0.0, 0.0, 0.14, 1.0);
+    // gl.clearColor(0.0, 0.0, 0.14, 1.0);
+    gl.clearColor(0.7, 0.71, 0.72, 1.0);
     gl.enable(gl.DEPTH_TEST);
   }
 
@@ -1579,76 +1654,40 @@ class scene extends SceneBase {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    useProgram(gl, prog);
+    prog.use(gl);
+
     setMaterialUniforms(gl, prog);
   }
 }
 
-const worldPos = create$3();
-
-const setColorUniforms = (gl, prog, colors) => {
-  gl.uniform3fv(prog.u_AmbientColor, colors.ambient);
-  gl.uniform3fv(prog.u_DiffuseColor, colors.diffuse);
-  gl.uniform3fv(prog.u_SpecularColor, colors.specular);
-};
-
-class light extends Updatable {
-  colors = {
-    ambient: [0.4, 0.4, 0.4],
-    diffuse: [0.8, 0.8, 0.8],
-    specular: [1, 1, 1],
-  };
-
-  constructor(position) {
-    super();
-    this.position = position;
-  }
-
-  _update(appProps) {
-    const gl = appProps.gl;
-    const prog = appProps.prog;
-    const camera = appProps.updatable.camera;
-
-    transformMat4(worldPos, this.position, camera.viewMat);
-    gl.uniform3fv(prog.u_LightingPos, worldPos);
-
-    setColorUniforms(gl, prog, this.colors);
-  }
-}
-
-class Projection {
-  constructor(matrix) { 
-    this.matrix = matrix; 
-  }
-
-  setMatUniform(gl, prog) {
-    setMatUniform(gl, prog.u_PMatrix, this.matrix);
+class Projection extends MatrixProvider {
+  setMatrixUniform(gl, prog) {
+    setMatrixUniform(gl, prog.u_PMatrix, this.matrix);
   }
 }
 
 class Perspective extends Projection {
-  fov = 1.04;
-  aspect = 1;
-  near = 0.1;
-  far = 1000;
-
-  constructor() {
-    super(create$4());
+  constructor(fov, aspect, near, far) {
+    super();
+    this.fov = fov;
+    this.aspect = aspect;
+    this.near = near;
+    this.far = far;
   }
 
-  setMatUniform(gl, prog) {
-    perspective(this.matrix, this.fov, this.aspect, 
+  _calcMatrix(out) {
+    perspective(out, this.fov, this.aspect, 
       this.near, this.far);
-      
-    super.setMatUniform(gl, prog);
   }
 }
 
-// В одной папке camera не может быть несколько разных файлов камер, 
+// В одной папке camera не может быть несколько разных модулей камер, 
+
+const vectorUp = [0, 1, 0];
 
 class index$1 extends Updatable {
   viewMat = create$4();
-  projection = new Perspective();
+  projection = new Perspective(1.04, 1, 0.1, 1000);
 
   constructor(position, lookAtPoint) {
     super();
@@ -1661,31 +1700,30 @@ class index$1 extends Updatable {
   }
 
   _update(appProps) {
-    this.projection.setMatUniform(appProps.gl, appProps.prog);
-
-    // Вокруг glMatrix тоже можно сделать обертку
+    this.projection.setMatrixUniform(appProps.gl, appProps.prog);
+    // Можно сделать с оптимизацией, как в Projection, 
     lookAt(this.viewMat, this.position, 
-      this.lookAtPoint, [0, 1, 0]);
+      this.lookAtPoint, vectorUp);
   }
 }
 
 class Visual extends Updatable {
   tag = 'default';
   isHidden = false;
-  // Может хранить любые данные пользовательского 
-  // рендеринга, например: материал, вспом. текстуры 
-  // и шейдерную программу для их обработки.
+  // Может хранить данные пользовательского рендеринга, 
+  // например: материал, текстуры, программу и пр.
   renderProps = {};
 
-  constructor(name, trs) {
+  constructor(name) {
     super();
     this.name = name;
-    this.trs = trs;
   }
 
   get prog() {
     return this.renderProps.prog;
   }
+
+  // Можно добавить еще геттеры: position, rotation, scale
 
   update(appProps) {
     if (this.isHidden) return;
@@ -1696,84 +1734,66 @@ class Visual extends Updatable {
 class ItemList extends Array {
   constructor(geometry) {
     super();
-    this._geometry = geometry;
-    geometry.traverse(node => this.push(node));
+    geometry.forEach(node => this.push(node));
     Object.freeze(this);
   }
-  
-  get geometry() {
-    return this._geometry;
-  }
 }
 
-// TODO: Порефакторить подобным образом класс Projection или попробовать 
-// сразу сделать униформы и атрибуты программы такими объектами 
+// Этот файл можно переименовать на calc-utils.js в контексте matrix-api
 
-// class MatrixUniform {
-//   matrix = mat4.create();
+// Также, вокруг gl-matrix можно создать 3 обертки: matrix, quaternion и vector
+// Они могут быть частью общей библиотеки math. Например:
 
-//   constructor(location) {
-//     this.location = location;
-//   }
+// import { Matrix } from './math.js';
+// const mat = new Matrix(glMatrix.mat4.create() или []);
+// const mat2 = mat.mul(mat1);
 
-//   set(gl) { 
-//     setMatUniform(gl, this.location, this.matrix); 
-//   }
-// }
+const calcNormalMatrix = (out, modelViewMat) => {
+  invert(out, modelViewMat);
+  transpose(out, out);
+};
 
-// TODO: Перенести в более подходящий раздел
+const modelViewMat = create$4();
+const normalMat = create$4();
 
-class MatrixUniform {
-  matrix = create$4();
+const setNormalMatrixUniform = (gl, prog) => {
+  calcNormalMatrix(normalMat, modelViewMat);
+  setMatrixUniform(gl, prog.u_NMatrix, normalMat);
+};
 
-  // Временный перенос location из констурктора 
-  // в параметры, для удобства
-  set(gl, location) { 
-    setMatUniform(gl, location, this.matrix); 
-  }
-}
+const setMatrixUniforms = (gl, prog, item, camera) => {
+  mul(modelViewMat, item.matrix, camera.viewMat); // переставить местами?
+  setMatrixUniform(gl, prog.u_MVMatrix, modelViewMat);
+  setNormalMatrixUniform(gl, prog);
+};
 
-class ModelViewMatrixUniform extends MatrixUniform {
-  set(gl, prog, viewMat, modelMat) {
-    mul(this.matrix, viewMat, modelMat);
-    super.set(gl, prog.u_MVMatrix);
-  }
-}
+const setAttribute = (gl, store, attr, buffer) => {
+  setAttribute$1(gl, attr, buffer.glBuffer(gl, store), 
+    buffer.typeSize, buffer.componentType);
+};
 
-class NormalMatrixUniform extends MatrixUniform {
-  set(gl, prog, mvMat) {
-    invert(this.matrix, mvMat);
-    transpose(this.matrix, this.matrix);
-    super.set(gl, prog.u_NMatrix);
-  }
-}
-
-const mvMatUniform = new ModelViewMatrixUniform();
-const nMatUniform = new NormalMatrixUniform();
-
-const setMatUniforms = (gl, prog, camera, item) => {
-  mvMatUniform.set(gl, prog, camera.viewMat, item.matrix);
-  nMatUniform.set(gl, prog, mvMatUniform.matrix);
+const drawElements = (gl, store, buffer) => {
+  drawElements$1(gl, buffer.glBuffer(gl, store), 
+    buffer.count, buffer.componentType);
 };
 
 class index extends Visual {
   constructor(name, trs, texImg, geometry) {
-    super(name, trs);
+    super(name);
+    this.trs = trs;
     this.texImg = texImg;
-    this.items = new ItemList(geometry);
-  }
-
-  get geometry() {
-    return this.items.geometry;
+    this.geometry = geometry;
+    this.items = new ItemList(geometry); 
+    this._setParentForRootItems();
   }
 
   findItem(name) {
     return this.items.find(item => item.name === name);
   }
 
-  _beforeUpdate() {
+  _setParentForRootItems() {
     for (const { trs } of this.items) {
-      if (!trs.parent) trs.parent = this.trs;
+      if (!trs.parent) trs.setParent(this.trs);
     }
   }
   
@@ -1785,10 +1805,10 @@ class index extends Visual {
     const texture = appProps.store.get(this.texImg);
     const geomStore = appProps.store.get(this.geometry);
   
-    setTexUniform(gl, prog.u_Sampler, texture);
+    setTextureUniform(gl, prog.u_Sampler, texture);
     
     for (const item of this.items) {
-      setMatUniforms(gl, prog, camera, item);
+      setMatrixUniforms(gl, prog, item, camera);
   
       for (const primitive of item.primitives) {
         setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
@@ -1801,74 +1821,49 @@ class index extends Visual {
 
 }
 
-const matrix = create$4();
-const color = [1, 1, 1, 1];
+const viewProjMat = create$4();
 
-// TODO: Попробовать перенести часть логики в шейдер, 
-// чтобы не создавать буфер и атрибут в js
+class debugLine extends Visual {
+  // constructor(name) {
+  //   super(name);
+  //   this.renderProps.prog = true;
+  // }
 
-// Не получится это сделать, т.к. луч требует минимум 2х точек 
-// в пространстве, начальной и конечной, кот. должны 
-// передаваться через атрибуты и соотв. задаваться через буфер.
+  // _beforeUpdate({ gl }) {
+    // const { renderProps } = this;
+    // renderProps.prog = createProgram(gl, shaders);
+    // renderProps.buffer = createBuffer(gl, 
+    //   new Float32Array([0, 1]), gl.ARRAY_BUFFER);
 
-// Можно еще попытаться реализовать луч через gl.POINTS
-
-const shaders = [
-  new Shader(`
-    attribute vec4 a_Position;
-    uniform mat4 u_Matrix;
-
-    void main() {
-      gl_Position = u_Matrix * a_Position;
-    }
-  `),
-
-  new Shader(`
-    uniform mediump vec4 u_Color;
-
-    void main() {
-      gl_FragColor = u_Color;
-    }
-  `),
-];
-
-class ray extends Visual {
-  constructor(name, trs) {
-    super(name, trs);
-    this.renderProps.prog = true;
-  }
-
-  _beforeUpdate({ gl }) {
-    // TODO: Попробовать сделать так, чтобы в буфер 
-    // сразу попадали нужны координаты
-
-    const { renderProps } = this;
-    renderProps.prog = createProgram(gl, shaders);
-    renderProps.vbo = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, renderProps.vbo);
-    gl.bufferData(gl.ARRAY_BUFFER, 
-      new Float32Array([0, 0, 0, 1, 0, 0]), gl.STATIC_DRAW);
-  }
+    // renderProps.buffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, renderProps.buffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 1]), gl.STATIC_DRAW);
+  // }
 
   _update(appProps) {
     const gl = appProps.gl;
     const camera = appProps.updatable.camera;
+    const prog = this.prog;
 
-    useProgram(gl, this.prog);
+    prog.use(gl);
 
-    mul(matrix, camera.viewMat, this.trs.matrix);
-    mul(matrix, camera.projMat, matrix);
-    setMatUniform(gl, this.prog.u_Matrix, matrix);
+    mul(viewProjMat, camera.projMat, camera.viewMat);
+    setMatrixUniform(gl, prog.u_Matrix, viewProjMat);
 
-    gl.uniform4fv(this.prog.u_Color, color);
+    // TODO: Доб. 3 свойства: color, startPos, endPos и сеттеры, 
+    // которые вместо присваивания будут переназначать их элементы
+    gl.uniform4fv(prog.u_Color, [1, 1, 1, 1]);
+    gl.uniform4fv(prog.u_Positions, [0, 3, 0, 1, 2, 3, 0, 1]);
 
-    const attr = this.prog.a_Position;
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.renderProps.vbo);
-    gl.enableVertexAttribArray(attr);
-    gl.vertexAttribPointer(attr, 3, gl.FLOAT, false, 0, 0);
+    // const attr = prog.a_Index;
+    // gl.bindBuffer(gl.ARRAY_BUFFER, this.renderProps.buffer);
+    // gl.enableVertexAttribArray(attr);
+    // gl.vertexAttribPointer(attr, 1, gl.FLOAT, false, 0, 0);
+    setAttribute$1(gl, prog.a_Index, 
+      this.renderProps.buffer, 1, gl.FLOAT);
 
     gl.drawArrays(gl.LINES, 0, 2);
   }
 }
 
-export { index$1 as Camera, Perspective as CameraPerspective, Projection as CameraProjection, light as Light, index as Mesh, ray as Ray, scene as Scene, TRS, Updatable, Visual, app, index$4 as gltfApi, glUtil as glu, index$3 as progApi, index$2 as shaderApi, textureApi as texApi };
+export { index$1 as Camera, debugLine as DebugLine, light as Light, index as Mesh, Perspective, Projection, scene as Scene, TRS, Updatable, app, index$4 as gltfApi, index$3 as progApi, index$2 as shaderApi, textureApi as texApi };

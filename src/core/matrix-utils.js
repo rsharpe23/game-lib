@@ -1,8 +1,5 @@
 import { mat4 } from '../../lib/gl-matrix/index.js';
 
-// Подумать, возможно и здесь можно использовать MatrixProvider с оптимизац.
-// т.к. meshItem (model), camView и camProjection - могут быть MatrixProvider'ами.
-
 // Этот файл можно переименовать на calc-utils.js в контексте matrix-api
 
 // Также, вокруг gl-matrix можно создать 3 обертки: matrix, quaternion и vector
@@ -12,15 +9,7 @@ import { mat4 } from '../../lib/gl-matrix/index.js';
 // const mat = new Matrix(glMatrix.mat4.create() или []);
 // const mat2 = mat.mul(mat1);
 
-export const calcMvMatrix = (out, modelMat, viewMat) => 
-  mat4.mul(out, viewMat, modelMat);
-
-export const calcNormalMatrix = (out, mvMat) => {
-  mat4.invert(out, mvMat);
+export const calcNormalMatrix = (out, modelViewMat) => {
+  mat4.invert(out, modelViewMat);
   mat4.transpose(out, out);
-};
-
-export const calcMvpMatrix = (out, modelMat, viewMat, projMat) => {
-  calcMvMatrix(out, modelMat, viewMat);
-  mat4.mul(out, projMat, out);
 };

@@ -11,15 +11,15 @@ export default class extends Callable {
     // const matches = this.src.matchAll(
     //   /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(\w+)\s*;/g);
 
-    // TODO: Отбрасывать закоментированные переменные
+    // Точка, в отличии от \w, ищет все символы, в т.ч. и квадратные скобки
     const matches = this.src.matchAll(
-      /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(\w+(\[\d+\])?)\s*;/g);
+      /\s*(attribute|uniform)\s+((low|medium|high)p\s+)?\w+\s+(.+)\s*;/g);
 
-    return Array.from(matches)
-      .map(item => [item[1], item[4].replace(/\[\d+\]/, '')]);
+    return Array.from(matches).map(
+      item => [item[1], item[4].replace(/\[\d+\]/, '')]);
   }
 
-  // Можно заменить на compile
+  // Можно переименовать на compile
   _call(gl, type) {
     return createShader(gl, type, this.src);
   }

@@ -1,4 +1,4 @@
-import Base from "./base.js";
+import TRSBase from "./trs-base.js";
 
 // Для статических объектов, скорость вычисления увелич. примерно на 13%.
 // Для динамических - примерно на 3% (на уровне статистич. погрешности)
@@ -14,7 +14,7 @@ import Base from "./base.js";
 // к тому, что когда вызывается new TRS(...) во внешнем коде, 
 // все первоначальные значения игнорируются.
 
-export default class extends Base {
+export default class extends TRSBase {
   setTranslation(value) {
     this.translation = value;
     this.commit();

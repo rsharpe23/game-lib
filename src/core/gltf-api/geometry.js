@@ -1,4 +1,6 @@
-import TRS from '../trs/index.js';
+import TRS from '../trs.js';
+
+// Придумать другое название
 
 export default class {
   constructor(scene, nodeTree, meshParser) {
@@ -7,7 +9,7 @@ export default class {
     this._meshParser = meshParser;
   }
   
-  traverse(callback) {
+  forEach(callback) {
     this._nodeTree.traverse(this._scene.nodes, 
       (node, parent) => {
         node.trs = new TRS(node, parent?.trs);

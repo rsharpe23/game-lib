@@ -6,14 +6,12 @@ import { setAttribute, drawElements } from './gl-utils.js';
 
 export default class extends Visual {
   constructor(name, trs, texImg, geometry) {
-    super(name, trs);
+    super(name);
+    this.trs = trs;
     this.texImg = texImg;
-    this.items = new ItemList(geometry);
+    this.geometry = geometry;
+    this.items = new ItemList(geometry); 
     this._setParentForRootItems();
-  }
-
-  get geometry() {
-    return this.items.geometry;
   }
 
   findItem(name) {
@@ -38,7 +36,7 @@ export default class extends Visual {
     
     for (const item of this.items) {
       setMatrixUniforms(gl, prog, item, camera);
-  
+
       for (const primitive of item.primitives) {
         setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
         setAttribute(gl, geomStore, prog.a_Normal, primitive.nbo);

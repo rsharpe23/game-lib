@@ -1,5 +1,5 @@
 // Контекст webgl можно создать и динамически (см. demo fxaa)
-const elem = document.getElementById('app');
+const canvas = document.getElementById('canvas');
 
 const webglOpts = {
   // antialias: false,
@@ -14,10 +14,12 @@ const fps = deltaTime => Math.round(1 / deltaTime * 1000);
 // Производительность GPU определяется с пом. дельты времени между кадрами, 
 // чем меньша дельта, тем быстрее видеокарта выполнила свою работу и тем больше fps.
 
+// TODO: Переделать в класс и через конструктор передавать все необходимые 
+// данные: программу, сцену, id канваса или сразу контекст webgl
+
 export default {
   props: {
-    gl: elem.getContext('webgl', webglOpts),
-    shaderDir: elem.dataset.shaderDir,
+    gl: canvas.getContext('webgl', webglOpts),
     prog: null, 
     scene: null,
     store: new WeakMap(),

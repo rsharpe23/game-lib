@@ -8,10 +8,12 @@ import { app, gltfApi, progApi, shaderApi, texApi,
 import Camera from './camera.js';
 
 const { props } = app;
-const { gl, store, shaderDir } = props;
+const { gl, store } = props;
 
-const loadShaders = subDir => 
-  shaderApi.loadShaders(`${shaderDir}/${subDir}`);
+const loadShaders = subDir => {
+  const { shaderDir } = gl.canvas.dataset;
+  return shaderApi.loadShaders(`${shaderDir}/${subDir}`);
+}
 
 // После того, как был изменен способ загрузки gltf (с раздельного gltf + bin на сплошной), 
 // стала появлятся ошибка: "WebGL warning: tex(Sub)Image[23]D: Resource has no data (yet?)."

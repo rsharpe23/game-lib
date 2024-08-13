@@ -30,18 +30,21 @@ export default class extends Drawing {
     const camera = appProps.scene.camera;
   
     const texture = appProps.store.get(this.texImg);
-    const geomStore = appProps.store.get(this.geometry);
-  
+    const gStore = appProps.store.get(this.geometry);
+
     setTextureUniform(gl, prog.u_Sampler, texture);
-    
+
     for (const item of this.items) {
       setMatrixUniforms(gl, prog, item, camera);
 
       for (const primitive of item.primitives) {
-        setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
-        setAttribute(gl, geomStore, prog.a_Normal, primitive.nbo);
-        setAttribute(gl, geomStore, prog.a_Texcoord, primitive.tbo);
-        drawElements(gl, geomStore, primitive.ibo);
+        setAttribute(gl, gStore, prog.a_Position, primitive.vbo);
+        setAttribute(gl, gStore, prog.a_Normal, primitive.nbo);
+        setAttribute(gl, gStore, prog.a_Texcoord, primitive.tbo);
+
+        // Чтобы реализовать каркасную сетку (wireframe), 
+        // нужно задать режим отрисовки LINE_STRIP
+        drawElements(gl, gStore, primitive.ibo);
       }
     }
   }

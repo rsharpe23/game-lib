@@ -38,22 +38,25 @@ const createScene = (camera, light) => {
       gl.ARRAY_BUFFER),
   };
 
-  scene.addVisual(tank);
-  scene.addVisual(debugLine);
+  scene.addDrawing(tank);
+  scene.addDrawing(debugLine);
 
   // setTimeout(() => {
-  //   import('../lib/gl-matrix/index.js')
-  //     .then(({ quat }) => {
-  //       const { trs } = tank.findItem('Tower');
-  //       quat.fromEuler(trs.rotation, 0, 60, 0);
-  //       trs.commit();
-  //     });
+    // import('../lib/gl-matrix/index.js')
+    //   .then(({ quat }) => {
+    //     const { trs } = tank.findItem('Tower');
+    //     quat.fromEuler(trs.rotation, 0, 60, 0);
+    //     trs.commit();
+    //   });
 
-  //   const tower = tank.findItem('Tower');
-  //   tower.trs.setParent(null);
-  //   tank.trs.setTranslation([0, 0, 7]);
+    // const tower = tank.findItem('Tower');
+    // tower.trs.setParent(null);
+    // tank.trs.setTranslation([0, 0, 7]);
 
-  //   debugLine.startPos = [0, 4, 4];
+    // tank.trs.scale[0] += 7;
+    // tank.trs.commit();
+
+    // debugLine.startPos = [0, 4, 4];
   // }, 1000);
 
   /*
@@ -495,14 +498,14 @@ const createScene = (camera, light) => {
     const mesh = new Mesh('tank', 
       new TRS({ translation }), texImg, geometry);
 
-    const { _update } = mesh;
-    mesh._update = function (appProps) {
-      _update.call(mesh, appProps);
-      this.trs.translation[0] += appProps.deltaTime * 0.002;
-      this.trs.commit();
-    };
+    // const { _update } = mesh;
+    // mesh._update = function (appProps) {
+    //   _update.call(mesh, appProps);
+    //   this.trs.translation[0] += appProps.deltaTime * 0.002;
+    //   this.trs.commit();
+    // };
 
-    scene.addVisual(mesh);
+    scene.addDrawing(mesh);
   }
   */
 
@@ -517,7 +520,7 @@ store.set(texImg, texApi.createTexture(gl, texImg));
 // TODO: Сделать так, чтобы при потере ссылки на сцену, 
 // очищались свяазанные данные из store
 props.prog = progApi.createProgram(gl, shaders);
-props.updatable = createScene(new Camera([0, 2, 10]), 
+props.scene = createScene(new Camera([0, 2, 10]), 
   new Light([0, -70, -100]));
 
 app.loop(performance.now());

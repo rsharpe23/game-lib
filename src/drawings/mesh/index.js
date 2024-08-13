@@ -1,10 +1,10 @@
 import { setTextureUniform } from '../../../lib/gl-utils.js';
-import Visual from '../visual.js';
+import Drawing from '../drawing.js';
 import ItemList from './item-list.js';
 import { setMatrixUniforms } from './uniform-utils.js';
 import { setAttribute, drawElements } from './gl-utils.js';
 
-export default class extends Visual {
+export default class extends Drawing {
   constructor(name, trs, texImg, geometry) {
     super(name);
     this.trs = trs;
@@ -27,7 +27,7 @@ export default class extends Visual {
   _update(appProps) {
     const gl = appProps.gl;
     const prog = appProps.prog;
-    const camera = appProps.updatable.camera;
+    const camera = appProps.scene.camera;
   
     const texture = appProps.store.get(this.texImg);
     const geomStore = appProps.store.get(this.geometry);

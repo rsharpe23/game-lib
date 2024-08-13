@@ -1,5 +1,5 @@
 export default class {
-  _canUpdate = false; 
+  // Непубличные свойства лучше не объявлять явно (см. TRS)
 
   update(appProps) {
     if (this._canUpdate) {
@@ -9,9 +9,5 @@ export default class {
 
     this._beforeUpdate?.(appProps);
     this._canUpdate = true;
-  }
-
-  _update(appProps) {
-    throw new Error('Not implemented');
   }
 }

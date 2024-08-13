@@ -31,7 +31,7 @@ export default class extends TRSBase {
   }
 
   _setParent(value) {
-    super._setParent(value);
+    this.parent = value;
     this.commit();
   }
 
@@ -45,7 +45,7 @@ export default class extends TRSBase {
 
   _calcMatrix(out) {  
     if (!this._committed) return;
-    this._calcWorldMatrix(out);
+    super._calcMatrix(out);
     this._committed = false; 
   }
 }

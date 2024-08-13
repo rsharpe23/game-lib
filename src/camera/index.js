@@ -49,6 +49,7 @@ const vectorUp = [0, 1, 0];
 
 export default class extends Updatable {
   viewMat = mat4.create();
+  viewProjMat = mat4.create();
   projection = new Perspective(1.04, 1, 0.1, 1000);
 
   constructor(position, lookAtPoint) {
@@ -58,14 +59,16 @@ export default class extends Updatable {
   }
 
   get projMat() {
-    return this.projection.matrix;
+    return this.projection.matrix; 
   }
 
   _update(appProps) {
-    this.projection.setMatrixUniform(appProps.gl, appProps.prog);
-    // Можно сделать с оптимизацией, как в Projection, 
+    this.projection.apply(appProps.gl, appProps.prog);
+
     mat4.lookAt(this.viewMat, this.position, 
       this.lookAtPoint, vectorUp);
+
+    mat4.mul(this.viewProjMat, this.projMat, this.viewMat);
   }
 };
 

@@ -1,8 +1,6 @@
 import { vec3 } from '../lib/gl-matrix/index.js';
 import Updatable from "./updatable.js";
 
-const worldPos = vec3.create();
-
 const setColorUniforms = (gl, prog, colors) => {
   gl.uniform4fv(prog.u_AmbientColor, colors.ambient);
   gl.uniform4fv(prog.u_DiffuseColor, colors.diffuse);
@@ -10,6 +8,8 @@ const setColorUniforms = (gl, prog, colors) => {
 };
 
 export default class extends Updatable {
+  relativePos = vec3.create();
+
   colors = {
     ambient: [0.4, 0.4, 0.4, 1],
     diffuse: [0.8, 0.8, 0.8, 1],
@@ -24,10 +24,10 @@ export default class extends Updatable {
   _update(appProps) {
     const gl = appProps.gl;
     const prog = appProps.prog;
-    const camera = appProps.updatable.camera;
+    const camera = appProps.scene.camera;
 
-    vec3.transformMat4(worldPos, this.position, camera.viewMat);
-    gl.uniform3fv(prog.u_LightingPos, worldPos);
+    vec3.transformMat4(this.relativePos, this.position, camera.viewMat);
+    gl.uniform3fv(prog.u_LightingPos, this.relativePos);
 
     setColorUniforms(gl, prog, this.colors);
   }

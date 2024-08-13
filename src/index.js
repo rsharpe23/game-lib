@@ -14,5 +14,5 @@ export { default as Scene } from './scene.js';
 export * from './camera/index.js';
 export { default as Camera } from './camera/index.js';
 
-export { default as Mesh } from './visuals/mesh/index.js';
-export { default as DebugLine } from './visuals/debug-line.js';
+export { default as Mesh } from './drawings/mesh/index.js';
+export { default as DebugLine } from './drawings/debug-line.js';

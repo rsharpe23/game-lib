@@ -18,8 +18,8 @@ export default class {
   }
 
   use(gl) {
-    // Вызов getParameter(gl.CURRENT_PROGRAM) не следует использ.
-    // в цикле отрисовки, т.к. эта ф-ция влияет на производительность
+    // Ф-цию getParameter(gl.CURRENT_PROGRAM) не следует использовать
+    // в цикле отрисовки, т.к. она влияет на производительность
     const { glProg } = this;
     if (gl.prog === glProg) return;
     gl.useProgram(gl.prog = glProg);

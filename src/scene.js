@@ -18,12 +18,10 @@ export default class extends SceneBase {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Установку программы и материала можно было бы перенести в меш.
-    // Также, в меш можно было бы перенести установку униформ света 
-    // и матрицы проекции, а в light.js и camera.js оставить только 
-    // их вычисления, подобно тому как вычисляется матрица вида.
-
     prog.use(gl);
+
+    // Установка общего материала для всех мешей, у которых 
+    // не задан собственный материал в renderProps
     setMaterialUniforms(gl, prog);
   }
 }

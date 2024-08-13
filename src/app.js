@@ -8,23 +8,29 @@ const webglOpts = {
 const fpsElem = document.getElementById('fps');
 const fps = deltaTime => Math.round(1 / deltaTime * 1000);
 
+// Производильтеность CPU определяется с пом. разницы 2х временных меток, 
+// перед началом выполнения ф-ции и после окончания выполнения.
+
+// Производительность GPU определяется с пом. дельты времени между кадрами, 
+// чем меньша дельта, тем быстрее видеокарта выполнила свою работу и тем больше fps.
+
 export default {
   props: {
     gl: elem.getContext('webgl', webglOpts),
     shaderDir: elem.dataset.shaderDir,
-    prog: null,
-    updatable: null,
+    prog: null, 
+    scene: null,
     store: new WeakMap(),
     deltaTime: 0,
     time: 0,
   },
 
   // trigger: true,
-  // res: 0,
+  // count: 0,
 
   // report() {
   //   this.trigger = false;
-  //   console.log(this.res);
+  //   console.log(this.count);
   // },
 
   get loop() {
@@ -34,9 +40,9 @@ export default {
       const props = this.props;
       props.deltaTime = elapsedTime - props.time;
       props.time = elapsedTime;
-      props.updatable.update(props)
+      props.scene.update(props)
 
-      // this.res += benchmark(() => props.updatable.update(props));
+      // this.count += benchmark(() => props.scene.update(props));
       
       // Любое проверочное число меньше делителя с остатком на 20 
       // if (Math.round(elapsedTime % 300) > 280) {

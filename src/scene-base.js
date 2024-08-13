@@ -1,22 +1,22 @@
 import Updatable from './updatable.js';
 
-const addVisual = (out, visual) => {
-  if (!visual.prog) {
-    out.unshift(visual);
+const addDrawing = (out, drawing) => {
+  if (!drawing.prog) {
+    out.unshift(drawing);
     return;
   }
   
-  const index = out.findLastIndex(v => v.prog === visual.prog);
+  const index = out.findLastIndex(d => d.prog === drawing.prog);
   if (~index) {
-    out.splice(index, 0, visual);
+    out.splice(index, 0, drawing);
     return;
   }
   
-  out.push(visual);
+  out.push(drawing);
 };
 
 export default class extends Updatable {
-  visuals = [];
+  drawings = [];
 
   constructor(camera, light) {
     super();
@@ -24,20 +24,20 @@ export default class extends Updatable {
     this.light = light;
   }
 
-  addVisual(visual) { 
-    addVisual(this.visuals, visual); 
+  addDrawing(drawing) { 
+    addDrawing(this.drawings, drawing); 
   }
 
-  removeVisual(visual) {
-    this.visuals.remove(visual);
+  removeDrawing(drawing) {
+    this.drawings.remove(drawing);
   }
 
-  findVisual(name) {
-    return this.visuals.find(visual => visual.name === name);
+  findDrawing(name) {
+    return this.drawings.find(d => d.name === name);
   }
 
-  findVisuals(tag) {
-    return this.visuals.filter(visual => visual.tag === tag);
+  findDrawings(tag) {
+    return this.drawings.filter(d => d.tag === tag);
   }
 
   update(appProps) {
@@ -46,8 +46,8 @@ export default class extends Updatable {
     this.camera.update(appProps);
     this.light.update(appProps);
 
-    for (const visual of this.visuals) {
-      visual.update(appProps);
+    for (const drawing of this.drawings) {
+      drawing.update(appProps);
     }
   }
 }

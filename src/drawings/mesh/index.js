@@ -41,9 +41,6 @@ export default class extends Drawing {
         setAttribute(gl, gStore, prog.a_Position, primitive.vbo);
         setAttribute(gl, gStore, prog.a_Normal, primitive.nbo);
         setAttribute(gl, gStore, prog.a_Texcoord, primitive.tbo);
-
-        // Чтобы реализовать каркасную сетку (wireframe), 
-        // нужно задать режим отрисовки LINE_STRIP
         drawElements(gl, gStore, primitive.ibo);
       }
     }

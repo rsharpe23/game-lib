@@ -7,7 +7,6 @@ export { gltfApi, progApi, shaderApi, texApi };
 export { default as TRS } from './core/trs.js';
 
 export { default as app } from './app.js';
-export { default as Updatable } from './updatable.js';
 export { default as Light } from './light.js';
 export { default as Scene } from './scene.js';
 

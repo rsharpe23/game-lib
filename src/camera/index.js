@@ -72,5 +72,4 @@ export default class extends Updatable {
   }
 };
 
-export { default as Projection } from './projections/projection.js';
 export { Perspective };

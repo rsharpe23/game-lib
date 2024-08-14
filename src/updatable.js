@@ -1,4 +1,6 @@
-export default class {
+import Node from './node.js';
+
+export default class extends Node {
   // Непубличные свойства лучше не объявлять явно (см. TRS)
 
   update(appProps) {

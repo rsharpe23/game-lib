@@ -6,37 +6,44 @@ const traverse = ({ children }, callback) => {
 };
 
 export default class {
-  tag = 'default';
   parent = null;
   children = [];
 
-  constructor(name) {
+  constructor(name, tag) {
     this.name = name;
+    this.tag = tag;
   }
 
   setParent(value) {
-    if (value === this.parent) return;
-    this.parent?.removeChild(this);
-    value?.addChild(this);
+    // Если выбрасывать исключение, тогда его придется всегда обрабатывать 
+    // во внешнем коде, даже когда очевидно, что оно не произойдет
+    if (value === this || value === this.parent) return;
+    this.parent?.onRemoveChild(this);
+    value?.onAppendChild(this);
+    this.parent = value;
   }
-  
-  addChild(child) {
-    child.parent = this;
+
+  onAppendChild(child) {
     this.children.push(child);
   }
 
-  removeChild(child) {
-    if (!this.children.remove(child)) {
-      throw new Error("Can't remove the child");
-    }
+  onRemoveChild(child) {
+    this.children.remove(child);
+  }
 
-    child.parent = null;
+  appendChild(child) {
+    child.setParent(this);
+  }
+
+  removeChild(child) {
+    if (!this.children.includes(child)) return;
+    child.setParent(null);
   }
 
   findChild(name) {
     const nodes = this.findChildren(node => node.name === name);
-    // Метод массива find() также возвращает 
-    // undefined, если элемент не найден
+    // Метод массива find() тоже возвращает undefined, 
+    // если элемент не найден
     return nodes[0];
   }
 

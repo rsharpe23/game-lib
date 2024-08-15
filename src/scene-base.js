@@ -1,5 +1,11 @@
 import Updatable from './updatable.js';
 
+// Не тестировалось
+const setProp = (node, prop, value) => {
+  node.removeChild(node[prop]);
+  node.appendChild(node[prop] = value);
+};
+
 export default class extends Updatable {
   constructor(name, camera, light) {
     super(name, 'scene');
@@ -8,22 +14,12 @@ export default class extends Updatable {
   }
 
   setCamera(value) {
-    this.camera = value;
+    setProp(this, 'camera', value);
   }
 
-  // get camera() {
-  //   // const node = this.findChildrenBy('camera')[0];
-
-  //   // if (!this._camera || this._camera.parent !== this) {
-
-  //   // }
-
-
-  // }
-
-  // get light() {
-  //   return this.findChildrenBy('light')[0];
-  // }
+  setLight(value) {
+    setProp(this, 'light', value);
+  }
 
   // TODO: Переопределить addChild так, чтобы в children сначала 
   // попадали те drawing'и, у которых нет собственной программы

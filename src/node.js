@@ -5,6 +5,7 @@ const traverse = ({ children }, callback) => {
   }
 };
 
+// TODO: Написать тесты
 export default class {
   parent = null;
   children = [];
@@ -16,7 +17,9 @@ export default class {
 
   setParent(value) {
     // Если выбрасывать исключение, тогда его придется всегда обрабатывать 
-    // во внешнем коде, даже когда очевидно, что оно не произойдет
+    // во внешнем коде, даже когда очевидно, что оно не произойдет.
+    // Лучше просто вызывать return, а когда надо проверять изменения, 
+    // то обращаться к children/parent напрямую.
     if (value === this || value === this.parent) return;
     this.parent?.onRemoveChild(this);
     value?.onAppendChild(this);

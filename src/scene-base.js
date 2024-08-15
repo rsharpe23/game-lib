@@ -1,26 +1,16 @@
-import Updatable from './updatable.js';
-
-// Не тестировалось
-const setProp = (node, prop, value) => {
-  node.removeChild(node[prop]);
-  node.appendChild(node[prop] = value);
-};
-
-export default class extends Updatable {
+export default class {
   constructor(name, camera, light) {
     super(name, 'scene');
-    this.setCamera(camera);
-    this.setLight(light);
+    this.camera = camera;
+    this.light = light;
   }
 
-  setCamera(value) {
-    setProp(this, 'camera', value);
-  }
-
-  setLight(value) {
-    setProp(this, 'light', value);
+  update(appProps) {
+    this.camera.update(appProps);
+    this.light.update(appProps);
+    super.update(appProps);
   }
 
   // TODO: Переопределить addChild так, чтобы в children сначала 
-  // попадали те drawing'и, у которых нет собственной программы
+  // попадали те ноды (drawing'и), у которых нет собственной программы
 }

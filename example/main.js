@@ -8,12 +8,10 @@ import { app, gltfApi, progApi, shaderApi, texApi,
 import Camera from './camera.js';
 
 const { props } = app;
-const { gl, store } = props;
+const { gl, store, dataset: { shaderDir } } = props;
 
-const loadShaders = subDir => {
-  const { shaderDir } = gl.canvas.dataset;
-  return shaderApi.loadShaders(`${shaderDir}/${subDir}`);
-}
+const loadShaders = subDir => 
+  shaderApi.loadShaders(`${shaderDir}/${subDir}`);
 
 // После того, как был изменен способ загрузки gltf (с раздельного gltf + bin на сплошной), 
 // стала появлятся ошибка: "WebGL warning: tex(Sub)Image[23]D: Resource has no data (yet?)."
@@ -29,19 +27,19 @@ const [shaders, dlShaders, texImg, geometry] = await Promise.all([
 ]);
 
 const createScene = (camera, light) => {
-  const scene = new Scene(camera, light);
+  const scene = new Scene('Scene', camera, light);
 
-  const tank = new Mesh('Tank', new TRS(), texImg, geometry);
+  // const tank = new Mesh('Tank', new TRS(), texImg, geometry);
+  // scene.addDrawing(tank);
 
-  const debugLine = new DebugLine('DebugLine', [0, 3, 0], [2, 3, 0]);
+  const debugLine = new DebugLine('Line', [0, 3, 0], [2, 3, 0]);
   debugLine.renderProps = {
     prog: progApi.createProgram(gl, dlShaders),
     indexBuffer: createBuffer(gl, new Float32Array([0, 1]), 
       gl.ARRAY_BUFFER),
   };
 
-  scene.addDrawing(tank);
-  scene.addDrawing(debugLine);
+  scene.appendChild(debugLine);
 
   // setTimeout(() => {
     // import('../lib/gl-matrix/index.js')
@@ -516,14 +514,14 @@ const createScene = (camera, light) => {
 
 // TODO: Инкапсулировать в какой-нибудь asset bundle manager, 
 // вместе с загрузкой ресурсов (shaders, geometry, texture и пр.)
-store.set(geometry, {});
-store.set(texImg, texApi.createTexture(gl, texImg));
+// store.set(geometry, {});
+// store.set(texImg, texApi.createTexture(gl, texImg));
 
 // TODO: Сделать так, чтобы при потере ссылки на сцену, 
 // очищались свяазанные данные из store
 props.prog = progApi.createProgram(gl, shaders);
-props.scene = createScene(new Camera([0, 2, 10]), 
-  new Light([0, -70, -100]));
+props.scene = createScene(new Camera('Camera', [0, 2, 10]), 
+  new Light('Light', [0, -70, -100]));
 
 app.loop(performance.now());
 app.watchFps();

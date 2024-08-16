@@ -1,5 +1,5 @@
 import { vec3 } from '../lib/gl-matrix/index.js';
-import Updatable from "./updatable.js";
+import Node from './node.js';
 
 const setColorUniforms = (gl, prog, colors) => {
   gl.uniform4fv(prog.u_AmbientColor, colors.ambient);
@@ -7,7 +7,7 @@ const setColorUniforms = (gl, prog, colors) => {
   gl.uniform4fv(prog.u_SpecularColor, colors.specular);
 };
 
-export default class extends Updatable {
+export default class extends Node {
   relativePos = vec3.create();
 
   colors = {
@@ -16,8 +16,8 @@ export default class extends Updatable {
     specular: [1, 1, 1, 1],
   };
 
-  constructor(position) {
-    super();
+  constructor(name, position) {
+    super(name, 'light');
     this.position = position;
   }
 

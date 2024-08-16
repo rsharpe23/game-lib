@@ -4,6 +4,7 @@ import ItemList from './item-list.js';
 import { setMatrixUniforms } from './uniform-utils.js';
 import { setAttribute, drawElements } from './gl-utils.js';
 
+// Меш - это базовый класс для любого 3D-объекта на сцене.
 export default class extends Drawing {
   constructor(name, trs, texImg, geometry) {
     super(name);
@@ -13,6 +14,14 @@ export default class extends Drawing {
     this.items = new ItemList(geometry); 
     this._setParentForRootItems();
   }
+
+  // TODO: Добавить свойство matrix, а также: position, rotation и scale 
+  // (после изменения которых будет пересчитываться матрица, чтобы 
+  // изменение трансформаций не отличалось от camera и light).
+
+  // Возможно придется добавить какой-нибудь MeshGroup и разместить 
+  // эти свойства там. Т.к. один меш скорей всего будет 
+  // определять только один примитив.
 
   findItem(name) {
     return this.items.find(item => item.name === name);

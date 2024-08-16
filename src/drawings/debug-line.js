@@ -1,4 +1,6 @@
-import { setMatrixUniform, setAttribute } from '../../lib/gl-utils.js';
+import { setMatrixUniform, setAttribute 
+} from '../../lib/gl-utils.js';
+
 import Drawing from './drawing.js';
 
 const positions = [0, 0, 0, 1, 0, 0, 0, 1];
@@ -19,7 +21,7 @@ export default class extends Drawing {
   color = [1, 1, 1, 1];
 
   constructor(name, startPos, endPos) {
-    super(name);
+    super(name, 'debug-line');
     this.startPos = startPos;
     this.endPos = endPos;
   }

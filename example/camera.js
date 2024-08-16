@@ -5,8 +5,8 @@ import Camera from '../src/camera/index.js';
 export default class extends Camera {
   rotation = quat.create();
 
-  constructor(position) {
-    super(position, [0, 0, 0]);
+  constructor(name, position) {
+    super(name, position, [0, 0, 0]);
   }
 
   _beforeUpdate({ gl }) {

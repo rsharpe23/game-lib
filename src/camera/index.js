@@ -42,18 +42,18 @@
 // ------------------------
 
 import { mat4 } from '../../lib/gl-matrix/index.js';
-import Updatable from '../updatable.js';
+import Node from '../node.js';
 import Perspective from './projections/perspective.js';
 
 const vectorUp = [0, 1, 0];
 
-export default class extends Updatable {
+export default class extends Node {
   viewMat = mat4.create();
   viewProjMat = mat4.create();
   projection = new Perspective(1.04, 1, 0.1, 1000);
 
-  constructor(position, lookAtPoint) {
-    super();
+  constructor(name, position, lookAtPoint) {
+    super(name, 'camera');
     this.position = position;
     this.lookAtPoint = lookAtPoint;
   }

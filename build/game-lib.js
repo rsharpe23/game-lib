@@ -1072,43 +1072,42 @@ function create() {
   };
 })();
 
-class MatrixProvider {
-  _matrix = create$4();
-
-  get matrix() {
-    this._calcMatrix(this._matrix);
-    return this._matrix;
-  }
-}
-
-class TRSBase extends MatrixProvider {
+class TRSBase {
   parent = null;
   children = [];
 
-  // Дефолтные трансформации, соответствуют единичной 
-  // матрице, создаваемой через mat4.create()
   translation = [0, 0, 0]; 
   rotation = [0, 0, 0, 1]; 
   scale = [1, 1, 1];
 
-  // Объект позволяют указывать только часть трансформаций, при необходим.
+  // Дефолтные трансформации, соответствуют единичной 
+  // матрице, создаваемой через mat4.create()
+  _matrix = create$4();
+
+  // Сеттеры определены методами из-за того, что в производном классе нельзя 
+  // переопределить data-свойства аксессорами, т.к. аксессоры хранятся в прототипе, 
+  // а data-свойства в объекте (из-за чего перекрывают их). В этом случае нужно 
+  // определять аксессоры сначала в базовом классе, а затем переопределять их в 
+  // производном, что слишком раздуто. Проще всего сделать сеттеры методами.
+
+  // Объект позволяют указывать только часть трансформаций, при необходимости
   constructor({ translation, rotation, scale } = {}, parent) {
-    super();
     if (translation) this.setTranslation(translation);
     if (rotation) this.setRotation(rotation);
     if (scale) this.setScale(scale);
     if (parent) this.setParent(parent);
   }
 
+  get matrix() {
+    this._calcMatrix(this._matrix);
+    return this._matrix;
+  } 
+
   setParent(value) {
     if (value === this.parent) return;
-    this._setParent(value);
-  }
-
-  _setParent(value) {
     this.parent?.removeChild(this);
     value?.addChild(this);
-    this.parent = value;
+    this._setParent(value);
   }
 
   addChild(child) {
@@ -1119,10 +1118,10 @@ class TRSBase extends MatrixProvider {
     this.children.remove(child);
   }
 
-  _calcWorldMatrix(out) {
+  _calcMatrix(out) {
     this._calcLocalMatrix(out);
     if (this.parent) {
-      mul(out, this.parent.matrix, out);
+      mul(out, this.parent.matrix, out); // мировая матрица
     }
   }
 
@@ -1163,7 +1162,7 @@ class TRS extends TRSBase {
   }
 
   _setParent(value) {
-    super._setParent(value);
+    this.parent = value;
     this.commit();
   }
 
@@ -1177,7 +1176,7 @@ class TRS extends TRSBase {
 
   _calcMatrix(out) {  
     if (!this._committed) return;
-    this._calcWorldMatrix(out);
+    super._calcMatrix(out);
     this._committed = false; 
   }
 }
@@ -1275,12 +1274,10 @@ const setMatrixUniform = (gl, uniform, matrix) => {
   gl.uniformMatrix4fv(uniform, false, matrix);
 };
 
-const setTextureUniform = (
-  gl, uniform, texture, unitIndex = 0) => {
-  
-  gl.activeTexture(gl.TEXTURE0 + unitIndex);
+const setTextureUniform = (gl, uniform, texture, texUnit = 0) => {
+  gl.activeTexture(gl.TEXTURE0 + texUnit);
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.uniform1i(uniform, unitIndex);
+  gl.uniform1i(uniform, texUnit);
 };
 
 const setAttribute$1 = (
@@ -1375,8 +1372,8 @@ class Program {
     this.glProg = glProg;
   }
 
-  setLocationProps(gl, locations) {
-    for (const [qualifier, name] of locations) {
+  setLocations(gl, data) {
+    for (const [qualifier, name] of data) {
       const action = qualifier === 'attribute' ? 'getAttribLocation' :
         qualifier === 'uniform' ? 'getUniformLocation' : '';
 
@@ -1390,28 +1387,28 @@ class Program {
   }
 
   use(gl) {
-    // Вызов getParameter(gl.CURRENT_PROGRAM) не следует использ.
-    // в цикле отрисовки, т.к. эта ф-ция влияет на производительность
+    // Ф-цию getParameter(gl.CURRENT_PROGRAM) не следует использовать
+    // в цикле отрисовки, т.к. она влияет на производительность
     const { glProg } = this;
     if (gl.prog === glProg) return;
     gl.useProgram(gl.prog = glProg);
   }
 }
 
-const _createProgram = (gl, glProg, locations) => {
+const _createProgram = (gl, glProg, locationData) => {
   const prog = new Program(glProg);
-  prog.setLocationProps(gl, locations);
+  prog.setLocations(gl, locationData);
   return prog;
 };
 
 const createProgram = (gl, shaders) => {
-  const locations = shaders.map(shader => shader.parse()).flat();
+  const locationData = shaders.map(shader => shader.parse()).flat();
 
   const [vs, fs] = shaders;
   const glProg = createProgram$1(gl, vs(gl, gl.VERTEX_SHADER), 
     fs(gl, gl.FRAGMENT_SHADER));
 
-  return _createProgram(gl, glProg, locations);
+  return _createProgram(gl, glProg, locationData);
 };
 
 var index$3 = /*#__PURE__*/Object.freeze({
@@ -1470,6 +1467,8 @@ var index$2 = /*#__PURE__*/Object.freeze({
 
 const isPowerOf2 = value => (value & (value - 1)) === 0;
 
+// Можно переименовать на texture-utils
+
 const createTexture = (gl, img) => 
   createTexture$1(gl, img, isPowerOf2);
 
@@ -1479,7 +1478,7 @@ var textureApi = /*#__PURE__*/Object.freeze({
 });
 
 // Контекст webgl можно создать и динамически (см. demo fxaa)
-const elem = document.getElementById('app');
+const canvas = document.getElementById('canvas');
 
 const webglOpts = {
   // antialias: false,
@@ -1488,23 +1487,32 @@ const webglOpts = {
 const fpsElem = document.getElementById('fps');
 const fps = deltaTime => Math.round(1 / deltaTime * 1000);
 
+// Производильтеность CPU определяется с пом. разницы 2х временных меток, 
+// перед началом выполнения ф-ции и после окончания выполнения.
+
+// Производительность GPU можно определить с пом. дельты времени между кадрами, 
+// чем меньша дельта, тем быстрее выполнена работа (CPU + GPU) и тем больше fps.
+
+// TODO: Переделать в класс и через конструктор передавать все необходимые 
+// данные: программу, сцену, id канваса или сразу контекст webgl
+
 var app = {
   props: {
-    gl: elem.getContext('webgl', webglOpts),
-    shaderDir: elem.dataset.shaderDir,
-    prog: null,
-    updatable: null,
+    gl: canvas.getContext('webgl', webglOpts),
+    dataset: canvas.dataset,
     store: new WeakMap(),
+    prog: null,
+    scene: null,
     deltaTime: 0,
     time: 0,
   },
 
   // trigger: true,
-  // res: 0,
+  // count: 0,
 
   // report() {
   //   this.trigger = false;
-  //   console.log(this.res);
+  //   console.log(this.count);
   // },
 
   get loop() {
@@ -1514,9 +1522,9 @@ var app = {
       const props = this.props;
       props.deltaTime = elapsedTime - props.time;
       props.time = elapsedTime;
-      props.updatable.update(props);
+      props.scene.update(props);
 
-      // this.res += benchmark(() => props.updatable.update(props));
+      // this.count += benchmark(() => props.scene.update(props));
       
       // Любое проверочное число меньше делителя с остатком на 20 
       // if (Math.round(elapsedTime % 300) > 280) {
@@ -1538,8 +1546,8 @@ var app = {
 };
 
 class Updatable {
-  _canUpdate = false; 
-
+  // Непубличные свойства лучше не объявлять явно (см. TRS)
+  
   update(appProps) {
     if (this._canUpdate) {
       this._update(appProps);
@@ -1549,13 +1557,121 @@ class Updatable {
     this._beforeUpdate?.(appProps);
     this._canUpdate = true;
   }
-
-  _update(appProps) {
-    throw new Error('Not implemented');
-  }
 }
 
-const worldPos = create$3();
+// Эта ф-ция не подходит для поиска одного нода, т.к. проходит 
+// по всей иерархии, даже если нод найден где-то в начале
+// const traverse = ({ children }, callback) => {
+//   for (const child of children) {
+//     callback(child);
+//     traverse(child, callback);
+//   }
+// };
+
+const traverse = ({ children }, callback) => {
+  if (!children || children.length === 0) return;
+  
+  const next = it => {
+    const { done, value } = it.next();
+    if (done) return;
+    callback(value, () => {
+      traverse(value, callback);
+      next(it);
+    });
+  }; 
+  
+  next(children[Symbol.iterator]());
+};
+
+// TODO: Написать тесты
+class Node extends Updatable {
+  parent = null;
+  children = [];
+
+  // TODO: Если имя не задано явно, пусть оно генерируется 
+  // автоматически (this.constructor.name + instanceNum). 
+
+  // instanceNum можно рассчитать примерно так:
+  // ctor() { Node.instanceMap[className] = (Node.instanceMap[className] ??= 0) + 1 }
+
+  // Этот ф-ционал можно реализовать через core-утилиту, 
+  // поскольку это не обязанность Node
+
+  constructor(name, tag) {
+    super();
+    this.name = name;
+    this.tag = tag;
+  }
+
+  appendChild(child) {
+    child.setParent(this);
+  }
+
+  removeChild(child) {
+    if (!this.children.includes(child)) return;
+    child.setParent(null);
+  }
+
+  setParent(value) {
+    // Если выбрасывать исключение, тогда его придется всегда обрабатывать 
+    // во внешнем коде, даже когда очевидно, что оно не произойдет.
+    // Лучше просто вызывать return, а если надо проверить изменения, 
+    // то обращаться к children/parent напрямую.
+    if (value === this || value === this.parent) return;
+    this.parent?.onRemoveChild(this);
+    value?.onAppendChild(this);
+    this.parent = value;
+  }
+
+  onRemoveChild(child) {
+    this.children.remove(child);
+  }
+
+  onAppendChild(child) {
+    this.children.push(child);
+  }
+
+  // Не тестировалось
+
+  // Метод массива find() тоже возвращает undefined, 
+  // если элемент не найден
+  findNode(name) {
+    let node;
+    traverse(this, (child, next) => {
+      if (child.name === name) node = child;
+      else next();
+    });
+
+    return node;
+  }
+
+  findNodesBy(tag) {
+    return this.findNodes(node => node.tag === tag);
+  }
+
+  // Название findChildren не подойдет, т.к. оно даёт неоднознач. понимаение 
+  // того, что ищется: только дочерние ноды либо ноды во всей иерархии
+  findNodes(callback) {
+    const nodes = [];
+    traverse(this, (child, next) => {
+      if (callback(child)) nodes.push(child);
+      next();
+    });
+
+    return nodes;
+  }
+
+  // Этот метод можно не выносить в производный класс, поскольку он 
+  // по сути является обязанностью для любого класса в иерархии 
+  // (каждый нод - это updatable-объект). Кроме того, сцена 
+  // переопределяет update() именно в базовом классе.
+  update(appProps) {
+    super.update(appProps);
+    for (const child of this.children) {
+      child.update(appProps);
+    }
+  }
+}
 
 const setColorUniforms = (gl, prog, colors) => {
   gl.uniform4fv(prog.u_AmbientColor, colors.ambient);
@@ -1563,76 +1679,46 @@ const setColorUniforms = (gl, prog, colors) => {
   gl.uniform4fv(prog.u_SpecularColor, colors.specular);
 };
 
-class light extends Updatable {
+class light extends Node {
+  relativePos = create$3();
+
   colors = {
     ambient: [0.4, 0.4, 0.4, 1],
     diffuse: [0.8, 0.8, 0.8, 1],
     specular: [1, 1, 1, 1],
   };
 
-  constructor(position) {
-    super();
+  constructor(name, position) {
+    super(name, 'light');
     this.position = position;
   }
 
   _update(appProps) {
     const gl = appProps.gl;
     const prog = appProps.prog;
-    const camera = appProps.updatable.camera;
+    const camera = appProps.scene.camera;
 
-    transformMat4(worldPos, this.position, camera.viewMat);
-    gl.uniform3fv(prog.u_LightingPos, worldPos);
+    transformMat4(this.relativePos, this.position, camera.viewMat);
+    gl.uniform3fv(prog.u_LightingPos, this.relativePos);
 
     setColorUniforms(gl, prog, this.colors);
   }
 }
 
-const addVisual = (out, visual) => {
-  if (!visual.prog) {
-    out.unshift(visual);
-    return;
+class SceneBase extends Node {
+  // Названия главной камеры и света должны 
+  // начинаться с нижнего подчеркивания 
+
+  get camera() {
+    return this._camera ??= this.findNode('_Camera');
   }
   
-  const index = out.findLastIndex(v => v.prog === visual.prog);
-  if (~index) {
-    out.splice(index, 0, visual);
-    return;
-  }
-  
-  out.push(visual);
-};
-
-class SceneBase extends Updatable {
-  visuals = [];
-
-  constructor(camera, light) {
-    super();
-    this.camera = camera;
-    this.light = light;
+  get light() { 
+    return this._light ??= this.findNode('_Light');
   }
 
-  addVisual(visual) { 
-    addVisual(this.visuals, visual); 
-  }
-
-  findVisual(name) {
-    return this.visuals.find(visual => visual.name === name);
-  }
-
-  findVisuals(tag) {
-    return this.visuals.filter(visual => visual.tag === tag);
-  }
-
-  update(appProps) {
-    super.update(appProps);
-
-    this.camera.update(appProps);
-    this.light.update(appProps);
-
-    for (const visual of this.visuals) {
-      visual.update(appProps);
-    }
-  }
+  // Сортировку children можно делегировать самим drawing'ам, 
+  // чтобы каждый нод сам решал как ему добавляться
 }
 
 const setMaterialUniforms = (gl, prog) => {
@@ -1642,7 +1728,6 @@ const setMaterialUniforms = (gl, prog) => {
 
 class scene extends SceneBase {
   _beforeUpdate({ gl }) {
-    // gl.clearColor(0.0, 0.0, 0.14, 1.0);
     gl.clearColor(0.7, 0.71, 0.72, 1.0);
     gl.enable(gl.DEPTH_TEST);
   }
@@ -1656,12 +1741,22 @@ class scene extends SceneBase {
 
     prog.use(gl);
 
+    // Установка общего материала для всех мешей, у которых 
+    // не задан собственный материал в renderProps
     setMaterialUniforms(gl, prog);
   }
 }
 
-class Projection extends MatrixProvider {
-  setMatrixUniform(gl, prog) {
+// Вычисление матрицы внутри свойства, как было реализовано в MatrixProvider, 
+// не подходит в некоторых случаях, например как здесь. Это из-за того, что 
+// расчёт будет выполняется в каждом из объектов, который это свойство вызывает, 
+// а нужно чтобы он выполнялся только один раз за обновление, внутри камеры
+
+class Projection {
+  matrix = create$4();
+
+  apply(gl, prog) {
+    this._calcMatrix(this.matrix);
     setMatrixUniform(gl, prog.u_PMatrix, this.matrix);
   }
 }
@@ -1685,45 +1780,47 @@ class Perspective extends Projection {
 
 const vectorUp = [0, 1, 0];
 
-class index$1 extends Updatable {
+class index$1 extends Node {
   viewMat = create$4();
+  viewProjMat = create$4();
   projection = new Perspective(1.04, 1, 0.1, 1000);
 
-  constructor(position, lookAtPoint) {
-    super();
+  constructor(name, position, lookAtPoint) {
+    super(name, 'camera');
     this.position = position;
     this.lookAtPoint = lookAtPoint;
   }
 
   get projMat() {
-    return this.projection.matrix;
+    return this.projection.matrix; 
   }
 
   _update(appProps) {
-    this.projection.setMatrixUniform(appProps.gl, appProps.prog);
-    // Можно сделать с оптимизацией, как в Projection, 
+    this.projection.apply(appProps.gl, appProps.prog);
+
     lookAt(this.viewMat, this.position, 
       this.lookAtPoint, vectorUp);
+
+    mul(this.viewProjMat, this.projMat, this.viewMat);
   }
 }
 
-class Visual extends Updatable {
-  tag = 'default';
+// Компоненты drawings отличаются лишь тем, что вызывают ф-цию gl.draw*
+
+// Подход, смешивания логики и отрисовки в одном месте (внутри update) 
+// был выбран из-за того, что каждый компонент верхнего уровня обращается 
+// к api webgl; будь то сцена, свет, камера, меш и т.д. Из-за этого сложно 
+// определить, какая логика относится к отрисовке, а какая нет.
+
+class Drawing extends Node {
   isHidden = false;
   // Может хранить данные пользовательского рендеринга, 
   // например: материал, текстуры, программу и пр.
   renderProps = {};
 
-  constructor(name) {
-    super();
-    this.name = name;
-  }
-
   get prog() {
     return this.renderProps.prog;
   }
-
-  // Можно добавить еще геттеры: position, rotation, scale
 
   update(appProps) {
     if (this.isHidden) return;
@@ -1762,7 +1859,7 @@ const setNormalMatrixUniform = (gl, prog) => {
 };
 
 const setMatrixUniforms = (gl, prog, item, camera) => {
-  mul(modelViewMat, item.matrix, camera.viewMat); // переставить местами?
+  mul(modelViewMat, camera.viewMat, item.matrix);
   setMatrixUniform(gl, prog.u_MVMatrix, modelViewMat);
   setNormalMatrixUniform(gl, prog);
 };
@@ -1777,7 +1874,8 @@ const drawElements = (gl, store, buffer) => {
     buffer.count, buffer.componentType);
 };
 
-class index extends Visual {
+// Меш - это базовый класс для любого 3D-объекта на сцене.
+class index extends Drawing {
   constructor(name, trs, texImg, geometry) {
     super(name);
     this.trs = trs;
@@ -1786,6 +1884,14 @@ class index extends Visual {
     this.items = new ItemList(geometry); 
     this._setParentForRootItems();
   }
+
+  // TODO: Добавить свойство matrix, а также: position, rotation и scale 
+  // (после изменения которых будет пересчитываться матрица, чтобы 
+  // изменение трансформаций не отличалось от camera и light).
+
+  // Возможно придется добавить какой-нибудь MeshGroup и разместить 
+  // эти свойства там. Т.к. один меш скорей всего будет 
+  // определять только один примитив.
 
   findItem(name) {
     return this.items.find(item => item.name === name);
@@ -1800,70 +1906,68 @@ class index extends Visual {
   _update(appProps) {
     const gl = appProps.gl;
     const prog = appProps.prog;
-    const camera = appProps.updatable.camera;
+    const camera = appProps.scene.camera;
   
     const texture = appProps.store.get(this.texImg);
-    const geomStore = appProps.store.get(this.geometry);
-  
+    const gStore = appProps.store.get(this.geometry);
+
     setTextureUniform(gl, prog.u_Sampler, texture);
-    
+
     for (const item of this.items) {
       setMatrixUniforms(gl, prog, item, camera);
-  
+
       for (const primitive of item.primitives) {
-        setAttribute(gl, geomStore, prog.a_Position, primitive.vbo);
-        setAttribute(gl, geomStore, prog.a_Normal, primitive.nbo);
-        setAttribute(gl, geomStore, prog.a_Texcoord, primitive.tbo);
-        drawElements(gl, geomStore, primitive.ibo);
+        setAttribute(gl, gStore, prog.a_Position, primitive.vbo);
+        setAttribute(gl, gStore, prog.a_Normal, primitive.nbo);
+        setAttribute(gl, gStore, prog.a_Texcoord, primitive.tbo);
+        drawElements(gl, gStore, primitive.ibo);
       }
     }
   }
 
 }
 
-const viewProjMat = create$4();
+const positions = [0, 0, 0, 1, 0, 0, 0, 1];
 
-class debugLine extends Visual {
-  // constructor(name) {
-  //   super(name);
-  //   this.renderProps.prog = true;
-  // }
+const setPositionsUniform = (gl, prog, startPos, endPos) => {
+  positions[0] = startPos[0];
+  positions[1] = startPos[1];
+  positions[2] = startPos[2];
 
-  // _beforeUpdate({ gl }) {
-    // const { renderProps } = this;
-    // renderProps.prog = createProgram(gl, shaders);
-    // renderProps.buffer = createBuffer(gl, 
-    //   new Float32Array([0, 1]), gl.ARRAY_BUFFER);
+  positions[4] = endPos[0];
+  positions[5] = endPos[1];
+  positions[6] = endPos[2];
 
-    // renderProps.buffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, renderProps.buffer);
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 1]), gl.STATIC_DRAW);
-  // }
+  gl.uniform4fv(prog.u_Positions, positions);
+};
+
+class debugLine extends Drawing {
+  color = [1, 1, 1, 1];
+
+  constructor(name, startPos, endPos) {
+    super(name, 'debug-line');
+    this.startPos = startPos;
+    this.endPos = endPos;
+  }
+
+  get indexBuffer() {
+    return this.renderProps.indexBuffer;
+  }
 
   _update(appProps) {
     const gl = appProps.gl;
-    const camera = appProps.updatable.camera;
+    const camera = appProps.scene.camera;
+    
     const prog = this.prog;
-
     prog.use(gl);
 
-    mul(viewProjMat, camera.projMat, camera.viewMat);
-    setMatrixUniform(gl, prog.u_Matrix, viewProjMat);
+    gl.uniform4fv(prog.u_Color, this.color);
+    setPositionsUniform(gl, prog, this.startPos, this.endPos);
+    setMatrixUniform(gl, prog.u_Matrix, camera.viewProjMat);
 
-    // TODO: Доб. 3 свойства: color, startPos, endPos и сеттеры, 
-    // которые вместо присваивания будут переназначать их элементы
-    gl.uniform4fv(prog.u_Color, [1, 1, 1, 1]);
-    gl.uniform4fv(prog.u_Positions, [0, 3, 0, 1, 2, 3, 0, 1]);
-
-    // const attr = prog.a_Index;
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.renderProps.buffer);
-    // gl.enableVertexAttribArray(attr);
-    // gl.vertexAttribPointer(attr, 1, gl.FLOAT, false, 0, 0);
-    setAttribute$1(gl, prog.a_Index, 
-      this.renderProps.buffer, 1, gl.FLOAT);
-
+    setAttribute$1(gl, prog.a_Index, this.indexBuffer, 1, gl.FLOAT);
     gl.drawArrays(gl.LINES, 0, 2);
   }
 }
 
-export { index$1 as Camera, debugLine as DebugLine, light as Light, index as Mesh, Perspective, Projection, scene as Scene, TRS, Updatable, app, index$4 as gltfApi, index$3 as progApi, index$2 as shaderApi, textureApi as texApi };
+export { index$1 as Camera, debugLine as DebugLine, light as Light, index as Mesh, Perspective, scene as Scene, TRS, app, index$4 as gltfApi, index$3 as progApi, index$2 as shaderApi, textureApi as texApi };

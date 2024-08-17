@@ -1,5 +1,3 @@
-// TODO: Поменять расширение файла на обычный .js 
-
 const { src, dest, parallel } = require('gulp');
 
 const glslify = require('gulp-glslify-next');

@@ -24,6 +24,8 @@ void main() {
 
   vec4 pos = u_MVMatrix * a_Position;
 
+  // TODO: Все умножение вынести в отдельные переменные, так сократится 
+  // длина и будет более понятно, что передается в аргументы
   v_Color = calcLighting(pos, u_NMatrix * a_Normal, u_LightingPos, 
     u_AmbientColor * u_MaterialAmbientColor, u_DiffuseColor, 
     u_SpecularColor * u_MaterialAmbientColor);

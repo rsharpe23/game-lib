@@ -12,7 +12,6 @@
     "start": "npx gulp",
     "build": "npx gulp build",
     "build:prod": "npx gulp build --type=prod",
-    "shaders": "npx gulp shaders"
   },
   "repository": {
     "type": "git",

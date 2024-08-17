@@ -29,12 +29,9 @@ export default class extends Updatable {
   parent = null;
   children = [];
 
-  // TODO: Если имя не задано явно, пусть оно генерируется 
-  // автоматически (this.constructor.name + instanceNum). 
-
-  // instanceNum можно рассчитать примерно так:
-  // ctor() { Node.instanceMap[className] = (Node.instanceMap[className] ??= 0) + 1 }
-
+  // TODO: Если параметр name будет задан с null, то  
+  // его значение должно сгенерироваться автоматически 
+  // (this.constructor.name + кол-во нодов этого типа в сцене). 
   // Этот ф-ционал можно реализовать через core-утилиту, 
   // поскольку это не обязанность Node
 

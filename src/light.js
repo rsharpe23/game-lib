@@ -26,7 +26,9 @@ export default class extends Node {
     const prog = appProps.prog;
     const camera = appProps.scene.camera;
 
+    // TODO: Вынести это в шейдер, а u_LightingPos задавать обычным position
     vec3.transformMat4(this.relativePos, this.position, camera.viewMat);
+
     gl.uniform3fv(prog.u_LightingPos, this.relativePos);
 
     setColorUniforms(gl, prog, this.colors);

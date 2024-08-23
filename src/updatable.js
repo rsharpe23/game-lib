@@ -1,6 +1,6 @@
 export default class {
   // Непубличные свойства лучше не объявлять явно (см. TRS)
-  
+
   update(appProps) {
     if (this._canUpdate) {
       this._update(appProps);

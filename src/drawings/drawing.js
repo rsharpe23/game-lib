@@ -1,6 +1,6 @@
-import Node from '../node.js';
+import Node from '../node/index.js';
 
-// Компоненты drawings отличаются лишь тем, что вызывают gl.draw*
+// Компоненты drawings отличаются лишь тем, что вызывают gl.draw*.
 
 // Подход, смешивания логики и отрисовки в одном месте (внутри update) 
 // был выбран из-за того, что практически каждый нод обращается к api webgl; 
@@ -17,7 +17,7 @@ export default class extends Node {
     return this.renderProps.prog;
   }
 
-  // Возможно это лучше перенести в Updatable
+  // TODO: Добавить проверку для использования локальной программы
   update(appProps) {
     if (this.isHidden) return;
     super.update(appProps);

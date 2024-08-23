@@ -1,3 +1,7 @@
+// Библиотека game-lib не должна расширять global scope при подключении 
+// (получается сайдэффект). Лучше всего вынести все расширения в отдельное место 
+// и сделать их зависимостью, подключая в html перед файлом бибиотеки.
+
 Array.prototype.remove = function (item) {
   const index = this.indexOf(item);
   if (~index) {
@@ -14,7 +18,7 @@ Image.from = src => {
   return img;
 };
 
-window.Callable = class extends Function {
+class Callable extends Function {
   constructor() {
     super('...args', 'return this._bound._call(...args)');
     this._bound = this.bind(this);
@@ -22,7 +26,7 @@ window.Callable = class extends Function {
   }
 }
 
-window.benchmark = callback => {
+const benchmark = callback => {
   const start = performance.now();
   callback();
   const end = performance.now();

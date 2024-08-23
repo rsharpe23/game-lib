@@ -1,6 +1,7 @@
 import { setMatrixUniform, setAttribute 
 } from '../../lib/gl-utils.js';
 
+import { findNode } from '../node/index.js';
 import Drawing from './drawing.js';
 
 const positions = [0, 0, 0, 1, 0, 0, 0, 1];
@@ -20,6 +21,7 @@ const setPositionsUniform = (gl, prog, startPos, endPos) => {
 export default class extends Drawing {
   color = [1, 1, 1, 1];
 
+  // Позиции могли бы быть относительно родительского нода
   constructor(name, startPos, endPos) {
     super(name, 'debug-line');
     this.startPos = startPos;
@@ -30,18 +32,26 @@ export default class extends Drawing {
     return this.renderProps.indexBuffer;
   }
 
+  _beforeUpdate(appProps) {
+    this._camera = findNode(appProps.scene, '_Camera');
+  }
+
   _update(appProps) {
     const gl = appProps.gl;
-    const camera = appProps.scene.camera;
-    
+
     const prog = this.prog;
     prog.use(gl);
 
     gl.uniform4fv(prog.u_Color, this.color);
     setPositionsUniform(gl, prog, this.startPos, this.endPos);
-    setMatrixUniform(gl, prog.u_Matrix, camera.viewProjMat);
 
-    setAttribute(gl, prog.a_Index, this.indexBuffer, 1, gl.FLOAT);
+    if (this._camera) {
+      setMatrixUniform(gl, prog.u_Matrix, this._camera.viewProjMat);
+    }
+
+    setAttribute(gl, prog.a_Index, 
+      this.renderProps.indexBuffer, 1, gl.FLOAT);
+
     gl.drawArrays(gl.LINES, 0, 2);
   }
 }

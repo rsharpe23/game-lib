@@ -19,7 +19,9 @@
 </head>
 <body>
   <div id="fps" class="fps">FPS: 0</div>
-  <canvas id="canvas" width="960" height="640" data-shader-dir="/build/shaders"></canvas>
+
+  <canvas width="960" height="640" 
+    id="canvas" data-shader-dir="/build/shaders"></canvas>
 
   <!-- TODO: Прочитать https://github.com/guybedford/es-module-shims -->
   <!-- <script async src="https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js"></script>
@@ -29,6 +31,7 @@
     }
   </script> -->
 
+  <script src="/build/global-ext.js"></script>
   <script src="main.js" type="module"></script>
   <!-- <script src="test.js" type="module"></script> -->
 </body>

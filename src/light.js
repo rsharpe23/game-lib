@@ -30,15 +30,15 @@ export default class extends Node {
     const gl = appProps.gl;
     const prog = appProps.prog;
 
-    if (this._camera) {
-      // TODO: Можно вынести это в шейдер, а u_LightingPos задавать обычным position
-      // Но в этом случае relativePos будет вычисляться в каждом вершине, каждого объекта
-      vec3.transformMat4(this.relativePos, this.position, 
-        this._camera.viewMat);
-      
-      gl.uniform3fv(prog.u_LightingPos, this.relativePos);
-    }
+    // TODO: Можно вынести это в шейдер, а u_LightingPos задавать обычным position
+    // Но в этом случае relativePos будет вычисляться в каждом вершине, каждого объекта
+    vec3.transformMat4(this.relativePos, this.position, 
+      this._camera.viewMat);
+
+    gl.uniform3fv(prog.u_LightingPos, this.relativePos);
 
     setColorUniforms(gl, prog, this.colors);
   }
+
+  
 }

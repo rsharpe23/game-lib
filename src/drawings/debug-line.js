@@ -7,6 +7,8 @@ import Drawing from './drawing.js';
 const positions = [0, 0, 0, 1, 0, 0, 0, 1];
 
 const setPositionsUniform = (gl, prog, startPos, endPos) => {
+  // Можно заменить циклами
+
   positions[0] = startPos[0];
   positions[1] = startPos[1];
   positions[2] = startPos[2];
@@ -21,7 +23,6 @@ const setPositionsUniform = (gl, prog, startPos, endPos) => {
 export default class extends Drawing {
   color = [1, 1, 1, 1];
 
-  // Позиции могли бы быть относительно родительского нода
   constructor(name, startPos, endPos) {
     super(name, 'debug-line');
     this.startPos = startPos;
@@ -44,10 +45,7 @@ export default class extends Drawing {
 
     gl.uniform4fv(prog.u_Color, this.color);
     setPositionsUniform(gl, prog, this.startPos, this.endPos);
-
-    if (this._camera) {
-      setMatrixUniform(gl, prog.u_Matrix, this._camera.viewProjMat);
-    }
+    setMatrixUniform(gl, prog.u_Matrix, this._camera.viewProjMat);
 
     setAttribute(gl, prog.a_Index, 
       this.renderProps.indexBuffer, 1, gl.FLOAT);

@@ -52,6 +52,8 @@ export const traverse = ({ children }, callback) => {
   next(children[Symbol.iterator]());
 };
 
+// TODO: Лучше все-таки переименовать на findChild/findChildren
+
 // Метод массива find() тоже возвращает undefined, 
 // если элемент не найден
 export const findNode = (root, name) => {
@@ -64,8 +66,6 @@ export const findNode = (root, name) => {
   return node;
 };
 
-// Название findChildren не подойдет, т.к. оно даёт неоднознач. понимаение 
-// того, что ищется: только дочерние ноды или ноды во всей иерархии
 export const findNodes = (root, callback) => {
   const nodes = [];
   traverse(root, (child, next) => {

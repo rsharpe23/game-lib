@@ -26,14 +26,7 @@ export default class extends Updatable {
   }
 
   setParent(value) {
-    // Обязательно нужно перехватывать только те ошибки, которые ожидаются. 
-    // А это аварийная ситуация (можно перехватить, но на самом высоком уровне абстракции).
-    // https://learn.microsoft.com/ru-ru/dotnet/standard/exceptions/best-practices-for-exceptions
-    if (value === this) {
-      throw new Error("Can't be my own parent");
-    }
-
-    if (value === this.parent) return;
+    if (value === this || value === this.parent) return;
     this.parent?.onRemoveChild(this);
     value?.onAppendChild(this);
     this.parent = value;
@@ -47,9 +40,6 @@ export default class extends Updatable {
     this.children.push(child);
   }
 
-  // Этот метод можно не выносить в производный класс, поскольку он 
-  // по сути является обязанностью для любого класса в иерархии 
-  // (что обычный Node, что NodeBase, это updatable-классы).
   update(appProps) {
     super.update(appProps);
     for (const child of this.children) {

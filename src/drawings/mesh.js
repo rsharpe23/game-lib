@@ -1,7 +1,7 @@
-import { mat4 } from '../../../lib/gl-matrix/index.js';
-import { setMatrixUniform } from '../../../lib/gl-utils.js';
-import { calcNormalMatrix } from '../../plugins/calc-matrix.js';
-import { findNode } from '../../node/index.js';
+import { mat4 } from '../../lib/gl-matrix/index.js';
+import { setMatrixUniform } from '../../lib/gl-utils.js';
+import { calcNormalMatrix } from '../misc/calc-matrix.js';
+import { findNode } from '../node/index.js';
 import Object3D from './object3d.js';
 
 // Для группы мешей нужна своя сцена (MeshGroup), где будет 

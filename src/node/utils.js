@@ -1,4 +1,4 @@
-// Эта ф-ция не подходит для поиска одного нода, т.к. проходит 
+// Эта реализация не подходит для поиска одного нода, т.к. проходит 
 // по всей иерархии, даже если нод найден где-то в начале
 
 // Как вариант, можно сделать чтобы callback возвращал true/false 
@@ -13,6 +13,27 @@
 
 // ---------------------
 
+// Эта реализация подходит только для нодов, чьи потомки также 
+// являются нодами, но не подойдет если потомки нодов 
+// представлены через индексы (как в gltf)
+
+// export const traverse = ({ children }, callback) => {
+//   if (!children || children.length === 0) return;
+  
+//   const next = it => {
+//     const { done, value } = it.next();
+//     if (done) return;
+//     callback(value, () => {
+//       traverse(value, callback);
+//       next(it);
+//     });
+//   }; 
+  
+//   next(children[Symbol.iterator]());
+// };
+
+// ---------------------
+
 // Бывает что не все ф-ции нужны во внешнем коде, 
 // поэтому лучше их вынести как дополнение к дефолтному Node
 
@@ -22,8 +43,8 @@ export const traverse = ({ children }, callback) => {
   const next = it => {
     const { done, value } = it.next();
     if (done) return;
-    callback(value, () => {
-      traverse(value, callback);
+    callback(value, newValue => {
+      traverse(newValue, callback);
       next(it);
     });
   }; 
@@ -37,7 +58,7 @@ export const findNode = (root, name) => {
   let node;
   traverse(root, (child, next) => {
     if (child.name === name) node = child;
-    else next();
+    else next(child);
   });
 
   return node;
@@ -49,7 +70,7 @@ export const findNodes = (root, callback) => {
   const nodes = [];
   traverse(root, (child, next) => {
     if (callback(child)) nodes.push(child);
-    next();
+    next(child);
   });
 
   return nodes;

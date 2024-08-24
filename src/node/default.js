@@ -26,8 +26,8 @@ export default class extends Updatable {
   }
 
   setParent(value) {
-    // Обязательно следует перехватывать только те ошибки, которые ожидаются. 
-    // А это аварийная ситуация (тоже можно перехватить, но на самом высоком уровне абстракции).
+    // Обязательно нужно перехватывать только те ошибки, которые ожидаются. 
+    // А это аварийная ситуация (можно перехватить, но на самом высоком уровне абстракции).
     // https://learn.microsoft.com/ru-ru/dotnet/standard/exceptions/best-practices-for-exceptions
     if (value === this) {
       throw new Error("Can't be my own parent");

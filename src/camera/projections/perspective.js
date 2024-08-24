@@ -10,8 +10,8 @@ export default class extends Projection {
     this.far = far;
   }
 
-  _calcMatrix(matrix) {
-    mat4.perspective(matrix, 
+  _calcMatrix(out) {
+    mat4.perspective(out, 
       this.fov, this.aspect, this.near, this.far);
   }
 }

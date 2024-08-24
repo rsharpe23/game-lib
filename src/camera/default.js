@@ -36,8 +36,8 @@ import Perspective from './projections/perspective.js';
 const vectorUp = [0, 1, 0];
 
 export default class extends Node {
-  viewMat = mat4.create();
-  viewProjMat = mat4.create();
+  vpMatrix = mat4.create();
+  viewMatrix = mat4.create();
   projection = new Perspective(1.04, 1, 0.1, 1000);
 
   constructor(name, position, lookAtPoint) {
@@ -46,16 +46,16 @@ export default class extends Node {
     this.lookAtPoint = lookAtPoint;
   }
 
-  get projMat() {
+  get projMatrix() {
     return this.projection.matrix; 
   }
 
   _update(appProps) {
     this.projection.apply(appProps.gl, appProps.prog);
 
-    mat4.lookAt(this.viewMat, this.position, 
-      this.lookAtPoint, vectorUp);
+    mat4.lookAt(this.viewMatrix, 
+      this.position, this.lookAtPoint, vectorUp);
 
-    mat4.mul(this.viewProjMat, this.projMat, this.viewMat);
+    mat4.mul(this.vpMatrix, this.projMatrix, this.viewMatrix);
   }
 };

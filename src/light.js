@@ -9,7 +9,7 @@ const setColorUniforms = (gl, prog, colors) => {
 
 export default class extends Node {
   // Должно быть открытым, т.к. может понадобиться в других нодах
-  relativePos = vec3.create();  
+  relPosition = vec3.create();  
 
   colors = {
     ambient: [0.4, 0.4, 0.4, 1],
@@ -32,10 +32,10 @@ export default class extends Node {
 
     // TODO: Можно вынести это в шейдер, а u_LightingPos задавать обычным position
     // Но в этом случае relativePos будет вычисляться в каждом вершине, каждого объекта
-    vec3.transformMat4(this.relativePos, this.position, 
-      this._camera.viewMat);
+    vec3.transformMat4(this.relPosition, this.position, 
+      this._camera.viewMatrix);
 
-    gl.uniform3fv(prog.u_LightingPos, this.relativePos);
+    gl.uniform3fv(prog.u_LightingPos, this.relPosition);
 
     setColorUniforms(gl, prog, this.colors);
   }

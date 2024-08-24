@@ -29,10 +29,6 @@ export default class extends Drawing {
     this.endPos = endPos;
   }
 
-  get indexBuffer() {
-    return this.renderProps.indexBuffer;
-  }
-
   _beforeUpdate(appProps) {
     this._camera = findNode(appProps.scene, '_Camera');
   }
@@ -45,7 +41,7 @@ export default class extends Drawing {
 
     gl.uniform4fv(prog.u_Color, this.color);
     setPositionsUniform(gl, prog, this.startPos, this.endPos);
-    setMatrixUniform(gl, prog.u_Matrix, this._camera.viewProjMat);
+    setMatrixUniform(gl, prog.u_Matrix, this._camera.vpMatrix);
 
     setAttribute(gl, prog.a_Index, 
       this.renderProps.indexBuffer, 1, gl.FLOAT);

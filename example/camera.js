@@ -15,9 +15,12 @@ export default class extends Camera {
   }
 
   _update(appProps) {
-    const deltaTime = appProps.deltaTime;
-    quat.fromEuler(this.rotation, 0, degToRad(deltaTime), 0);
+    this._calcRotation(this.rotation, appProps.deltaTime);
     vec3.transformQuat(this.position, this.position, this.rotation);
     super._update(appProps);
+  }
+
+  _calcRotation(out, deltaTime) {
+    quat.fromEuler(out, 0, degToRad(deltaTime), 0);
   }
 };

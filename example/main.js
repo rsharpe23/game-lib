@@ -22,7 +22,7 @@ const [shaders, dlShaders] = await Promise.all([
   loadShaders('debug-line'),
 ]);
 
-const buildScene = () => {
+const createScene = () => {
   const scene = new Scene('Scene');
 
   scene.appendChild(new Camera('_Camera', [0, 2, 10]));
@@ -43,7 +43,7 @@ const buildScene = () => {
 // TODO: Сделать так, чтобы при потере ссылки на сцену, 
 // очищались свяазанные данные из store
 props.prog = progApi.createProgram(gl, shaders);
-props.scene = buildScene();
+props.scene = createScene();
 
 app.loop(performance.now());
 app.watchFps();

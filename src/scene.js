@@ -29,9 +29,7 @@ export default class extends Node {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    prog.use(gl); // скорей всего придется убрать отсюда
-
-    // Установка общего материала для всех мешей
-    setMaterialUniforms(gl, prog);
+    prog.use(gl);
+    setMaterialUniforms(gl, prog); // общий материал
   }
 }

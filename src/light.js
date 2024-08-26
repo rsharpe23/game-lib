@@ -30,8 +30,9 @@ export default class extends Node {
     const gl = appProps.gl;
     const prog = appProps.prog;
 
-    // TODO: Можно вынести это в шейдер, а u_LightingPos задавать обычным position
-    // Но в этом случае relativePos будет вычисляться в каждом вершине, каждого объекта
+    // Можно вынести это в шейдер, а u_LightingPos задавать 
+    // обычным position. Но в этом случае relativePos будет вычисляться 
+    // в каждом вершине, каждого объекта
     vec3.transformMat4(this.relPosition, this.position, 
       this._camera.viewMatrix);
 

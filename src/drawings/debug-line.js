@@ -7,8 +7,6 @@ import Drawing from './drawing.js';
 const positions = [0, 0, 0, 1, 0, 0, 0, 1];
 
 const setPositionsUniform = (gl, prog, startPos, endPos) => {
-  // Можно заменить циклами
-
   positions[0] = startPos[0];
   positions[1] = startPos[1];
   positions[2] = startPos[2];
@@ -29,6 +27,14 @@ export default class extends Drawing {
     this.endPos = endPos;
   }
 
+  get _vpMatrix() {
+    return this?._camera.vpMatrix;
+  }
+
+  get _indexBuffer() {
+    return this.renderProps.indexBuffer;
+  }
+
   _beforeUpdate(appProps) {
     this._camera = findNode(appProps.scene, '_Camera');
   }
@@ -41,11 +47,10 @@ export default class extends Drawing {
 
     gl.uniform4fv(prog.u_Color, this.color);
     setPositionsUniform(gl, prog, this.startPos, this.endPos);
-    setMatrixUniform(gl, prog.u_Matrix, this._camera.vpMatrix);
+    setMatrixUniform(gl, prog.u_Matrix, this._vpMatrix);
 
-    setAttribute(gl, prog.a_Index, 
-      this.renderProps.indexBuffer, 1, gl.FLOAT);
-
+    setAttribute(gl, prog.a_Index, this._indexBuffer, 1, gl.FLOAT);
+    
     gl.drawArrays(gl.LINES, 0, 2);
   }
 }

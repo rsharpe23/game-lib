@@ -42,8 +42,7 @@ export default class extends Updatable {
 
   update(appProps) {
     super.update(appProps);
-    for (const child of this.children) {
+    for (const child of this.children)
       child.update(appProps);
-    }
   }
 }

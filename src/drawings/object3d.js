@@ -30,8 +30,7 @@ export default class extends Drawing {
 
   _calcMatrix(matrix, matrixOfParent) {
     this.trs.calcMatrix(matrix); // матрица модели
-    if (matrixOfParent) {
+    if (matrixOfParent)
       mat4.mul(matrix, matrixOfParent, matrix); // мировая матрица модели
-    }
   }
 }

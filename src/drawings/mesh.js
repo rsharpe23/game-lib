@@ -4,9 +4,6 @@ import { calcNormalMatrix } from '../misc/calc-matrix.js';
 import { findNode } from '../node/index.js';
 import Object3D from './object3d.js';
 
-// Для группы мешей нужна своя сцена (MeshGroup), где будет 
-// устанавлена общая текстура/материал (возможно программа) 
-
 const drawPrimitive = (gl, prog, primitive) => {
   setAttribute(gl, prog.a_Position, primitive.vbo);
   setAttribute(gl, prog.a_Normal, primitive.nbo);
@@ -14,6 +11,8 @@ const drawPrimitive = (gl, prog, primitive) => {
   drawElements(gl, primitive.ibo);
 };
 
+// Для группы мешей нужна своя сцена (MeshGroup),  
+// где будут устанав. общие текстура/материал, программа
 export default class extends Object3D {
   mvMatrix = mat4.create();
   normalMatrix = mat4.create();
@@ -42,10 +41,7 @@ export default class extends Object3D {
     calcNormalMatrix(this.normalMatrix, this.mvMatrix);
     setMatrixUniform(gl, prog.u_NMatrix, this.normalMatrix);
 
-    for (const primitive of this.primitives) {
-      // Эффект каркаса (wireframe) можно реализовать с пом. 
-      // режима отрисовки примитивов - gl.LINE_STRIP
+    for (const primitive of this.primitives) 
       drawPrimitive(gl, prog, primitive);
-    }
   }
 }

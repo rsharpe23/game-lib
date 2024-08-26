@@ -1,6 +1,8 @@
 import { mat4 } from '../../../lib/gl-matrix/index.js';
 
 export default class {
+  // Пропсы в виде объекта позволят задавать трансформации 
+  // по отдельности, пропуская ненужные
   constructor({ translation, rotation, scale }) {
     this.translation = translation ?? [0, 0, 0];
     this.rotation = rotation ?? [0, 0, 0, 1];

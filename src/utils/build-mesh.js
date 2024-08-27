@@ -8,14 +8,13 @@ const parents = {
   },
 };
 
+// TODO: Проверить, одинаковы ли свойства у мешей, 
+// созданных через эту ф-цию, для одного и того же gltf
 export default (gltfParser, rootMesh) => {
-  // Здесь нельзя делать деструктуризацию нода, т.к. его свойства 
-  // будут каждый раз пересоздаваться по новой, что сведёт 
-  // на нет все оптимизации со store
-  gltfParser.parse((node, index) => {
-    const mesh = new Mesh(node.name, new TRS(node), node.primitives);
+  gltfParser.parse(({ name, primitives, children, ...rest }, index) => {
+    const mesh = new Mesh(name, new TRS(...rest), primitives);
     mesh.setParent(parents[index] ?? rootMesh);
-    if (node.children) 
-      parents.add(mesh, node.children);
+    if (children) 
+      parents.add(mesh, children);
   });
 };

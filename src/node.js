@@ -1,10 +1,8 @@
-import Updatable from '../updatable.js';
+import Updatable from './updatable.js';
 
 // Св-во name напоминает id в html-элементе, а tag - класс.
 // Name можно генерировать автоматически (если оно null/false) 
 // так: this.constructor.name + кол-во нодов этого типа в сцене
-
-// TODO: Написать тесты
 
 export default class extends Updatable {
   parent = null;

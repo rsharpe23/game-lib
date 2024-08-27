@@ -1,20 +1,10 @@
-import { loadJson, loadBuffer } from '../../../lib/load-api.js';
-import Node, { traverse } from '../../node/index.js';
-import Mesh from '../../drawings/mesh.js'
-import TRS from '../trs.js';
-
-const loadGltf = async path => {
-  const gltf = await loadJson(path);
-  const { uri } = gltf.buffers[0];
-  gltf.buffers[0] = await loadBuffer(uri);
-  return gltf;
-};
-
-// ------------------
+import { traverse } from '../../../lib/node-utils.js';
+import { createBuffer as gluCreateBuffer 
+} from '../../../lib/gl-utils.js';
 
 const typeSizeMap = {
-  'SCALAR': 1,
-  'VEC2': 2,
+  'SCALAR': 1, 
+  'VEC2': 2, 
   'VEC3': 3,
 };
 
@@ -35,11 +25,13 @@ const getPrimitives = ({ primitives }, callback) => {
 const createBuffer = (gl, buffers, 
   { buffer, byteLength, byteOffset, target }) => {
 
-  const data = new Uint8Array(buffers[buffer], byteOffset, byteLength);
-  return glCreateBuffer(gl, data, target);
+  const data = new Uint8Array(buffers[buffer], 
+    byteOffset, byteLength);
+    
+  return gluCreateBuffer(gl, data, target);
 };
 
-class GltfParser {
+export default class {
   constructor(gl, gltf, store) {
     this.gl = gl;
     this.gltf = gltf;
@@ -65,27 +57,21 @@ class GltfParser {
   }
 
   _parseNode(node, { nodes, meshes }) {
-    const { mesh, ...result } = nodes[node];
+    const { mesh, ...rest } = nodes[node];
 
-    result.primitives = getPrimitives(meshes[mesh], 
+    rest.primitives = getPrimitives(meshes[mesh], 
       accessor => this._parseAccessor(accessor, this.gltf));
 
-    return result;
+    return rest;
   }
 
   _parseAccessor(accessor, { accessors, bufferViews, buffers }) {
-    const { bufferView, type, ...result } = accessors[accessor];
+    const { bufferView, type, ...rest } = accessors[accessor];
 
-    result.typeSize = typeSizeMap[type];
-    result.buffer = createBuffer(this.gl, buffers, 
+    rest.typeSize = typeSizeMap[type];
+    rest.buffer = createBuffer(this.gl, buffers, 
       bufferViews[bufferView]);
 
-    return result;
+    return rest;
   }
 }
-
-// ------------------
-
-const store = new WeakMap();
-const gltf = await loadGltf('assets/tank.gltf');
-const gltfParser = new GltfParser(null, gltf, store);

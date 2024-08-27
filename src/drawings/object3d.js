@@ -24,7 +24,7 @@ export default class extends Drawing {
     return this.trs.scale;
   }
 
-  _update(appProps) {
+  _update(_) {
     this._calcMatrix(this.matrix, this.parent?.matrix);
   }
 

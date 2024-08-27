@@ -12,7 +12,9 @@ const drawPrimitive = (gl, prog, primitive) => {
 };
 
 // Для группы мешей нужна своя сцена (MeshGroup),  
-// где будут устанав. общие текстура/материал, программа
+// где будут устанавливаться общие текстура/материал, 
+// программа, но не будет собственной отрисовки
+
 export default class extends Object3D {
   mvMatrix = mat4.create();
   normalMatrix = mat4.create();

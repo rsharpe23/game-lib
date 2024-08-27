@@ -1,1 +1,0 @@
-import '../src/misc/gltf-parser/v3.js';

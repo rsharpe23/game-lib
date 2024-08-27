@@ -52,8 +52,8 @@ export default class {
     });
   }
 
-  _getNode(index, store) {
-    return store[index] ??= this._parseNode(index, this.gltf);
+  _getNode(node, store) {
+    return store[node] ??= this._parseNode(node, this.gltf);
   }
 
   _parseNode(node, { nodes, meshes }) {

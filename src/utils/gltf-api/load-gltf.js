@@ -1,4 +1,4 @@
-import { loadJson, loadBuffer } from '../../../lib/load-api.js';
+import { loadJson, loadBuffer } from '../../../lib/loader.js';
 
 // TODO: Сделать через for await of
 

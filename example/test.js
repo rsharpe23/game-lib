@@ -1,1 +1,1 @@
-import '../src/misc/gltf-parser/v2.js';
+import '../src/misc/gltf-parser/v3.js';

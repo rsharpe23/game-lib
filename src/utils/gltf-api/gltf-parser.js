@@ -46,13 +46,13 @@ export default class {
 
   _parse(root, store, callback) {
     traverse(root, (child, next) => {
-      const _child = this._getNode(child, store);
+      const _child = this._getData(child, store);
       callback(_child, child);
       next(_child);
     });
   }
 
-  _getNode(node, store) {
+  _getData(node, store) {
     return store[node] ??= this._parseNode(node, this.gltf);
   }
 

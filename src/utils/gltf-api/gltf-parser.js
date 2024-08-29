@@ -56,3 +56,23 @@ export default class {
     return gluCreateBuffer(this.gl, data, target);
   }
 }
+
+// Вместо того, чтобы переопределять getNode 
+// можно переопределить сам parse
+
+class Cacheable {
+  constructor(gl, store) {
+    super(gl);
+    this.store = store;
+  }
+
+  parse(gltf, callback) {
+    const store = this.store.get(gltf);
+    
+    if (!Object.keys(store))
+      super.parse(gltf, (node, index) => store[index] = node);
+
+    for (const [index, node] of Object.entries(store))
+      callback(node, index);
+  }
+}

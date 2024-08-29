@@ -6,18 +6,18 @@ const typeSizeMap = {
 
 const getRoot = ({ nodes }) => ({ children: nodes });
 
-const getPrimitives = ({ primitives }, accessorCb) => {
+const getPrimitives = ({ primitives }, getAccessor) => {
   return primitives.map(({ attributes, indices }) => ({
-    vbo: accessorCb(attributes['POSITION']),
-    nbo: accessorCb(attributes['NORMAL']),
-    tbo: accessorCb(attributes['TEXCOORD_0']),
-    ibo: accessorCb(indices),
+    vbo: getAccessor(attributes['POSITION']),
+    nbo: getAccessor(attributes['NORMAL']),
+    tbo: getAccessor(attributes['TEXCOORD_0']),
+    ibo: getAccessor(indices),
   }));
 };
 
 export default class {
   constructor(gl) {
-    this.gl = gl;
+    this._gl = gl;
   }
 
   parse({ scene, scenes, ...rest }, callback) {
@@ -53,7 +53,7 @@ export default class {
     const data = new Uint8Array(buffers[buffer], 
       byteOffset, byteLength);
 
-    return gluCreateBuffer(this.gl, data, target);
+    return gluCreateBuffer(this._gl, data, target);
   }
 }
 
@@ -63,12 +63,12 @@ export default class {
 class Cacheable {
   constructor(gl, store) {
     super(gl);
-    this.store = store;
+    this._store = store;
   }
 
   parse(gltf, callback) {
-    const store = this.store.get(gltf);
-    
+    const store = this._store.get(gltf);
+
     if (!Object.keys(store))
       super.parse(gltf, (node, index) => store[index] = node);
 

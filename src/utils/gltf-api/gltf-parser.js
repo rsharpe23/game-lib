@@ -1,77 +1,58 @@
-import { traverse } from '../../../lib/node-utils.js';
-import { createBuffer as gluCreateBuffer 
-} from '../../../lib/gl-utils.js';
-
 const typeSizeMap = {
   'SCALAR': 1, 
   'VEC2': 2, 
   'VEC3': 3,
 };
 
-const getRoot = ({ scene, scenes }) => {
-  const { nodes: children } = scenes[scene];
-  return { children };
-};
+const getRoot = ({ nodes }) => ({ children: nodes });
 
-const getPrimitives = ({ primitives }, callback) => {
+const getPrimitives = ({ primitives }, accessorCb) => {
   return primitives.map(({ attributes, indices }) => ({
-    vbo: callback(attributes['POSITION']),
-    nbo: callback(attributes['NORMAL']),
-    tbo: callback(attributes['TEXCOORD_0']),
-    ibo: callback(indices),
+    vbo: accessorCb(attributes['POSITION']),
+    nbo: accessorCb(attributes['NORMAL']),
+    tbo: accessorCb(attributes['TEXCOORD_0']),
+    ibo: accessorCb(indices),
   }));
 };
 
-const createBuffer = (gl, buffers, 
-  { buffer, byteLength, byteOffset, target }) => {
-
-  const data = new Uint8Array(buffers[buffer], 
-    byteOffset, byteLength);
-    
-  return gluCreateBuffer(gl, data, target);
-};
-
 export default class {
-  constructor(gl, gltf, store) {
+  constructor(gl) {
     this.gl = gl;
-    this.gltf = gltf;
-    this.store = store;
   }
 
-  parse(callback) {
-    const { gltf, store } = this;
-    if (!store.has(gltf)) store.set(gltf, {});
-    this._parse(getRoot(gltf), store.get(gltf), callback);
-  }
-
-  _parse(root, store, callback) {
-    traverse(root, (child, next) => {
-      const _child = this._getData(child, store);
-      callback(_child, child);
-      next(_child);
+  parse({ scene, scenes, ...rest }, callback) {
+    traverse(getRoot(scenes[scene]), (node, next) => {
+      const _node = this._getNode(node, rest);
+      callback(_node, node);
+      next(_node);
     });
   }
 
-  _getData(node, store) {
-    return store[node] ??= this._parseNode(node, this.gltf);
+  _getNode(node, { nodes, ...rest }) {
+    const { mesh, ...result } = nodes[node];
+    result.primitives = this._getPrimitives(mesh, rest);
+    return result;
   }
 
-  _parseNode(node, { nodes, meshes }) {
-    const { mesh, ...rest } = nodes[node];
-
-    rest.primitives = getPrimitives(meshes[mesh], 
-      accessor => this._parseAccessor(accessor, this.gltf));
-
-    return rest;
+  _getPrimitives(mesh, { meshes, ...rest }) {
+    return getPrimitives(meshes[mesh], 
+      accessor => this._getAccessor(accessor, rest));
   }
 
-  _parseAccessor(accessor, { accessors, bufferViews, buffers }) {
-    const { bufferView, type, ...rest } = accessors[accessor];
+  _getAccessor(accessor, { accessors, ...rest }) {
+    const { bufferView, type, ...result } = accessors[accessor];
+    result.typeSize = typeSizeMap[type];
+    result.buffer = this._getBuffer(bufferView, rest);
+    return result;
+  }
 
-    rest.typeSize = typeSizeMap[type];
-    rest.buffer = createBuffer(this.gl, buffers, 
-      bufferViews[bufferView]);
+  _getBuffer(bufferView, { bufferViews, buffers }) {
+    const { buffer, byteLength, 
+      byteOffset, target } = bufferViews[bufferView];
 
-    return rest;
+    const data = new Uint8Array(buffers[buffer], 
+      byteOffset, byteLength);
+
+    return gluCreateBuffer(this.gl, data, target);
   }
 }

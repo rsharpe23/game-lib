@@ -9,11 +9,11 @@ import { loadJson, loadBuffer } from '../../../lib/loader.js';
 
 // TODO: Написать тесты
 
-const mapBuffers = buffers => 
-  buffers.map(({ uri }) => loadBuffer(uri));
+const loadBuffers = buffers =>
+  Promise.all( buffers.map(({ uri }) => loadBuffer(uri)) );
 
 export default async path => {
-  const gltf = await loadJson(path);
-  gltf.buffers = await Promise.all(mapBuffers(gltf.buffers));
-  return gltf;
+  const { buffers, ...rest } = await loadJson(path);
+  rest.buffers = await loadBuffers(buffers);
+  return rest;
 };

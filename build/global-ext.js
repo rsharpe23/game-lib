@@ -18,6 +18,8 @@ Image.from = src => {
   return img;
 };
 
+// TODO: Вынести в lib/utils.js
+
 class Callable extends Function {
   constructor() {
     super('...args', 'return this._bound._call(...args)');

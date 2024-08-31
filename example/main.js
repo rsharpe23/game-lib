@@ -31,6 +31,7 @@ const createScene = () => {
   const debugLine = new DebugLine('Line', [0, 3, 0], [2, 3, 0]);
   debugLine.renderProps = {
     prog: progApi.createProgram(gl, dlShaders),
+    // Инкапсулировать буфер внутри debugLine
     indexBuffer: createBuffer(gl, new Float32Array([0, 1]), 
       gl.ARRAY_BUFFER),
   };

@@ -1,1 +1,1 @@
-export { default } from './cacheable.js';
+export { default } from './cachable.js';

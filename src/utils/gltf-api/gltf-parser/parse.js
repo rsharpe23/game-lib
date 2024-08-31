@@ -1,4 +1,4 @@
-import traverse from './traverse.js';
+import { traverse } from '../../../../lib/node-utils.js';
 
 const getPrimitives = ({ primitives }, getBuffer) => {
   return primitives.map(({ attributes, indices }) => ({
@@ -40,7 +40,8 @@ const parseNode = (node, { nodes, meshes, ...rest }) => {
 };
 
 export default ({ scene, scenes, ...rest }, callback) => {
-  traverse(scenes[scene], (node, next) => {
+  const { nodes: children } = scenes[scene];
+  traverse({ children }, (node, next) => {
     const _node = parseNode(node, rest);
     callback(_node, node);
     next(_node);

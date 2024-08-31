@@ -1,5 +1,5 @@
 import { createBuffer } from '../../../../lib/gl-utils.js';
-import parse from './utils/parse.js';
+import parse from './parse.js';
 
 export default class {
   constructor(gl) {

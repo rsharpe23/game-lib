@@ -1,16 +1,16 @@
 import { traverse } from '../../../../lib/node-utils.js';
 
-const getPrimitives = ({ primitives }, getBuffer) => {
+const getPrimitives = ({ primitives }, bufferCb) => {
   return primitives.map(({ attributes, indices }) => ({
-    vbo: getBuffer(attributes['POSITION']),
-    nbo: getBuffer(attributes['NORMAL']),
-    tbo: getBuffer(attributes['TEXCOORD_0']),
-    ibo: getBuffer(indices),
+    vbo: bufferCb(attributes['POSITION']),
+    nbo: bufferCb(attributes['NORMAL']),
+    tbo: bufferCb(attributes['TEXCOORD_0']),
+    ibo: bufferCb(indices),
   }));
 };
 
 const parseBufferView = (bufferView, 
-  { bufferViews, buffers, glBuffer }) => {
+  { bufferViews, buffers, glBufferCb }) => {
 
   const { buffer, byteLength, 
     byteOffset, target } = bufferViews[bufferView];
@@ -18,7 +18,7 @@ const parseBufferView = (bufferView,
   const data = new Uint8Array(buffers[buffer], 
     byteOffset, byteLength);
 
-  return glBuffer(data, target);
+  return glBufferCb(data, target);
 };
 
 const parseAccessor = (accessor, { accessors, ...rest }) => {

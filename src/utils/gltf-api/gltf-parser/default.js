@@ -7,9 +7,9 @@ export default class {
   }
 
   parse(gltf, callback) {
-    const glBuffer = (data, target) => 
-      createBuffer(this._gl, data, target);
+    const glBufferCb = this._glBufferCb 
+      ??= createBuffer.bind(null, this._gl);
 
-    parse({ ...gltf, glBuffer }, callback);
+    parse({ ...gltf, glBufferCb }, callback);
   }
 }

@@ -4,6 +4,8 @@ import { setMatrixUniform, setAttribute
 import { findNode } from '../node/index.js';
 import Drawing from './drawing.js';
 
+// Можно вынести отдельно
+
 const positions = [0, 0, 0, 1, 0, 0, 0, 1];
 
 const setPositionsUniform = (gl, prog, startPos, endPos) => {
@@ -17,6 +19,8 @@ const setPositionsUniform = (gl, prog, startPos, endPos) => {
 
   gl.uniform4fv(prog.u_Positions, positions);
 };
+
+// --------------
 
 export default class extends Drawing {
   color = [1, 1, 1, 1];

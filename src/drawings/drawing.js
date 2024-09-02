@@ -7,6 +7,8 @@ import Node from '../node/index.js';
 // будь то сцена, свет, камера, меш и т.д. Из-за этого сложно определить, 
 // какая логика относится к отрисовке, а какая нет.
 
+// Здесь должна устанавливаться локальная программа
+
 export default class extends Node {
   isHidden = false;
   // Может хранить данные пользовательского рендеринга, 
@@ -17,7 +19,6 @@ export default class extends Node {
     return this.renderProps.prog;
   }
 
-  // TODO: Добавить проверку для использования локальной программы
   update(appProps) {
     if (this.isHidden) return;
     super.update(appProps);

@@ -11,15 +11,14 @@ const drawPrimitive = (gl, prog, primitive) => {
   drawElements(gl, primitive.ibo);
 };
 
-// Для группы мешей нужна своя сцена (MeshGroup),  
-// где будут устанавливаться общие текстура/материал, 
-// программа, но не будет собственной отрисовки
+// Текстуру и материал можно устанавливать в MeshBase. 
+// Он же по сути заменяет собой как MeshGroup, так и место 
+// где устанавливаются локальные текстура/материал для меша.
 
 export default class extends Object3D {
   mvMatrix = mat4.create();
   normalMatrix = mat4.create();
 
-  // Локальный материал/текстуру можно установить через renderProps
   constructor(name, trs, primitives) {
     super(name, 'mesh', trs);
     this.primitives = primitives;
@@ -34,8 +33,6 @@ export default class extends Object3D {
 
     const gl = appProps.gl;
     const prog = appProps.prog;
-
-    // TODO: Добавить установку локального матриала/текстуры (если они есть)
 
     mat4.mul(this.mvMatrix, this._camera.viewMatrix, this.matrix);
     setMatrixUniform(gl, prog.u_MVMatrix, this.mvMatrix);

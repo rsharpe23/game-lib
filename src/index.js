@@ -29,7 +29,7 @@ export * as progApi from './core/program-api/index.js';
 export * as shaderApi from './core/shader-api/index.js';
 
 export { default as TRS } from './utils/trs.js';
-export { default as buildMesh } from './utils/build-mesh.js';
+export { default as MeshBuilder } from './utils/mesh-builder.js';
 export { default as calcNormalMatrix } from './utils/calc-normal-mat.js';
 export * as gltfApi from './utils/gltf-api/index.js';
 

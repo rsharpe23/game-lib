@@ -55,12 +55,14 @@
 import { loadImage } from '../lib/loader.js';
 
 import { app, progApi, shaderApi, Scene, Light, DebugLine, MeshGroup, 
-  TRS, buildMesh, gltfApi, texApi } from '../src/index.js';
+  TRS, MeshBuilder, gltfApi, texApi } from '../src/index.js';
 
 import Camera from './camera.js';
 
 const { props } = app;
 const { gl, store, dataset: { shaderDir } } = props;
+
+const meshBuilder = new MeshBuilder(new gltfApi.GltfParser(gl, store));
 
 const loadShaders = subDir => 
   shaderApi.loadShaders(`${shaderDir}/${subDir}`);
@@ -72,9 +74,7 @@ const [shaders, dlShaders, texImg, gltf] = await Promise.all([
   gltfApi.loadGltf('assets/tank.gltf'),
 ]);
 
-const createScene = () => {
-  const scene = new Scene('Scene');
-
+const buildScene = scene => {
   scene.appendChild(new Camera('Camera', [0, 2, 10]));
   scene.appendChild(new Light('Light', [0, -70, -100]));
 
@@ -86,7 +86,7 @@ const createScene = () => {
   // scene.appendChild(debugLine);
 
   const tank = new MeshGroup('Tank', new TRS(), texImg);
-  buildMesh(gltf, new gltfApi.GltfParser(gl, store), tank);
+  meshBuilder.build(gltf, tank);
 
   scene.appendChild(tank);
 
@@ -97,7 +97,7 @@ store.set(texImg, texApi.createTexture(gl, texImg));
 store.set(gltf, new Map());
 
 props.prog = progApi.createProgram(gl, shaders);
-props.scene = createScene();
+props.scene = buildScene(new Scene('Scene'));
 
 app.loop(performance.now());
 app.watchFps();

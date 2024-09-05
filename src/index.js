@@ -24,4 +24,26 @@
 
 // ------------
 
-// TODO: Реэкспортировать только открытый API
+export * as texApi from './core/texture-api.js';
+export * as progApi from './core/program-api/index.js';
+export * as shaderApi from './core/shader-api/index.js';
+
+export { default as TRS } from './utils/trs.js';
+export { default as buildMesh } from './utils/build-mesh.js';
+export { default as calcNormalMatrix } from './utils/calc-normal-mat.js';
+export * as gltfApi from './utils/gltf-api/index.js';
+
+export { default as Drawing } from './drawings/drawing.js';
+export { default as MeshBase } from './drawings/mesh-base.js';
+export { default as MeshGroup } from './drawings/mesh-group.js';
+export { default as Mesh } from './drawings/mesh.js';
+export { default as DebugLine } from './drawings/debug-line/index.js';
+
+export * from './camera/index.js';
+export { default } from './camera/index.js';
+
+export { default as app } from './app.js';
+export { default as Light } from './light.js';
+export { default as Node } from './node.js';
+export { default as Scene } from './scene.js';
+export { default as Updatable } from './updatable.js';

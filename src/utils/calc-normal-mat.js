@@ -9,7 +9,7 @@ import { mat4 } from '../../lib/gl-matrix/index.js';
 // const mat = new Matrix(glMatrix.mat4.create() или []);
 // const mat2 = mat.mul(mat1);
 
-export const calcNormalMatrix = (out, mvMatrix) => {
+export default (out, mvMatrix) => {
   mat4.invert(out, mvMatrix);
   mat4.transpose(out, out);
 };

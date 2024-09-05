@@ -21,7 +21,7 @@ export default {
   props: {
     gl: canvas.getContext('webgl', webglOpts),
     dataset: canvas.dataset,
-    store: new WeakMap(),
+    store: new Map(),
     prog: null,
     scene: null,
     deltaTime: 0,

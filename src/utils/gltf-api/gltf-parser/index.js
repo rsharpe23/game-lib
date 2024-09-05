@@ -1,5 +1,5 @@
 import { createBuffer } from '../../../../lib/gl-utils.js';
-import parse from './parse.js';
+import parse from './utils/parse.js';
 
 export default class {
   constructor(gl, store) {
@@ -12,17 +12,17 @@ export default class {
     // не сохраняет правильный порядок при добавлении эл-тов.
     const store = this._store.get(gltf);
 
-    if (!store.size())
-      this._parse(gltf, (node, index) => store.set(index, node));
+    if (!store.size)
+      this._parse(gltf, (mesh, index) => store.set(index, mesh));
 
-    for (const [index, node] of store.entries())
-      callback(node, index);
+    for (const [index, mesh] of store.entries())
+      callback(mesh, index);
   }
 
   _parse(gltf, callback) {
-    const glBufferCb = this._glBufferCb 
+    const bufferCb = this._bufferCb 
       ??= createBuffer.bind(null, this._gl);
 
-    parse({ ...gltf, glBufferCb }, callback);
+    parse({ ...gltf, bufferCb }, callback);
   }
 }

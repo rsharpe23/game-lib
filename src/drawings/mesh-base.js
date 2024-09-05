@@ -4,8 +4,8 @@ import Drawing from './drawing.js';
 export default class extends Drawing {
   matrix = mat4.create();
 
-  constructor(name, tag, trs) {
-    super(name, tag);
+  constructor(name, trs) {
+    super(name, 'mesh');
     this.trs = trs;
   }
 
@@ -24,7 +24,7 @@ export default class extends Drawing {
     return this.trs.scale;
   }
 
-  _update(_) {
+  _update(appProps) {
     this._calcMatrix(this.matrix, this.parent?.matrix);
   }
 

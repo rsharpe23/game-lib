@@ -25,7 +25,7 @@
 // * -- trs.js
 
 import { mat4 } from '../../lib/gl-matrix/index.js';
-import Node from '../node/index.js';
+import Node from '../node.js';
 import Perspective from './projections/perspective.js';
 
 const vectorUp = [0, 1, 0];

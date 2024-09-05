@@ -1,0 +1,1 @@
+export default { 'SCALAR': 1, 'VEC2': 2, 'VEC3': 3 };

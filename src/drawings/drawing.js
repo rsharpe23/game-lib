@@ -1,4 +1,4 @@
-import Node from '../node/index.js';
+import Node from '../node.js';
 
 // Drawings-ноды отличаются лишь тем, что вызывают gl.draw*.
 
@@ -12,9 +12,10 @@ import Node from '../node/index.js';
 export default class extends Node {
   isHidden = false;
   // Может хранить данные пользовательского рендеринга, 
-  // например: материал, текстуры, программу и пр.
+  // например: материалы, текстуры, программу и пр.
   renderProps = {};
 
+  // Попробовать вынести из renderProps
   get prog() {
     return this.renderProps.prog;
   }

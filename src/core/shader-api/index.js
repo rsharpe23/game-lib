@@ -4,7 +4,7 @@
 // экспортировать в самом конце, после дефолтного экспорта. 
 // Такой вариант более понятен, чем реэкспорт в начале файла.
 
-import { loadText } from '../../../lib/load-api.js';
+import { loadText } from '../../../lib/loader.js';
 import Shader from './shader.js';
 
 export const loadShader = async path => {

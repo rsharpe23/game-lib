@@ -1,8 +1,20 @@
+import { setMatrixUniform, setAttribute as gluSetAttribute, 
+  drawElements as gluDrawElements } from '../../lib/gl-utils.js';
+
 import { mat4 } from '../../lib/gl-matrix/index.js';
-import { setMatrixUniform } from '../../lib/gl-utils.js';
-import { calcNormalMatrix } from '../misc/calc-matrix.js';
-import { findNode } from '../node/index.js';
-import Object3D from './object3d.js';
+import { findChild } from '../../lib/node-utils.js';
+import calcNormalMatrix from '../utils/calc-normal-mat.js';
+import MeshGroup from './mesh-group.js';
+
+const setAttribute = (gl, attr, buffer) => {
+  gluSetAttribute(gl, attr, buffer.buffer, buffer.typeSize, 
+    buffer.componentType);
+};
+
+const drawElements = (gl, buffer) => {
+  gluDrawElements(gl, buffer.buffer, buffer.count, 
+    buffer.componentType);
+};
 
 const drawPrimitive = (gl, prog, primitive) => {
   setAttribute(gl, prog.a_Position, primitive.vbo);
@@ -11,21 +23,17 @@ const drawPrimitive = (gl, prog, primitive) => {
   drawElements(gl, primitive.ibo);
 };
 
-// Текстуру и материал можно устанавливать в MeshBase. 
-// Он же по сути заменяет собой как MeshGroup, так и место 
-// где устанавливаются локальные текстура/материал для меша.
-
-export default class extends Object3D {
+export default class extends MeshGroup {
   mvMatrix = mat4.create();
   normalMatrix = mat4.create();
 
-  constructor(name, trs, primitives) {
-    super(name, 'mesh', trs);
+  constructor(name, trs, primitives, texImg) {
+    super(name, trs, texImg);
     this.primitives = primitives;
   }
 
-  _beforeUpdate(appProps) {
-    this._camera = findNode(appProps.scene, '_Camera');
+  _beforeUpdate({ scene }) {
+    this._camera = findChild(scene, 'Camera');
   }
 
   _update(appProps) {

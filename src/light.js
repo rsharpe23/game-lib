@@ -1,5 +1,6 @@
 import { vec3 } from '../lib/gl-matrix/index.js';
-import Node, { findNode } from './node/index.js';
+import { findChild } from '../lib/node-utils.js';
+import Node from './node.js';
 
 const setColorUniforms = (gl, prog, colors) => {
   gl.uniform4fv(prog.u_AmbientColor, colors.ambient);
@@ -22,8 +23,8 @@ export default class extends Node {
     this.position = position;
   }
 
-  _beforeUpdate(appProps) {
-    this._camera = findNode(appProps.scene, '_Camera');
+  _beforeUpdate({ scene }) {
+    this._camera = findChild(scene, 'Camera');
   }
 
   _update(appProps) {
@@ -35,11 +36,8 @@ export default class extends Node {
     // в каждом вершине, каждого объекта
     vec3.transformMat4(this.relPosition, this.position, 
       this._camera.viewMatrix);
-
+    
     gl.uniform3fv(prog.u_LightingPos, this.relPosition);
-
     setColorUniforms(gl, prog, this.colors);
   }
-
-  
 }

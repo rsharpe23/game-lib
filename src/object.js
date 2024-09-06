@@ -1,5 +1,8 @@
 export default class {
-  // Непубличные свойства лучше не объявлять явно (см. TRS)
+  constructor(name, tag) {
+    this.name = name;
+    this.tag = tag;
+  }
 
   update(appProps) {
     if (this._canUpdate) {

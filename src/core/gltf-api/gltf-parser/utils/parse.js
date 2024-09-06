@@ -1,5 +1,5 @@
 import { traverse } from '../../../../../lib/node-utils.js';
-import typeSizeMap from './type-size.js';
+import typeSizes from './type-sizes.js';
 
 const getBuffer = (bufferView, { bufferViews, buffers, bufferCb }) => {
   const { buffer, byteLength, 
@@ -14,7 +14,7 @@ const getBuffer = (bufferView, { bufferViews, buffers, bufferCb }) => {
 const getAccessor = (accessor, { accessors, ...rest }) => {
   const { bufferView, type, ...result } = accessors[accessor];
 
-  result.typeSize = typeSizeMap[type];
+  result.typeSize = typeSizes[type];
   result.buffer = getBuffer(bufferView, rest);
 
   return result;

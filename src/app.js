@@ -1,3 +1,5 @@
+// Это должен быть класс!
+
 // Контекст webgl можно создать и динамически (см. demo fxaa)
 const canvas = document.getElementById('canvas');
 

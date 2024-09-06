@@ -12,13 +12,18 @@ export default class extends Node {
   }
 
   _update(appProps) {
-    const gl =  appProps.gl;
-    const prog = appProps.prog;
+    const gl = appProps.gl;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    prog.use(gl);
-    setMaterialUniforms(gl, prog); // общий материал
+    // Пока что общая концепция заключается в одном материале 
+    // для всех мешей, но с разными текстурами. Меши без текстуры 
+    // использоваться не могут.
+
+    // Общая программа в appProps реализована потому, 
+    // что её используют также камера и свет
+
+    setMaterialUniforms(gl, appProps.prog); // общий материал
   }
 }

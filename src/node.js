@@ -1,18 +1,9 @@
-import Updatable from './updatable.js';
+import { findChild, findChildren } from '../lib/node-utils.js';
+import Object from './object.js';
 
-// Св-во name напоминает id в html-элементе, а tag - класс.
-// Name можно генерировать автоматически (если оно null/false) 
-// так: this.constructor.name + кол-во нодов этого типа в сцене
-
-export default class extends Updatable {
+export default class extends Object {
   parent = null;
   children = [];
-
-  constructor(name, tag) {
-    super();
-    this.name = name;
-    this.tag = tag;
-  }
 
   appendChild(child) {
     child.setParent(this);
@@ -36,6 +27,14 @@ export default class extends Updatable {
 
   onAppendChild(child) {
     this.children.push(child);
+  }
+
+  findChild(name) {
+    return findChild(this, child => child.name === name);
+  }
+
+  findChildren(tag) {
+    return findChildren(this, child => child.tag === tag);
   }
 
   update(appProps) {

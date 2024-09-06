@@ -1,9 +1,7 @@
-import { setMatrixUniform, setAttribute, createBuffer 
-} from '../../../lib/gl-utils.js';
-
-import { findChild } from '../../../lib/node-utils.js';
+import { setMatrixUniform, setAttribute } from '../../../lib/gl-utils.js';
 import Drawing from '../drawing.js';
-import setPositionsUniform from './set-pos-uniform.js';
+import setPositionsUniform from './utils/set-pos-uniform.js';
+import createBuffer from './utils/create-buffer.js';
 
 export default class extends Drawing {
   color = [1, 1, 1, 1];
@@ -15,10 +13,11 @@ export default class extends Drawing {
   }
 
   _beforeUpdate({ gl, scene }) {
-    this._indexBuffer = createBuffer(gl, 
-      new Float32Array([0, 1]), gl.ARRAY_BUFFER);
+    // this._indexBuffer = createBuffer(gl, 
+    //   new Float32Array([0, 1]), gl.ARRAY_BUFFER);
 
-    this._camera = findChild(scene, 'Camera');
+    this._buffer = createBuffer(gl);
+    this._camera = scene.findChild('Camera');
   }
 
   _update(appProps) {
@@ -29,11 +28,9 @@ export default class extends Drawing {
 
     setMatrixUniform(gl, prog.u_Matrix, this._camera.vpMatrix);
     setPositionsUniform(gl, prog, this.startPos, this.endPos);
-
     gl.uniform4fv(prog.u_Color, this.color);
 
-    setAttribute(gl, prog.a_Index, this._indexBuffer, 1, gl.FLOAT);
-
+    setAttribute(gl, prog.a_Index, this._buffer, 1, gl.FLOAT);
     gl.drawArrays(gl.LINES, 0, 2);
   }
 }

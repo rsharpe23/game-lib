@@ -22,7 +22,6 @@ export default class {
     // в цикле отрисовки, т.к. она влияет на производительность
     const { glProg } = this;
     if (gl.prog === glProg) return;
-    // св-во prog устанавливать через символ
     gl.useProgram(gl.prog = glProg);  
   }
 }

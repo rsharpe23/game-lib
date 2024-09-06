@@ -24,7 +24,7 @@ export default class extends Node {
   }
 
   _beforeUpdate({ scene }) {
-    this._camera = findChild(scene, 'Camera');
+    this._camera = scene.findChild('Camera');
   }
 
   _update(appProps) {

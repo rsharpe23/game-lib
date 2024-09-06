@@ -2,10 +2,10 @@ import { setMatrixUniform, setAttribute as gluSetAttribute,
   drawElements as gluDrawElements } from '../../lib/gl-utils.js';
 
 import { mat4 } from '../../lib/gl-matrix/index.js';
-import { findChild } from '../../lib/node-utils.js';
 import calcNormalMatrix from '../utils/calc-normal-mat.js';
-import MeshGroup from './mesh-group.js';
+import MeshBase from './mesh-base.js';
 
+// Вынести в gl-utils
 const setAttribute = (gl, attr, buffer) => {
   gluSetAttribute(gl, attr, buffer.buffer, buffer.typeSize, 
     buffer.componentType);
@@ -15,6 +15,7 @@ const drawElements = (gl, buffer) => {
   gluDrawElements(gl, buffer.buffer, buffer.count, 
     buffer.componentType);
 };
+// -----------
 
 const drawPrimitive = (gl, prog, primitive) => {
   setAttribute(gl, prog.a_Position, primitive.vbo);
@@ -23,7 +24,7 @@ const drawPrimitive = (gl, prog, primitive) => {
   drawElements(gl, primitive.ibo);
 };
 
-export default class extends MeshGroup {
+export default class extends MeshBase {
   mvMatrix = mat4.create();
   normalMatrix = mat4.create();
 
@@ -33,7 +34,7 @@ export default class extends MeshGroup {
   }
 
   _beforeUpdate({ scene }) {
-    this._camera = findChild(scene, 'Camera');
+    this._camera = scene.findChild('Camera');
   }
 
   _update(appProps) {

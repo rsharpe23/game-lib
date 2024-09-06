@@ -4,6 +4,7 @@ import { app, progApi, shaderApi, Scene, Light, DebugLine, MeshBase,
   TRS, MeshBuilder, gltfApi, texApi } from '../src/index.js';
 
 import Camera from './camera.js';
+import './tank.js';
 
 const { props } = app;
 const { gl, store, dataset: { shaderDir } } = props;

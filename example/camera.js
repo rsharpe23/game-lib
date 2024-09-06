@@ -1,6 +1,15 @@
 import { degToRad } from '../lib/math.js';
 import { vec3, quat } from '../lib/gl-matrix/index.js';
-import Camera from '../src/nodes/camera/index.js';
+import { Camera } from '../src/index.js';
+
+// Лучше не делать оберток вокруг готовых нодов, например для камеры: 
+// new OrbitControl(new Camera()), поскольку в таком случае будет 
+// сложно ей манипулировать из вне. Например если понадобиться сделать 
+// её дочерней для какого-нибудь конкретного нода, то что будет 
+// с OrbitControl? Его тоже придется переносить?
+
+// Кроме того, такой подход позволит сильно упростить 
+// оптимизацию drawing'ов по программе.
 
 export default class extends Camera {
   rotation = quat.create();

@@ -43,7 +43,7 @@ export default {
       const props = this.props;
       props.deltaTime = elapsedTime - props.time;
       props.time = elapsedTime;
-      props.scene.update(props)
+      props.scene.update(props); 
 
       // this.count += benchmark(() => props.scene.update(props));
       

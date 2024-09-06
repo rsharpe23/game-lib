@@ -6,7 +6,7 @@ export default gl => {
 
   return { 
     buffer, 
-    componentType: gl.FLOAT, 
+    componentType: gl.FLOAT, // шейдеру нельзя передать int
     typeSize: 1, 
     count: 2 
   };

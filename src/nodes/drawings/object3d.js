@@ -2,6 +2,8 @@ import { mat4 } from '../../../lib/gl-matrix/index.js';
 import Drawing from './drawing.js';
 
 // 3d объектом может быть не только меш, но и спецэффект
+// Drawing3D некорретное название, поскольку DebugLine наследуется от 
+// обычного Drawing'а и при этом также отображается в 3D
 
 export default class extends Drawing {
   matrix = mat4.create();

@@ -1,8 +1,6 @@
 import { mat4 } from '../../lib/gl-matrix/index.js';
 
-// Этот файл можно переименовать на calc-utils.js в контексте matrix-api
-
-// Также, вокруг gl-matrix можно создать 3 обертки: matrix, quaternion и vector
+// Вокруг gl-matrix можно создать 3 обертки: matrix, quaternion и vector
 // Они могут быть частью общей библиотеки math. Например:
 
 // import { Matrix } from './math.js';

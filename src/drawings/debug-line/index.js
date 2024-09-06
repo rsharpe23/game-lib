@@ -13,9 +13,6 @@ export default class extends Drawing {
   }
 
   _beforeUpdate({ gl, scene }) {
-    // this._indexBuffer = createBuffer(gl, 
-    //   new Float32Array([0, 1]), gl.ARRAY_BUFFER);
-
     this._buffer = createBuffer(gl);
     this._camera = scene.findChild('Camera');
   }

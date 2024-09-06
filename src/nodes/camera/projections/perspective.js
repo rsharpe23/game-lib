@@ -1,4 +1,4 @@
-import { mat4 } from '../../../lib/gl-matrix/index.js';
+import { mat4 } from '../../../../lib/gl-matrix/index.js';
 import Projection from './projection.js';
 
 export default class extends Projection {

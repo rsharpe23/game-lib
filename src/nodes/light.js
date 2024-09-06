@@ -1,5 +1,4 @@
-import { vec3 } from '../lib/gl-matrix/index.js';
-import { findChild } from '../lib/node-utils.js';
+import { vec3 } from '../../lib/gl-matrix/index.js';
 import Node from './node.js';
 
 const setColorUniforms = (gl, prog, colors) => {

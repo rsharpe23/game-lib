@@ -1,5 +1,5 @@
-import { mat4 } from '../../../lib/gl-matrix/index.js';
-import { setMatrixUniform } from '../../../lib/gl-utils.js';
+import { mat4 } from '../../../../lib/gl-matrix/index.js';
+import { setMatrixUniform } from '../../../../lib/gl-utils.js';
 
 // Вычисление матрицы внутри свойства, как было в старой версии TRS, 
 // не подходит в некоторых случаях, например как здесь. Это из-за того, что 

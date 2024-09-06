@@ -7,17 +7,18 @@ export { default as TRS } from './utils/trs.js';
 export { default as MeshBuilder } from './utils/mesh-builder.js';
 export { default as calcNormalMatrix } from './utils/calc-normal-mat.js';
 
-export { default as Drawing } from './drawings/drawing.js';
-export { default as Object3D } from './drawings/object3d.js';
-export { default as MeshBase } from './drawings/mesh-base.js';
-export { default as Mesh } from './drawings/mesh.js';
-export { default as DebugLine } from './drawings/debug-line/index.js';
+export { default as Node } from './nodes/node.js';
+export { default as Scene } from './nodes/scene.js';
+export { default as Light } from './nodes/light.js';
 
-export * from './camera/index.js';
-export { default } from './camera/index.js';
+export * from './nodes/camera/index.js';
+export { default } from './nodes/camera/index.js';
 
-export { default as Light } from './light.js';
-export { default as Scene } from './scene.js';
-export { default as Node } from './node.js';
+export { default as Drawing } from './nodes/drawings/drawing.js';
+export { default as Drawing3D } from './nodes/drawings/drawing3d.js';
+export { default as DebugLine } from './nodes/drawings/debug-line/index.js';
+export { default as MeshBase } from './nodes/drawings/mesh-base.js';
+export { default as Mesh } from './nodes/drawings/mesh.js';
+
 export { default as Object } from './object.js';
 export { default as app } from './app.js';

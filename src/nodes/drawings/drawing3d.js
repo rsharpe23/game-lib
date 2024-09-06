@@ -1,4 +1,4 @@
-import { mat4 } from '../../lib/gl-matrix/index.js';
+import { mat4 } from '../../../lib/gl-matrix/index.js';
 import Drawing from './drawing.js';
 
 // 3d объектом может быть не только меш, но и спецэффект

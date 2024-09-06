@@ -24,7 +24,7 @@
 // * -- trs-base.js
 // * -- trs.js
 
-import { mat4 } from '../../lib/gl-matrix/index.js';
+import { mat4 } from '../../../lib/gl-matrix/index.js';
 import Node from '../node.js';
 import Perspective from './projections/perspective.js';
 

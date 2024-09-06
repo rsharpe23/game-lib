@@ -1,4 +1,4 @@
-import Mesh from '../drawings/mesh.js';
+import Mesh from '../nodes/drawings/mesh.js';
 import TRS from './trs.js';
 
 const parents = {

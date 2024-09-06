@@ -12,7 +12,11 @@ export default class extends Node {
 
   update(appProps) {
     if (this.isHidden) return;
-    (this.prog ?? appProps.prog).use(appProps.gl);
+    this._useProgram(appProps);
     super.update(appProps);
+  }
+
+  _useProgram(appProps) {
+    (this.prog ?? appProps.prog).use(appProps.gl);
   }
 }

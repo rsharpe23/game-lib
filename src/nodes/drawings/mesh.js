@@ -1,21 +1,9 @@
-import { setMatrixUniform, setAttribute as gluSetAttribute, 
-  drawElements as gluDrawElements } from '../../lib/gl-utils.js';
+import { setMatrixUniform, setAttribute, drawElements 
+} from '../../../lib/gl-utils.js';
 
-import { mat4 } from '../../lib/gl-matrix/index.js';
-import calcNormalMatrix from '../utils/calc-normal-mat.js';
+import { mat4 } from '../../../lib/gl-matrix/index.js';
+import calcNormalMatrix from '../../utils/calc-normal-mat.js';
 import MeshBase from './mesh-base.js';
-
-// Вынести в gl-utils
-const setAttribute = (gl, attr, buffer) => {
-  gluSetAttribute(gl, attr, buffer.buffer, buffer.typeSize, 
-    buffer.componentType);
-};
-
-const drawElements = (gl, buffer) => {
-  gluDrawElements(gl, buffer.buffer, buffer.count, 
-    buffer.componentType);
-};
-// -----------
 
 const drawPrimitive = (gl, prog, primitive) => {
   setAttribute(gl, prog.a_Position, primitive.vbo);

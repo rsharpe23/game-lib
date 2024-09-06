@@ -1,5 +1,5 @@
-import { findChild, findChildren } from '../lib/node-utils.js';
-import Object from './object.js';
+import { findChild, findChildren } from '../../lib/node-utils.js';
+import Object from '../object.js';
 
 export default class extends Object {
   parent = null;

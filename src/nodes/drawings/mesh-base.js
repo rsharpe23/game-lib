@@ -1,10 +1,10 @@
-import { setTextureUniform } from '../../lib/gl-utils.js'; 
-import Object3D from './object3d.js';
+import { setTextureUniform } from '../../../lib/gl-utils.js'; 
+import Drawing3D from './drawing3d.js';
 
 // Это не абстрактный класс, а просто базовый класс меша, 
-// объект которого можно создать, поскольку он также является нодом.
+// объект которого можно создать, поскольку он реализует _update().
 
-export default class extends Object3D {
+export default class extends Drawing3D {
   constructor(name, trs, texImg) {
     super(name, 'mesh', trs);
     this.texImg = texImg;

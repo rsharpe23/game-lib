@@ -5,7 +5,7 @@ import { app, progApi, shaderApi, Scene, Light, DebugLine, MeshBase,
   TRS, gltfToMesh, gltfApi, texApi } from '../src/index.js';  
 
 import OrbitCamera from './nodes/orbit-camera.js';
-import Tank from './nodes/tank.js';
+// import Tank from './nodes/tank.js';
 
 const { props } = app;
 const { gl, store, dataset: { shaderDir } } = props;
@@ -32,15 +32,11 @@ const buildScene = scene => {
   scene.appendChild(new OrbitCamera('Camera', [0, 2, 10]));
   scene.appendChild(new Light('Light', [0, -70, -100]));
 
-  // const debugLine = new DebugLine('Line', [0, 3, 0], [2, 3, 0]);
-  // debugLine.prog = progApi.createProgram(gl, dlShaders);
-  // scene.appendChild(debugLine);
+  const debugLine = new DebugLine('Line', [0, 3, 0], [2, 3, 0]);
+  debugLine.prog = progApi.createProgram(gl, dlShaders);
+  scene.appendChild(debugLine);
 
-  // const tank = new MeshBase('Tank', new TRS(), texImg);
-  // meshBuilder.build(gltf, tank);
-  // scene.appendChild(tank);
-
-  const tank = toMesh(gltf, new Tank('tank', new TRS(), texImg));
+  const tank = toMesh(gltf, new MeshBase('tank', new TRS(), texImg));
   scene.appendChild(tank);
 
   return scene;

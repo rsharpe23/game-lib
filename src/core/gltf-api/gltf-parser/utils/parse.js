@@ -40,9 +40,9 @@ const getNode = (node, { nodes, meshes, ...rest }) => {
 
 export default ({ scene, scenes, ...rest }, callback) => {
   const { nodes: children } = scenes[scene];
-  traverse({ children }, (child, next) => {
-    const _child = getNode(child, rest);
-    callback(_child, child);
-    next(_child);
+  traverse({ children }, (index, next) => {
+    const node = getNode(index, rest);
+    callback(node, index);
+    next(node);
   });
 };

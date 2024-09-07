@@ -33,6 +33,7 @@ const vectorUp = [0, 1, 0];
 export default class extends Node {
   vpMatrix = mat4.create();
   viewMatrix = mat4.create();
+  // Вынести в конструктор
   projection = new Perspective(1.04, 1, 0.1, 1000);
 
   constructor(name, position, lookAtPoint) {

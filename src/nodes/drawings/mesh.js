@@ -2,7 +2,7 @@ import { setMatrixUniform, setAttribute, drawElements
 } from '../../../lib/gl-utils.js';
 
 import { mat4 } from '../../../lib/gl-matrix/index.js';
-import calcNormalMatrix from '../../utils/calc-normal-mat.js';
+import calcNormalMatrix from '../../utils/calc-norm-mat.js';
 import MeshBase from './mesh-base.js';
 
 const drawPrimitive = (gl, prog, primitive) => {
@@ -14,7 +14,7 @@ const drawPrimitive = (gl, prog, primitive) => {
 
 export default class extends MeshBase {
   mvMatrix = mat4.create();
-  normalMatrix = mat4.create();
+  normMatrix = mat4.create();
 
   constructor(name, trs, primitives, texImg) {
     super(name, trs, texImg);
@@ -34,8 +34,8 @@ export default class extends MeshBase {
     mat4.mul(this.mvMatrix, this._camera.viewMatrix, this.matrix);
     setMatrixUniform(gl, prog.u_MVMatrix, this.mvMatrix);
 
-    calcNormalMatrix(this.normalMatrix, this.mvMatrix);
-    setMatrixUniform(gl, prog.u_NMatrix, this.normalMatrix);
+    calcNormalMatrix(this.normMatrix, this.mvMatrix);
+    setMatrixUniform(gl, prog.u_NMatrix, this.normMatrix);
 
     for (const primitive of this.primitives) 
       drawPrimitive(gl, prog, primitive);

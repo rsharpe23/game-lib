@@ -24,6 +24,7 @@ export default {
     store: new Map(),
     prog: null,
     scene: null,
+    input: null,
     deltaTime: 0,
     time: 0,
   },

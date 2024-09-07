@@ -29,7 +29,7 @@ const getPrimitives = ({ primitives }, accessorCb) => {
   }));
 };
 
-const getMesh = (node, { nodes, meshes, ...rest }) => {
+const getNode = (node, { nodes, meshes, ...rest }) => {
   const { mesh, ...result } = nodes[node];
 
   result.primitives = getPrimitives(meshes[mesh], 
@@ -41,8 +41,8 @@ const getMesh = (node, { nodes, meshes, ...rest }) => {
 export default ({ scene, scenes, ...rest }, callback) => {
   const { nodes: children } = scenes[scene];
   traverse({ children }, (child, next) => {
-    const mesh = getMesh(child, rest);
-    callback(mesh, child);
-    next(mesh);
+    const _child = getNode(child, rest);
+    callback(_child, child);
+    next(_child);
   });
 };

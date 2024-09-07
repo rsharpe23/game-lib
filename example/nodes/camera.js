@@ -1,6 +1,6 @@
-import { degToRad } from '../lib/math.js';
-import { vec3, quat } from '../lib/gl-matrix/index.js';
-import { Camera } from '../src/index.js';
+import { degToRad } from '../../lib/math.js';
+import { vec3, quat } from '../../lib/gl-matrix/index.js';
+import { Camera } from '../../src/index.js';
 
 // Лучше не делать оберток вокруг готовых нодов, например для камеры: 
 // new OrbitControl(new Camera()), поскольку в таком случае будет 

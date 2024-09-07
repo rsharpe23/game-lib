@@ -17,14 +17,30 @@ export default class {
   vertical = 0;
 
   constructor(canvas) {
-    canvas.addEventListener('mousemove', e => {
+    // Чтобы заблокировать и скрыть курсор используется Pointer Lock API
+    // https://developer.mozilla.org/ru/docs/Web/API/Pointer_Lock_API
+
+    canvas.addEventListener('click', async () => {
+      if(document.pointerLockElement) return;
+      await canvas.requestPointerLock({ unadjustedMovement: true });
+    });
+
+    const onMouseMove = e => {
       // В доке указано, что movement может возвращать разные 
-      // единицы измеренеия на разных устройствах
+      // единицы измеренеия на разных устройствах и советуют 
+      // вычислять его самостоятельно, с пом. screenX/Y
       const screen = this.screen;
       screen.dx = e.movementX;
       screen.dy = e.movementY;
       screen.reset(0);
-    });
+    };
+
+    document.addEventListener("pointerlockchange", () => {
+      const listener = (document.pointerLockElement === canvas) 
+        ? 'addEventListener' : 'removeEventListener';
+
+      document[listener]('mousemove', onMouseMove);
+    }, false);
 
     document.addEventListener('keydown', e => {
       switch (e.code) {

@@ -5,8 +5,9 @@ export default class {
 
   setLocations(gl, data) {
     for (const [qualifier, name] of data) {
-      const action = qualifier === 'attribute' ? 'getAttribLocation' :
-        qualifier === 'uniform' ? 'getUniformLocation' : '';
+      const action = (qualifier === 'attribute') 
+        ? 'getAttribLocation' : (qualifier === 'uniform') 
+        ? 'getUniformLocation' : '';
 
       if (!action) {
         throw new Error(`Incorrect qualifier: ${qualifier}`

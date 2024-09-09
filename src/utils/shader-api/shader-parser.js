@@ -1,5 +1,8 @@
 import { createShader } from '../../../lib/gl-utils.js';
 
+// TODO: Переделать немного, т.к. обертка шейдера должна 
+// принимать в конструкторе glShader, наподобие как в Program
+
 export default class extends Callable {
   constructor(src) {
     super();
@@ -19,7 +22,6 @@ export default class extends Callable {
       item => [item[1], item[4].replace(/\[\d+\]/, '')]);
   }
 
-  // Можно переименовать на compile
   _call(gl, type) {
     return createShader(gl, type, this.src);
   }

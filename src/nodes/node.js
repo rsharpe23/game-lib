@@ -1,4 +1,4 @@
-import { findChild, findChildren } from '../../lib/node-utils.js';
+import { find, findAll } from '../../lib/node-utils.js';
 import Object from '../object.js';
 
 export default class extends Object {
@@ -30,11 +30,11 @@ export default class extends Object {
   }
 
   findChild(name) {
-    return findChild(this, child => child.name === name);
+    return find(this, child => child.name === name);
   }
 
   findChildren(tag) {
-    return findChildren(this, child => child.tag === tag);
+    return findAll(this, child => child.tag === tag);
   }
 
   update(appProps) {

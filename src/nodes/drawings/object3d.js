@@ -5,6 +5,9 @@ import Drawing from './drawing.js';
 // Drawing3D некорретное название, поскольку DebugLine наследуется от 
 // обычного Drawing'а и при этом также отображается в 3D
 
+// Название лучше подобрать другое, чтобы не было 
+// ошибочных ассоциаций с src/object.js
+
 export default class extends Drawing {
   matrix = mat4.create();
 

@@ -7,9 +7,6 @@ const parents = {
   },
 };
 
-// Можно вынести в MeshBase как обычный (не статический) 
-// метод build(gltf, gltfParser)
-
 export default (gltfParser, gltf, mesh) => {
   gltfParser.parse(gltf, ({ name, primitives, children, ...rest }, index) => {
     const node = new Mesh(name, new TRS(rest), primitives);

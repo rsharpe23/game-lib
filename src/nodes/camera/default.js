@@ -31,13 +31,13 @@ import Perspective from './projections/perspective.js';
 const vectorUp = [0, 1, 0];
 
 export default class extends Node {
-  vpMatrix = mat4.create();
+  viewProjMatrix = mat4.create();
   viewMatrix = mat4.create();
-  // Вынести в конструктор
-  projection = new Perspective(1.04, 1, 0.1, 1000);
+  // projection = new Perspective(1.04, 1, 0.1, 1000);
 
-  constructor(name, position, lookAtPoint) {
+  constructor(name, projection, position, lookAtPoint) {
     super(name, 'camera');
+    this.projection = projection;
     this.position = position;
     this.lookAtPoint = lookAtPoint;
   }
@@ -52,6 +52,7 @@ export default class extends Node {
     mat4.lookAt(this.viewMatrix, 
       this.position, this.lookAtPoint, vectorUp);
 
-    mat4.mul(this.vpMatrix, this.projMatrix, this.viewMatrix);
+    mat4.mul(this.viewProjMatrix, 
+      this.projMatrix, this.viewMatrix);
   }
 };
